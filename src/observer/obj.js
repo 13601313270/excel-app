@@ -18,27 +18,6 @@ class obj {
     // 渲染
     render() {
     }
-
-    get value() {
-        if (this.value_ instanceof obj) {
-            return this.value_.value;
-        } else {
-            return this.value_;
-        }
-    }
-
-    set value(value) {
-        this.dep.lock();
-        // 释放原有的监听
-        if (this.value_ instanceof obj) {
-            this.dep.unListen(this.value_.dep);
-        }
-        this.value_ = value;
-        if (value instanceof obj) {
-            this.dep.listen(value.dep);
-        }
-        this.dep.__check();// release
-    }
 }
 export default obj;
 /**

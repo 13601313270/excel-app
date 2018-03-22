@@ -13,8 +13,6 @@ class Dep {
     }
 
     listen(obj) {
-        console.log('----------');
-        console.trace(obj);
         if (obj.sentEvent.indexOf(this) === -1) {
             obj.sentEvent.push(this);
             this.using.push(obj);
@@ -73,13 +71,13 @@ class Dep {
     }
 
     // 请求判断当前是否可以释放，如果可以则释放并通知下家
-    __check() {
+    update() {
         // 当有多个上级的时候，会收到多个render，所以只捕捉最后一次
         if (this.__allBeforeIsState0()) {
             this.render();
             this.state = 0;
             if (this.sentEvent.length > 0) {
-                this.sentEvent.forEach(i => i.__check());
+                this.sentEvent.forEach(i => i.update());
             }
         }
     }

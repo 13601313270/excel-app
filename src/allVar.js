@@ -8,7 +8,7 @@ class AllVarClass extends Dep {
     setVar(key, val) {
         this.allData[key] = val;
         this.listen(this.allData[key].dep);
-        this.allData[key].dep.__check();
+        this.allData[key].dep.update();
     }
 
     getAllData() {
@@ -17,7 +17,7 @@ class AllVarClass extends Dep {
 
     start() {
         for (let i in this.allData) {
-            this.allData[i].dep.__check();
+            this.allData[i].dep.update();
         }
     }
 

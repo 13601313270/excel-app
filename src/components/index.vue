@@ -65,13 +65,35 @@ import dashboard from './dashboard';
 import allVars from './allVars.vue';
 import propsCom from './props.vue';
 
+class Var extends Obj {
+    get value() {
+        if (this.value_ instanceof Obj) {
+            return this.value_.value;
+        } else {
+            return this.value_;
+        }
+    }
+
+    set value(value) {
+        this.dep.lock();
+        // 释放原有的监听
+        if (this.value_ instanceof Obj) {
+            this.dep.unListen(this.value_.dep);
+        }
+        this.value_ = value;
+        if (value instanceof Obj) {
+            this.dep.listen(value.dep);
+        }
+        this.dep.update();// release
+    }
+}
+
 allMatch.push(INPUT);
 allMatch.push(INPUT_DATE);
 allMatch.push(TEXT);
 allMatch.push(BAR);
 allMatch.push(MIN);
 
-console.clear();
 export default {
     data() {
         return {
@@ -96,9 +118,9 @@ export default {
     methods: {
         codeUpdate(code) {
             this.insertCode = code;
-            var widgePanel = allVar.getVar(this.insertVarName).value_.dom.parentNode;
+            let widgePanel = allVar.getVar(this.insertVarName).value_.dom.parentNode;
             allVar.getVar(this.insertVarName).value_.dom.remove();
-            var insertObj = evalObjAndStr(1, code);
+            let insertObj = evalObjAndStr(1, code);
             allVar.getVar(this.insertVarName).codeText = code;
             allVar.getVar(this.insertVarName).value = insertObj[0];
             widgePanel.appendChild(allVar.getVar(this.insertVarName).value_.dom);
@@ -138,25 +160,25 @@ export default {
         evalObjAndStr(1, fileContent);
         this.allVar = allVar;
 
-        var this_ = this;
+        let this_ = this;
 
         window.addData = function(id) {
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
                 if (item.type === 'function' && this_.dragDomFunc.match(item.match)) {
                     // console.log(item);
-                    var code = '';
+                    let code = '';
                     if (item.type === 'function') {
                         code += item.name + '(';
                         let propsArr = [];
                         item.props.forEach((item) => {
-                            var item2 = item;
-                            var isArr = false;
+                            let item2 = item;
+                            let isArr = false;
                             if (item2.dataType instanceof Array) {
                                 isArr = true;
                                 item2.dataType = item2.dataType[0];
                             }
-                            var pushProp = '';
+                            let pushProp = '';
                             if (item2.enum) {
                                 for (let j in item2.enum) {
                                     pushProp = '"' + j + '"';
@@ -181,23 +203,22 @@ export default {
                         code += propsArr.join(',');
                     }
                     code += ')';
-                    var newVarName = '$' + window.prompt('请输入名称', 'a7').replace(/^\$/, '');
+                    let newVarName = '$' + window.prompt('请输入名称', 'a7').replace(/^\$/, '');
                     this_.insertVarName = newVarName;
-                    console.log(code);
-                    var insertObj = evalObjAndStr(1, code);
-                    allVar.setVar(newVarName, new Obj());
+                    let insertObj = evalObjAndStr(1, code);
+                    allVar.setVar(newVarName, new Var());
                     allVar.getVar(newVarName).codeText = code;
                     allVar.getVar(newVarName).value = insertObj[0];
                     // console.log(insertObj[0]);
                     this_.insertProps = insertObj[0];
                     this_.insertCode = code;
                     // evalObjAndStr(1, newVarName + ' = ' + code);
-                    var reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
+                    let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
                     this_.html = this_.html.replace(reg, '<widget random-id="' + id + '" data="' + newVarName + '">');
                     return allVar.getVar(newVarName);
                 }
             }
-        }
+        };
 
         let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {

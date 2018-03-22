@@ -1,22 +1,28 @@
 /**
  * Created by ptmind on 2018/3/9.
  */
-import FuncObj from '../FuncObj'
+import FuncObj from '../FuncObj';
 class INPUT_DATE extends FuncObj {
     constructor(defaultVallue) {
-        super(...Array.from(arguments))
-        this.name = 'INPUT_DATE'
-        this.dom = document.createElement('input')
-        this.dom.type = 'date'
-        let this_ = this
+        super(...Array.from(arguments));
+        this.name = 'INPUT_DATE';
+        this.dom = document.createElement('input');
+        this.dom.type = 'date';
+        let this_ = this;
         this.dom.addEventListener('change', function() {
-            this_.value = this.value
-        })
-        this.value = defaultVallue// 0正常,1锁定
+            this_.valueee = this.value;
+            this_.dep.update();// release
+        });
+        this.valueee = defaultVallue;// 0正常,1锁定
+        this_.dep.update();// release
+    }
+
+    get value() {
+        return this.valueee;
     }
 
     render() {
-        this.dom.value = this.value
+        this.dom.value = this.value;
     }
 }
 
@@ -34,4 +40,4 @@ export default {
             default: ''
         }
     ]
-}
+};

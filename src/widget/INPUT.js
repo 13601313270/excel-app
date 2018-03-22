@@ -1,27 +1,33 @@
 /**
  * Created by ptmind on 2018/3/9.
  */
-import FuncObj from '../FuncObj'
+import FuncObj from '../FuncObj';
 
 class INPUT extends FuncObj {
     constructor(type, value) {
-        super(...Array.from(arguments))
-        this.name = 'INPUT'
-        this.dom = document.createElement('input')
+        super(...Array.from(arguments));
+        this.name = 'INPUT';
+        this.dom = document.createElement('input');
         // this.dom.type = type;
-        let this_ = this
+        let this_ = this;
         this.dom.addEventListener('change', function() {
             if (type === 'number') {
-                this_.value = parseFloat(this.value)
+                this_.valueee = parseFloat(this.value);
             } else {
-                this_.value = this.value
+                this_.valueee = this.value.toString();
             }
-        })
-        this.value = value// 0正常,1锁定
+            this_.dep.update();// release
+        });
+        this.valueee = value;// 0正常,1锁定
+        this.dep.update();// release
+    }
+
+    get value() {
+        return this.valueee;
     }
 
     render() {
-        this.dom.value = this.value
+        this.dom.value = this.valueee;
     }
 }
 export default {
@@ -47,4 +53,4 @@ export default {
             default: ''
         }
     ]
-}
+};

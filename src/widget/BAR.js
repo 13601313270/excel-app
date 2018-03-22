@@ -18,10 +18,19 @@ class BAR extends FuncObj {
         this.dom = document.createElement('div');
         this.myChart = echarts.init(this.dom);
         this.myChart.on('click', (params) => {
-            this.value = params.data;
+            this.value33 = params.data;
             // this.value = params.name;
+            this.dep.update();// release
         });
         this.render();
+    }
+
+    get value() {
+        if (this.value33 instanceof Obj) {
+            return this.value33.value;
+        } else {
+            return this.value33;
+        }
     }
 
     render() {
