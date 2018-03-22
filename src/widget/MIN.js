@@ -2,7 +2,7 @@
  * Created by ptmind on 2018/3/9.
  */
 import FuncObj from '../FuncObj';
-import Obj from '../obj';
+import Obj from '../observer/obj';
 class MIN extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));

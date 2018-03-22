@@ -1,4 +1,4 @@
-import Obj from './obj';
+import Obj from './observer/obj';
 class AllVarClass extends Obj {
     constructor() {
         super();

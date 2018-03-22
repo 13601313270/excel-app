@@ -2,7 +2,7 @@
  * Created by ptmind on 2018/3/8.
  */
 import allVar from './allVar';
-import Obj from './obj';
+import Obj from './observer/obj';
 var __allMatch__ = [
     {
         match: /^-?\d+$/,

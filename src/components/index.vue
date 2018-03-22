@@ -52,7 +52,7 @@
 
 <script>
 import evalObjAndStr from '../evalObjAndStr';
-import Obj from '../obj';
+import Obj from '../observer/obj';
 import allMatch from '../allMatch';
 import allVar from '../allVar';
 import INPUT from '../widget/INPUT';

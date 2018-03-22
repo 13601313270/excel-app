@@ -20,7 +20,7 @@
     </div>
 </template>
 <script>
-import Obj from '../obj';
+import Obj from '../observer/obj';
 import AllVarClass from '../allVar.js';
 export default {
     props: ['data', 'randomId'],

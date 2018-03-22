@@ -3,7 +3,7 @@
  */
 import echarts from 'echarts';
 import FuncObj from '../FuncObj';
-import Obj from '../obj';
+import Obj from '../observer/obj';
 class BAR extends FuncObj {
     constructor(source, x, y, begin, end) {
         super(...Array.from(arguments));

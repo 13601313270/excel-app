@@ -3,7 +3,7 @@
  */
 // 函数调用对象
 // runObj执行这个方法的对象
-import Obj from './obj';
+import Obj from './observer/obj';
 import __allMatch__ from './allMatch';
 import allVar from './allVar';
 
