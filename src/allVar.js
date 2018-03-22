@@ -11,6 +11,12 @@ class AllVarClass extends Obj {
         this.__check();
     }
 
+    __check() {
+        for (let i in this.value_) {
+            this.value_[i].dep.__check();
+        }
+    }
+
     getVar(key) {
         return this.value_[key];
     }
