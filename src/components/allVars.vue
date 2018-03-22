@@ -20,8 +20,8 @@
     </div>
 </template>
 <script>
-import Obj from '../observer/obj';
 import AllVarClass from '../allVar.js';
+import Dep from '../observer/dep';
 export default {
     props: ['data', 'randomId'],
     data() {
@@ -31,11 +31,10 @@ export default {
     },
     mounted() {
         let self = this;
-        let list = new Obj();
+        let list = new Dep();
         list.render = function() {
             let allData = AllVarClass.getAllData();
             for (let i in allData) {
-                // console.log(allData[i].codeText);
                 self.$set(self.datas, i, {
                     code: allData[i].codeText,
                     value: allData[i].value

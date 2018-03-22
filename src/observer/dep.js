@@ -13,6 +13,8 @@ class Dep {
     }
 
     listen(obj) {
+        console.log('----------');
+        console.trace(obj);
         if (obj.sentEvent.indexOf(this) === -1) {
             obj.sentEvent.push(this);
             this.using.push(obj);

@@ -1,5 +1,5 @@
-import Obj from './observer/obj';
-class AllVarClass extends Obj {
+import Dep from './observer/dep';
+class AllVarClass extends Dep {
     constructor() {
         super();
         this.allData = {};
@@ -7,7 +7,7 @@ class AllVarClass extends Obj {
 
     setVar(key, val) {
         this.allData[key] = val;
-        this.listen(val);
+        this.listen(this.allData[key].dep);
         this.allData[key].dep.__check();
     }
 

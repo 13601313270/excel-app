@@ -330,7 +330,6 @@ function getEvalObj(tableNum, str, isBind) {
         forword();
     }
     allVar.start();
-    // allAction.push(forAction('\n'));
     return allAction;
 }
 export default getEvalObj;
