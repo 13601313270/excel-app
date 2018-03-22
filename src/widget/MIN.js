@@ -1,23 +1,23 @@
 /**
  * Created by ptmind on 2018/3/9.
  */
-import FuncObj from '../FuncObj'
-import Obj from '../obj'
+import FuncObj from '../FuncObj';
+import Obj from '../obj';
 class MIN extends FuncObj {
     constructor(value) {
-        super(...Array.from(arguments))
-        this.name = 'MIN'
-        this.dom = document.createElement('div')
+        super(...Array.from(arguments));
+        this.name = 'MIN';
+        this.dom = document.createElement('div');
         this.props.forEach((item) => {
             if (item instanceof Obj) {
-                item.notify(this)
+                this.listen(item);
             }
-        })
-        this.render()
+        });
+        this.render();
     }
 
     render() {
-        this.dom.innerHTML = this.value
+        this.dom.innerHTML = this.value;
     }
 
     // set value(val) {
@@ -25,17 +25,17 @@ class MIN extends FuncObj {
     // }
 
     get value() {
-        let min = null
+        let min = null;
         this.props.forEach((item) => {
-            let itemVal = item
+            let itemVal = item;
             if (itemVal instanceof Obj) {
-                itemVal = itemVal.value
+                itemVal = itemVal.value;
             }
             if (itemVal < min || min === null) {
-                min = itemVal
+                min = itemVal;
             }
-        })
-        return min
+        });
+        return min;
     }
 }
 export default {
@@ -49,4 +49,4 @@ export default {
         title: '比较项',
         dataType: ['number']
     }]
-}
+};

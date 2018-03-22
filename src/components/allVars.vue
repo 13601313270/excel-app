@@ -44,7 +44,7 @@ export default {
                 });
             }
         };
-        AllVarClass.notify(list);
+        list.listen(AllVarClass);
     },
     methods: {}
 }

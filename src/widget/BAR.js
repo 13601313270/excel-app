@@ -1,38 +1,38 @@
 /**
  * Created by ptmind on 2018/3/9.
  */
-import echarts from 'echarts'
-import FuncObj from '../FuncObj'
-import Obj from '../obj'
+import echarts from 'echarts';
+import FuncObj from '../FuncObj';
+import Obj from '../obj';
 class BAR extends FuncObj {
     constructor(source, x, y, begin, end) {
-        super(...Array.from(arguments))
-        console.log(source, x, y, begin, end)
+        super(...Array.from(arguments));
+        console.log(source, x, y, begin, end);
         if (begin instanceof Obj) {
-            begin.notify(this)
+            this.listen(begin);
         }
         if (end instanceof Obj) {
-            end.notify(this)
+            this.listen(end);
         }
-        this.name = 'BAR'
-        this.dom = document.createElement('div')
-        this.myChart = echarts.init(this.dom)
+        this.name = 'BAR';
+        this.dom = document.createElement('div');
+        this.myChart = echarts.init(this.dom);
         this.myChart.on('click', (params) => {
-            this.value = params.data
+            this.value = params.data;
             // this.value = params.name;
-        })
-        this.render()
+        });
+        this.render();
     }
 
     render() {
-        console.log('bar render')
-        let begin = this.props[3]
+        console.log('bar render');
+        let begin = this.props[3];
         if (begin instanceof Obj) {
-            begin = begin.value
+            begin = begin.value;
         }
-        let end = this.props[4]
+        let end = this.props[4];
         if (end instanceof Obj) {
-            end = end.value
+            end = end.value;
         }
         var option = {
             tooltip: {},
@@ -47,24 +47,24 @@ class BAR extends FuncObj {
                 type: 'bar',
                 data: [6.71, 6.6, 6.57, 6.5, 6.68, 6.73, 6.71, 6.6, 6.57, 6.5, 6.68, 6.73]
             }]
-        }
-        option.xAxis.data = []
-        var timeItem = new Date(begin)
+        };
+        option.xAxis.data = [];
+        var timeItem = new Date(begin);
         for (var i = 0; i < 100; i++) {
-            option.xAxis.data.push((timeItem.getYear() + 1900) + '-' + (timeItem.getMonth() + 1) + '-' + (timeItem.getDate()))
-            timeItem = new Date(timeItem.getTime() + 24 * 60 * 60 * 1000)
+            option.xAxis.data.push((timeItem.getYear() + 1900) + '-' + (timeItem.getMonth() + 1) + '-' + (timeItem.getDate()));
+            timeItem = new Date(timeItem.getTime() + 24 * 60 * 60 * 1000);
             if (timeItem > new Date(end)) {
-                break
+                break;
             }
         }
-        option.series[0].data = option.series[0].data.splice(0, option.xAxis.data.length)
+        option.series[0].data = option.series[0].data.splice(0, option.xAxis.data.length);
         // 使用刚指定的配置项和数据显示图表。
-        this.myChart.setOption(option)
+        this.myChart.setOption(option);
         setTimeout(() => {
-            this.dom.style.width = '500px'
-            this.dom.style.height = '300px'
-            this.myChart.resize()
-        }, 2000)
+            this.dom.style.width = '500px';
+            this.dom.style.height = '300px';
+            this.myChart.resize();
+        }, 2000);
     }
 }
 export default {
@@ -105,4 +105,4 @@ export default {
             default: ''
         }
     ]
-}
+};

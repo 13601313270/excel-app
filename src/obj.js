@@ -12,27 +12,27 @@ class obj {
         this.state = 0;
     }
 
-    // 绑定本对象修改后会影响的其他对象
-    notify(obj) {
-        if (this.sentEvent.indexOf(obj) === -1) {
-            this.sentEvent.push(obj);
-            obj.using.push(this);
+    listen(obj) {
+        if (obj.sentEvent.indexOf(this) === -1) {
+            obj.sentEvent.push(this);
+            this.using.push(obj);
         }
     }
 
-    unNotify(obj) {
-        if (this.sentEvent.length > 0) {
-            for (let i = 0; i < this.sentEvent.length; i++) {
-                if (this.sentEvent[i] === obj) {
-                    this.sentEvent.splice(i, 1);
+    unListen(obj) {
+        // this不再监听obj
+        if (obj.sentEvent.length > 0) {
+            for (let i = 0; i < obj.sentEvent.length; i++) {
+                if (obj.sentEvent[i] === this) {
+                    obj.sentEvent.splice(i, 1);
                     break;
                 }
             }
         }
-        if (obj.using.length > 0) {
-            for (let i = 0; i < obj.using.length; i++) {
-                if (obj.using[i] === this) {
-                    obj.using.splice(i, 1);
+        if (this.using.length > 0) {
+            for (let i = 0; i < this.using.length; i++) {
+                if (this.using[i] === obj) {
+                    this.using.splice(i, 1);
                     break;
                 }
             }
@@ -94,16 +94,16 @@ class obj {
         this.lock();
         // 释放原有的监听
         if (this.value_ instanceof obj) {
-            this.value_.unNotify(this);
+            this.unListen(this.value_);
         }
         var this_ = this;
         callBack(function(value) {
             this_.value_ = value;
             if (value instanceof obj) {
-                value.notify(this_);
+                this_.listen(value);
             }
             this_.__check();// release
-        })
+        });
     }
 
     set value(value) {
