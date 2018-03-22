@@ -7,19 +7,11 @@ import Obj from '../observer/obj';
 class BAR extends FuncObj {
     constructor(source, x, y, begin, end) {
         super(...Array.from(arguments));
-        console.log(source, x, y, begin, end);
-        if (begin instanceof Obj) {
-            this.listen(begin);
-        }
-        if (end instanceof Obj) {
-            this.listen(end);
-        }
         this.name = 'BAR';
         this.dom = document.createElement('div');
         this.myChart = echarts.init(this.dom);
         this.myChart.on('click', (params) => {
             this.value33 = params.data;
-            // this.value = params.name;
             this.dep.update();// release
         });
         this.render();

@@ -58,7 +58,7 @@ class __runObj__ extends Obj {
         }
     }
 }
-function getEvalObj(tableNum, str, isBind) {
+function getEvalObj(tableNum, str) {
     // 解释器梭子
     let forwordStrNum = 0;
     let maxLen = 255;
@@ -144,11 +144,9 @@ function getEvalObj(tableNum, str, isBind) {
                 var Temp = Function.prototype.bind.apply(func, applyArgs);
                 var baseWord2 = new Temp();
                 baseWord2.className = funcName;
-                if (isBind) {
-                    for (let i = 0; i < params.length; i++) {
-                        if (params[i] instanceof Obj) {
-                            baseWord2.listen(params[i]);
-                        }
+                for (let i = 0; i < params.length; i++) {
+                    if (params[i] instanceof Obj) {
+                        baseWord2.listen(params[i]);
                     }
                 }
                 return baseWord2;
@@ -157,17 +155,13 @@ function getEvalObj(tableNum, str, isBind) {
                 if (word === '.') {
                     var oldBase = baseWord;
                     returnObj = new __runObj__(oldBase, funcName, params);
-                    if (isBind) {
-                        returnObj.listen(oldBase);
-                    }
+                    returnObj.listen(oldBase);
                 } else {
                     returnObj = new __runObj__(window, funcName, params);
                 }
-                if (isBind) {
-                    for (let i = 0; i < params.length; i++) {
-                        if (params[i] instanceof Obj) {
-                            returnObj.listen(params[i])
-                        }
+                for (let i = 0; i < params.length; i++) {
+                    if (params[i] instanceof Obj) {
+                        returnObj.listen(params[i]);
                     }
                 }
                 return returnObj;
@@ -221,11 +215,9 @@ function getEvalObj(tableNum, str, isBind) {
                 }
                 var insertObj = new __runObj__(window, '', innerStrArr);
                 baseWord = insertObj;
-                if (isBind) {
-                    for (var i = 0; i < innerStrArr.length; i++) {
-                        if (innerStrArr[i] instanceof Obj) {
-                            baseWord.listen(innerStrArr[i]);
-                        }
+                for (var i = 0; i < innerStrArr.length; i++) {
+                    if (innerStrArr[i] instanceof Obj) {
+                        baseWord.listen(innerStrArr[i]);
                     }
                 }
             }

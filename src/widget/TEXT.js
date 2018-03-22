@@ -9,9 +9,6 @@ class TEXT extends FuncObj {
         this.name = 'TEXT';
         this.dom = document.createElement('div');
         this.valueeee = value;
-        if (value instanceof Obj) {
-            this.listen(value);
-        }
     }
 
     get value() {

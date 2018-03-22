@@ -21,7 +21,6 @@
 </template>
 <script>
 import AllVarClass from '../allVar.js';
-import Dep from '../observer/dep';
 export default {
     props: ['data', 'randomId'],
     data() {
@@ -31,17 +30,14 @@ export default {
     },
     mounted() {
         let self = this;
-        let list = new Dep();
-        list.render = function() {
-            let allData = AllVarClass.getAllData();
-            for (let i in allData) {
-                self.$set(self.datas, i, {
-                    code: allData[i].codeText,
-                    value: allData[i].value
+        AllVarClass.on('ready', function(key, val) {
+            if (val) {
+                self.$set(self.datas, key, {
+                    code: val.codeText,
+                    value: val.value
                 });
             }
-        };
-        list.listen(AllVarClass);
+        });
     },
     methods: {}
 }

@@ -8,21 +8,12 @@ class MIN extends FuncObj {
         super(...Array.from(arguments));
         this.name = 'MIN';
         this.dom = document.createElement('div');
-        this.props.forEach((item) => {
-            if (item instanceof Obj) {
-                this.listen(item);
-            }
-        });
         this.render();
     }
 
     render() {
         this.dom.innerHTML = this.value;
     }
-
-    // set value(val) {
-    //     super.render();
-    // }
 
     get value() {
         let min = null;
