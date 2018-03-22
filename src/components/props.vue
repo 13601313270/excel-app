@@ -134,7 +134,7 @@ export default {
             innerOption: {},
             codeOption: {},
             allMatch: {},
-            allVar: allVar.value_
+            allVar: allVar.getAllData()
         };
     },
     mounted() {
@@ -194,7 +194,7 @@ export default {
         changeType(name) {
             if (name === 'var') {
                 this.innerOption = 1;
-                for (let i in allVar.value) {
+                for (let i in this.allVar) {
                     this.innerOption = {
                         type: 'var',
                         name: i

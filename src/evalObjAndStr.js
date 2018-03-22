@@ -318,8 +318,7 @@ function getEvalObj(tableNum, str, isBind) {
     }
 
     let allAction = [];
-    var fff = 0;
-    while (fff++ < 100 && forwordStrNum < str.length) {
+    while (forwordStrNum < str.length) {
         let begin = forwordStrNum;
         let codeLine = forAction('\n');
         if (codeLine !== null) {
@@ -330,7 +329,7 @@ function getEvalObj(tableNum, str, isBind) {
         }
         forword();
     }
-    allVar.__check();
+    allVar.start();
     // allAction.push(forAction('\n'));
     return allAction;
 }

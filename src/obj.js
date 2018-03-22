@@ -1,9 +1,11 @@
 /**
  * Created by ptmind on 2018/3/7.
  */
+var events = require('events');
+
 class Dep {
-    constructor(obj) {
-        this.obj = obj;
+    constructor() {
+        this.eventEmitter = new events.EventEmitter();
         this.sentEvent = [];
         this.using = [];
         this.value_ = null;
@@ -15,6 +17,10 @@ class Dep {
             obj.sentEvent.push(this);
             this.using.push(obj);
         }
+    }
+
+    on(action, callback) {
+        this.eventEmitter.on(action, callback);
     }
 
     // 不再监听某对象
@@ -38,7 +44,8 @@ class Dep {
     }
 
     render() {
-        this.obj.render();
+        this.eventEmitter.emit('ready');
+        // this.obj.render();
     }
 
     lock() {
@@ -75,10 +82,13 @@ class Dep {
         }
     }
 }
+
 class obj {
     constructor() {
-        this.dep = new Dep(this);
-        this.dep.obj = this;
+        this.dep = new Dep();
+        this.dep.eventEmitter.on('ready', () => {
+            this.render();
+        });
         this.value_ = null;
     }
 
@@ -88,11 +98,6 @@ class obj {
 
     // 渲染
     render() {
-        // this.dom.innerHTML = this.value;
-        // console.log('-----render-----');
-        // console.log(this);
-        // console.log(this.value);
-        // console.log(this.dep.sentEvent);
     }
 
     get value() {
@@ -103,26 +108,17 @@ class obj {
         }
     }
 
-    isYou(callBack) {
+    set value(value) {
         this.dep.lock();
         // 释放原有的监听
         if (this.value_ instanceof obj) {
             this.dep.unListen(this.value_.dep);
         }
-        var this_ = this;
-        callBack(function(value) {
-            this_.value_ = value;
-            if (value instanceof obj) {
-                this_.dep.listen(value.dep);
-            }
-            this_.dep.__check();// release
-        });
-    }
-
-    set value(value) {
-        this.isYou(function(finish) {
-            finish(value);
-        });
+        this.value_ = value;
+        if (value instanceof obj) {
+            this.dep.listen(value.dep);
+        }
+        this.dep.__check();// release
     }
 }
 export default obj;

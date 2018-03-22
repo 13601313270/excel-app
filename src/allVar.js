@@ -2,23 +2,27 @@ import Obj from './obj';
 class AllVarClass extends Obj {
     constructor() {
         super();
-        this.value_ = {};
+        this.allData = {};
     }
 
     setVar(key, val) {
-        this.value_[key] = val;
+        this.allData[key] = val;
         this.listen(val);
-        this.__check();
+        this.allData[key].dep.__check();
     }
 
-    __check() {
-        for (let i in this.value_) {
-            this.value_[i].dep.__check();
+    getAllData() {
+        return this.allData;
+    }
+
+    start() {
+        for (let i in this.allData) {
+            this.allData[i].dep.__check();
         }
     }
 
     getVar(key) {
-        return this.value_[key];
+        return this.allData[key];
     }
 }
 export default new AllVarClass();

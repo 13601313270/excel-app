@@ -22,9 +22,6 @@
 <script>
 import Obj from '../obj';
 import AllVarClass from '../allVar.js';
-
-class TempClass extends Obj {
-}
 export default {
     props: ['data', 'randomId'],
     data() {
@@ -34,13 +31,14 @@ export default {
     },
     mounted() {
         let self = this;
-        let list = new TempClass();
+        let list = new Obj();
         list.render = function() {
-            for (let i in AllVarClass.value) {
-                // console.log(AllVarClass.value[i].codeText);
+            let allData = AllVarClass.getAllData();
+            for (let i in allData) {
+                // console.log(allData[i].codeText);
                 self.$set(self.datas, i, {
-                    code: AllVarClass.value[i].codeText,
-                    value: AllVarClass.value[i].value
+                    code: allData[i].codeText,
+                    value: allData[i].value
                 });
             }
         };
