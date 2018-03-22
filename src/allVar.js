@@ -7,7 +7,7 @@ class AllVarClass extends Obj {
 
     setVar(key, val) {
         this.value_[key] = val;
-        val.listen(this);
+        val.notify(this);
         this.__check();
     }
 

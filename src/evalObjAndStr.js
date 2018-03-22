@@ -25,7 +25,7 @@ class __runObj__ extends Obj {
         for (let i = 0; i < this.params.length; i++) {
             var insert = this.params[i];
             if (insert instanceof Obj) {
-                insert.listen(this);
+                insert.notify(this);
                 insert = insert.value;
                 if (typeof insert === 'string') {
                     insert = '"' + insert + '"';
@@ -147,7 +147,7 @@ function getEvalObj(tableNum, str, isBind) {
                 if (isBind) {
                     for (let i = 0; i < params.length; i++) {
                         if (params[i] instanceof Obj) {
-                            params[i].listen(baseWord2);
+                            params[i].notify(baseWord2);
                         }
                     }
                 }
@@ -158,7 +158,7 @@ function getEvalObj(tableNum, str, isBind) {
                     var oldBase = baseWord;
                     returnObj = new __runObj__(oldBase, funcName, params);
                     if (isBind) {
-                        oldBase.listen(returnObj);
+                        oldBase.notify(returnObj);
                     }
                 } else {
                     returnObj = new __runObj__(window, funcName, params);
@@ -166,7 +166,7 @@ function getEvalObj(tableNum, str, isBind) {
                 if (isBind) {
                     for (let i = 0; i < params.length; i++) {
                         if (params[i] instanceof Obj) {
-                            params[i].listen(returnObj);
+                            params[i].notify(returnObj);
                         }
                     }
                 }
@@ -224,7 +224,7 @@ function getEvalObj(tableNum, str, isBind) {
                 if (isBind) {
                     for (var i = 0; i < innerStrArr.length; i++) {
                         if (innerStrArr[i] instanceof Obj) {
-                            innerStrArr[i].listen(baseWord);
+                            innerStrArr[i].notify(baseWord);
                         }
                     }
                 }

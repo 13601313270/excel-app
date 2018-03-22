@@ -10,7 +10,7 @@ class MIN extends FuncObj {
         this.dom = document.createElement('div')
         this.props.forEach((item) => {
             if (item instanceof Obj) {
-                item.listen(this)
+                item.notify(this)
             }
         })
         this.render()

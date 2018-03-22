@@ -13,14 +13,14 @@ class obj {
     }
 
     // 绑定本对象修改后会影响的其他对象
-    listen(obj) {
+    notify(obj) {
         if (this.sentEvent.indexOf(obj) === -1) {
             this.sentEvent.push(obj);
             obj.using.push(this);
         }
     }
 
-    unListen(obj) {
+    unNotify(obj) {
         if (this.sentEvent.length > 0) {
             for (let i = 0; i < this.sentEvent.length; i++) {
                 if (this.sentEvent[i] === obj) {
@@ -94,13 +94,13 @@ class obj {
         this.lock();
         // 释放原有的监听
         if (this.value_ instanceof obj) {
-            this.value_.unListen(this);
+            this.value_.unNotify(this);
         }
         var this_ = this;
         callBack(function(value) {
             this_.value_ = value;
             if (value instanceof obj) {
-                value.listen(this_);
+                value.notify(this_);
             }
             this_.__check();// release
         })

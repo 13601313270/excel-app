@@ -9,10 +9,10 @@ class BAR extends FuncObj {
         super(...Array.from(arguments))
         console.log(source, x, y, begin, end)
         if (begin instanceof Obj) {
-            begin.listen(this)
+            begin.notify(this)
         }
         if (end instanceof Obj) {
-            end.listen(this)
+            end.notify(this)
         }
         this.name = 'BAR'
         this.dom = document.createElement('div')
