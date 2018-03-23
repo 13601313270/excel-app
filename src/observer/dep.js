@@ -73,7 +73,7 @@ class Dep {
     update() {
         // 当有多个上级的时候，会收到多个render，所以只捕捉最后一次
         if (this.__allBeforeIsState0()) {
-            console.log('render');
+            // console.log('render');
             this.render();
             this.state = 0;
             if (this.sentEvent.length > 0) {

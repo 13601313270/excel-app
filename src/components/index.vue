@@ -5,7 +5,7 @@
             <div draggable="true" @dragstart='drag("INPUT")'>输入框</div>
             <div draggable="true" @dragstart='drag("INPUT_DATE")'>日期</div>
             <!--<div draggable="true" @dragstart='drag($event)'>下拉框</div>-->
-            <div draggable="true" @dragstart='drag("INPUT")'>开关器</div>
+            <div draggable="true" @dragstart='drag("CHECK_BOX")'>开关器</div>
             <div draggable="true" @dragstart='drag("TEXT")'>文本</div>
 
             <h2>图表</h2>
@@ -55,6 +55,7 @@ import evalObjAndStr from '../evalObjAndStr';
 import allMatch from '../allMatch';
 import allVar from '../allVar';
 import INPUT from '../widget/INPUT';
+import CHECK_BOX from '../widget/CHECK_BOX';
 import INPUT_DATE from '../widget/INPUT_DATE';
 import TEXT from '../widget/TEXT';
 import MIN from '../widget/MIN';
@@ -65,6 +66,7 @@ import allPageVars from './allVars.vue';
 import propsCom from './props.vue';
 
 allMatch.push(INPUT);
+allMatch.push(CHECK_BOX);
 allMatch.push(INPUT_DATE);
 allMatch.push(TEXT);
 allMatch.push(BAR);

@@ -20,7 +20,6 @@ class TEXT extends FuncObj {
     }
 
     render() {
-        console.log('TEXT render');
         this.dom.innerHTML = this.value;
     }
 }
