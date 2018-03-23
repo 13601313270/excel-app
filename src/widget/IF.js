@@ -7,7 +7,6 @@ class IF extends FuncObj {
     constructor(judge, obj1, obj2) {
         super(...Array.from(arguments));
         this.dep.name = 'IF';
-        console.log(this.dep.using);
         this.name = 'IF';
     }
 

@@ -99,42 +99,40 @@ export default {
         addData(id, dom) {
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
-                if (item.type === 'function' && this.dragDomFunc.match(item.match)) {
-                    let code = '';
-                    if (item.type === 'function') {
-                        code += item.name + '(';
-                        let propsArr = [];
-                        item.props.forEach((item) => {
-                            let item2 = item;
-                            let isArr = false;
-                            if (item2.dataType instanceof Array) {
-                                isArr = true;
-                                item2.dataType = item2.dataType[0];
+                if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
+                    let code = item.name + '(';
+                    let propsArr = [];
+                    item.props.forEach((item) => {
+                        let item2 = item;
+                        let isArr = false;
+                        if (item2.dataType instanceof Array) {
+                            isArr = true;
+                            item2.dataType = item2.dataType[0];
+                        }
+                        let pushProp = '';
+                        if (item2.enum) {
+                            for (let j in item2.enum) {
+                                pushProp = '"' + j + '"';
+                                break;
                             }
-                            let pushProp = '';
-                            if (item2.enum) {
-                                for (let j in item2.enum) {
-                                    pushProp = '"' + j + '"';
-                                    break;
-                                }
-                            } else if (item2.dataType === 'number') {
-                                pushProp = 1;
-                            } else if (item2.dataType === 'string') {
-                                pushProp = '""';
-                            } else {
-                                pushProp = 'TRUE';
-                            }
+                        } else if (item2.dataType === 'number') {
+                            pushProp = 1;
+                        } else if (item2.dataType === 'string') {
+                            pushProp = '""';
+                        } else {
+                            pushProp = 'TRUE';
+                        }
+                        propsArr.push(pushProp);
+                        if (isArr) {
                             propsArr.push(pushProp);
-                            if (isArr) {
-                                propsArr.push(pushProp);
-                                propsArr.push(pushProp);
-                                propsArr.push(pushProp);
-                                propsArr.push(pushProp);
-                                item2.dataType = [item2.dataType];
-                            }
-                        });
-                        code += propsArr.join(',');
-                    }
+                            propsArr.push(pushProp);
+                            propsArr.push(pushProp);
+                            propsArr.push(pushProp);
+                            item2.dataType = [item2.dataType];
+                        }
+                    });
+                    code += propsArr.join(',');
+
                     code += ')';
                     let shuru = window.prompt('请输入名称', 'a7');
                     if (shuru !== null) {

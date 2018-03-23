@@ -14,7 +14,7 @@ class Var extends Obj {
         // 释放原有的监听
         if (this.value_ instanceof Obj) {
             this.dep.unListen(this.value_.dep);
-            console.log(this.value_.destory());
+            this.value_.destory();
         }
         this.value_ = varObj;
         if (varObj instanceof Obj) {
@@ -29,7 +29,6 @@ class AllVarClass extends Dep {
     }
 
     setVar(key, val) {
-        console.log('setVar');
         if (this.allData[key] === undefined) {
             this.allData[key] = new Var();
             this.listen(this.allData[key].dep);

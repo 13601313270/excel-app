@@ -236,7 +236,7 @@ function getEvalObj(tableNum, str) {
             else {
                 let matchObj = null;
                 for (let i = 0; i < __allMatch__.length; i++) {
-                    if (__allMatch__[i].type === 'function' && word.match(__allMatch__[i].match)) {
+                    if (__allMatch__[i].func !== undefined && word.match(__allMatch__[i].match)) {
                         matchObj = functionCall(__allMatch__[i].func, baseWord);
                     } else if (word.match(__allMatch__[i].match)) {
                         matchObj = __allMatch__[i].value(tableNum, word, baseWord, function(endStrArrStep, extendParentEnd) {

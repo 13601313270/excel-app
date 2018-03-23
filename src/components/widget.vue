@@ -9,7 +9,7 @@ export default {
         return {};
     },
     mounted() {
-        var data = allVar.getVar(this.data);
+        let data = allVar.getVar(this.data);
         if (data && data.value_.dom) {
             this.$refs.content.innerHTML = '';
             this.$refs.content.appendChild(data.value_.dom);
