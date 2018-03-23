@@ -20,7 +20,7 @@
     </div>
 </template>
 <script>
-import AllVarClass from '../allVar.js';
+import AllVarClass from '../observer/allVar.js';
 export default {
     props: ['data', 'randomId'],
     data() {

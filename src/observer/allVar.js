@@ -1,5 +1,5 @@
-import Dep from './observer/dep';
-import Obj from './observer/obj';
+import Dep from './dep';
+import Obj from './obj';
 class Var extends Obj {
     get value() {
         if (this.value_ instanceof Obj) {

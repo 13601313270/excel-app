@@ -97,7 +97,7 @@
 <script>
 import innerDom from './props.vue';
 import allMatch from '../allMatch';
-import allVar from '../allVar';
+import allVar from '../observer/allVar';
 export default {
     name: 'inner-dom',
     props: {

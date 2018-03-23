@@ -53,7 +53,7 @@
 <script>
 import evalObjAndStr from '../evalObjAndStr';
 import allMatch from '../allMatch';
-import allVar from '../allVar';
+import allVar from '../observer/allVar';
 import INPUT from '../widget/INPUT';
 import CHECK_BOX from '../widget/CHECK_BOX';
 import INPUT_DATE from '../widget/INPUT_DATE';

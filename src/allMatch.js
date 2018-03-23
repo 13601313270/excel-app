@@ -1,7 +1,7 @@
 /**
  * Created by ptmind on 2018/3/8.
  */
-import allVar from './allVar';
+import allVar from './observer/allVar';
 import Obj from './observer/obj';
 var __allMatch__ = [
     {

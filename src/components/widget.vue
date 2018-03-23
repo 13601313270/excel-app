@@ -2,7 +2,7 @@
     <div class="widget" ref="content" @dragover="allowDrop($event)" @drop="ondrop($event)"></div>
 </template>
 <script>
-import allVar from '../allVar';
+import allVar from '../observer/allVar';
 export default {
     props: ['data', 'randomId'],
     data() {
