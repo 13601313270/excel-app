@@ -1,11 +1,6 @@
 import Dep from './dep';
 import Obj from './obj';
 class Var extends Obj {
-    constructor() {
-        super();
-        this.dep.name = 'VAR';
-    }
-
     get value() {
         if (this.value_ instanceof Obj) {
             return this.value_.value;

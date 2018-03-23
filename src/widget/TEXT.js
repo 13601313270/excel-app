@@ -6,7 +6,6 @@ import Obj from '../observer/obj';
 class TEXT extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
-        this.dep.name = 'TEXT';
         this.name = 'TEXT';
         this.dom = document.createElement('div');
         this.valueeee = value;
