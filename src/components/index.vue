@@ -37,7 +37,7 @@
         </div>
         <div style="flex-grow:1;display: flex;flex-direction: column;" id="content">
             <div style="flex-grow: 1;background-color: #f9f9f9;padding: 10px;">
-                <component :is="currentView" style="width: 100%;"></component>
+                <component :is="currentView" style="width: 100%;" @addData="addData"></component>
             </div>
             <div style="display: flex;">
                 <div style="flex-grow: 1;padding: 3px 3px;">
@@ -92,10 +92,67 @@ export default {
     },
     computed: {
         saveHtml() {
-            return this.html.replace(/ random-id="r(\d+)"/g, '');
+            return this.html.replace(/ @change="addData" random-id="r(\d+)"/g, '');
         }
     },
     methods: {
+        addData(id, dom) {
+            for (let i = 0; i < allMatch.length; i++) {
+                let item = allMatch[i];
+                if (item.type === 'function' && this.dragDomFunc.match(item.match)) {
+                    let code = '';
+                    if (item.type === 'function') {
+                        code += item.name + '(';
+                        let propsArr = [];
+                        item.props.forEach((item) => {
+                            let item2 = item;
+                            let isArr = false;
+                            if (item2.dataType instanceof Array) {
+                                isArr = true;
+                                item2.dataType = item2.dataType[0];
+                            }
+                            let pushProp = '';
+                            if (item2.enum) {
+                                for (let j in item2.enum) {
+                                    pushProp = '"' + j + '"';
+                                    break;
+                                }
+                            } else if (item2.dataType === 'number') {
+                                pushProp = 1;
+                            } else if (item2.dataType === 'string') {
+                                pushProp = '""';
+                            } else {
+                                pushProp = 'TRUE';
+                            }
+                            propsArr.push(pushProp);
+                            if (isArr) {
+                                propsArr.push(pushProp);
+                                propsArr.push(pushProp);
+                                propsArr.push(pushProp);
+                                propsArr.push(pushProp);
+                                item2.dataType = [item2.dataType];
+                            }
+                        });
+                        code += propsArr.join(',');
+                    }
+                    code += ')';
+                    let shuru = window.prompt('请输入名称', 'a7');
+                    if (shuru !== null) {
+                        let newVarName = '$' + shuru.replace(/^\$/, '');
+                        this.insertVarName = newVarName;
+                        let insertObj = evalObjAndStr(1, code);
+                        insertObj[0].codeText = code;
+                        allVar.setVar(newVarName, insertObj[0]);
+                        this.insertProps = insertObj[0];
+                        this.insertCode = code;
+                        let reg = new RegExp('<widget @change="addData" random-id="' + id + '"[^>]*>', 'g');
+                        this.html = this.html.replace(reg, '<widget @change="addData" random-id="' + id + '" data="' + newVarName + '">');
+                        dom.innerHTML = '';
+                        dom.appendChild(allVar.getVar(newVarName).value_.dom);
+                    }
+                }
+            }
+        },
         codeUpdate(code) {
             this.insertCode = code;
             let widgePanel = allVar.getVar(this.insertVarName).value_.dom.parentNode;
@@ -143,66 +200,9 @@ export default {
 </div>`;
 
         evalObjAndStr(1, fileContent);
-        let this_ = this;
-
-        window.addData = function(id) {
-            for (let i = 0; i < allMatch.length; i++) {
-                let item = allMatch[i];
-                if (item.type === 'function' && this_.dragDomFunc.match(item.match)) {
-                    // console.log(item);
-                    let code = '';
-                    if (item.type === 'function') {
-                        code += item.name + '(';
-                        let propsArr = [];
-                        item.props.forEach((item) => {
-                            let item2 = item;
-                            let isArr = false;
-                            if (item2.dataType instanceof Array) {
-                                isArr = true;
-                                item2.dataType = item2.dataType[0];
-                            }
-                            let pushProp = '';
-                            if (item2.enum) {
-                                for (let j in item2.enum) {
-                                    pushProp = '"' + j + '"';
-                                    break;
-                                }
-                            } else if (item2.dataType === 'number') {
-                                pushProp = 1;
-                            } else if (item2.dataType === 'string') {
-                                pushProp = '""';
-                            } else {
-                                pushProp = 'TRUE';
-                            }
-                            propsArr.push(pushProp);
-                            if (isArr) {
-                                propsArr.push(pushProp);
-                                propsArr.push(pushProp);
-                                propsArr.push(pushProp);
-                                propsArr.push(pushProp);
-                                item2.dataType = [item2.dataType];
-                            }
-                        });
-                        code += propsArr.join(',');
-                    }
-                    code += ')';
-                    let newVarName = '$' + window.prompt('请输入名称', 'a7').replace(/^\$/, '');
-                    this_.insertVarName = newVarName;
-                    let insertObj = evalObjAndStr(1, code);
-                    insertObj[0].codeText = code;
-                    allVar.setVar(newVarName, insertObj[0]);
-                    this_.insertProps = insertObj[0];
-                    this_.insertCode = code;
-                    let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
-                    this_.html = this_.html.replace(reg, '<widget random-id="' + id + '" data="' + newVarName + '">');
-                    return allVar.getVar(newVarName);
-                }
-            }
-        };
-
         let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {
-            return '<widget random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
+            return '<widget @change="addData" random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
         });
         newDash.template = this.html;
         this.currentView = newDash;

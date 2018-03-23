@@ -20,9 +20,7 @@ export default {
             e.preventDefault();
         },
         ondrop(e) {
-            var newData = window.addData(this.randomId);
-            this.$refs.content.innerHTML = '';
-            this.$refs.content.appendChild(newData.value_.dom);
+            this.$emit('change', this.randomId, this.$refs.content);
         }
     }
 }

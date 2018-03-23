@@ -10,6 +10,11 @@ export default function() {
         components: {
             widget
         },
+        methods: {
+            addData(id, dom) {
+                this.$emit('addData', id, dom);
+            }
+        },
         mounted() {
         },
         template: `<div>
@@ -21,5 +26,5 @@ export default function() {
         <widget></widget>
     </div>
 </div>`
-    }
+    };
 }
