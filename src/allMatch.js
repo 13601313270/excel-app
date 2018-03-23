@@ -45,7 +45,7 @@ var __allMatch__ = [
         title: '变量',
         value(tableNum, word, baseWord) {
             if (allVar.getVar(word) === undefined) {
-                // allVar.setVar(word, new Obj());
+                allVar.setVar(word, new Obj());
             }
             return allVar.getVar(word);
         }

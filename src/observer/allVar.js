@@ -1,6 +1,11 @@
 import Dep from './dep';
 import Obj from './obj';
 class Var extends Obj {
+    constructor() {
+        super();
+        this.dep.name = 'VAR';
+    }
+
     get value() {
         if (this.value_ instanceof Obj) {
             return this.value_.value;
@@ -14,6 +19,7 @@ class Var extends Obj {
         // 释放原有的监听
         if (this.value_ instanceof Obj) {
             this.dep.unListen(this.value_.dep);
+            console.log(this.value_.destory());
         }
         this.value_ = varObj;
         if (varObj instanceof Obj) {

@@ -7,6 +7,7 @@
                 <td>对象</td>
                 <td>公式</td>
                 <td>计算值</td>
+                <td>操作</td>
             </tr>
             </thead>
             <tbody>
@@ -14,6 +15,9 @@
                 <td v-html="key"></td>
                 <td v-html="item.code"></td>
                 <td v-html="item.value"></td>
+                <td>
+                    <button @click="change(key)">修改</button>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -37,7 +41,11 @@ export default {
             });
         });
     },
-    methods: {}
+    methods: {
+        change(key) {
+            this.$emit('change', key);
+        }
+    }
 }
 </script>
 <style scoped lang="less">

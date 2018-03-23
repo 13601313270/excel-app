@@ -81,5 +81,21 @@ class Dep {
             }
         }
     }
+
+    // 当变为孤立点时，则会删除(sentEvent为空，说明不会再被任何对象使用)
+    destory() {
+        if (this.sentEvent.length === 0) {
+            for (let i = 0; i < this.using.length; i++) {
+                let temp = this.using[i];// 提前保存成变量temp，因为执行完unListen，this.using将重新排列
+                this.unListen(temp);
+                temp.destory();
+            }
+            this.eventEmitter.removeAllListeners('ready');
+            return true;
+        } else {
+            // 有部分其余对象依赖于此对象，所以无法删除
+            return false;
+        }
+    }
 }
 export default Dep;

@@ -40,7 +40,7 @@
             </div>
             <div style="display: flex;">
                 <div style="flex-grow: 1;padding: 3px 3px;">
-                    <all-vars></all-vars>
+                    <all-vars @change="editVar"></all-vars>
                 </div>
                 <textarea :value="saveHtml"
                           style="flex-grow: 1;width: 400px;height:200px;"></textarea>
@@ -117,6 +117,12 @@ export default {
                     this.currentView = newDash;
                 }
             });
+        },
+        editVar(key) {
+            let Var = allVar.getVar(key);
+            this.insertVarName = key;
+            this.insertProps = Var.value_;
+            this.insertCode = Var.codeText;
         }
     },
     mounted() {

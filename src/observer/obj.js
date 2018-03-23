@@ -17,6 +17,10 @@ class obj {
 
     render() {
     }
+
+    destory() {
+        this.dep.destory();
+    }
 }
 export default obj;
 /**

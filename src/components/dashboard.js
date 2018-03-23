@@ -14,8 +14,8 @@ export default function() {
         },
         template: `<div>
     <div>
-        <div style="border: solid 1px black;"><widget data="$a2"></widget></div>
-        <widget data="$a1"></widget>
+        <div style="border: solid 1px black;"><widget></widget></div>
+        <widget></widget>
         <widget></widget>
         <widget></widget>
         <widget></widget>

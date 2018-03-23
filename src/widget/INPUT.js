@@ -7,6 +7,7 @@ class INPUT extends FuncObj {
     constructor(type, value) {
         super(...Array.from(arguments));
         this.name = 'INPUT';
+        this.dep.name = 'INPUT';
         this.dom = document.createElement('input');
         // this.dom.type = type;
         let self = this;

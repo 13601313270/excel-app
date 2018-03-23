@@ -5,7 +5,6 @@
 // runObj执行这个方法的对象
 import Obj from './observer/obj';
 import __allMatch__ from './allMatch';
-// import allVar from './allVar';
 
 class __runObj__ extends Obj {
     constructor(runObj, funcName, params) {
@@ -286,7 +285,6 @@ function getEvalObj(tableNum, str) {
         }
         forword();
     }
-    // allVar.start();
     return allAction;
 }
 export default getEvalObj;
