@@ -13,6 +13,7 @@
 
             <h2>计算</h2>
             <div draggable="true" @dragstart='drag("MIN")'>最小值</div>
+            <div draggable="true" @dragstart='drag("IF")'>IF判断</div>
         </div>
         <div v-if="insertVarName!==''"
              style="position: fixed;z-index: 2;top:0%;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
@@ -59,6 +60,7 @@ import CHECK_BOX from '../widget/CHECK_BOX';
 import INPUT_DATE from '../widget/INPUT_DATE';
 import TEXT from '../widget/TEXT';
 import MIN from '../widget/MIN';
+import IF from '../widget/IF';
 import BAR from '../widget/BAR';
 
 import dashboard from './dashboard';
@@ -71,6 +73,7 @@ allMatch.push(INPUT_DATE);
 allMatch.push(TEXT);
 allMatch.push(BAR);
 allMatch.push(MIN);
+allMatch.push(IF);
 
 export default {
     data() {

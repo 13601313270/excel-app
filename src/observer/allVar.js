@@ -32,8 +32,9 @@ class AllVarClass extends Dep {
         console.log('setVar');
         if (this.allData[key] === undefined) {
             this.allData[key] = new Var();
+            this.listen(this.allData[key].dep);
             this.allData[key].dep.on('ready', () => {
-                this.eventEmitter.emit('ready', key, this.allData[key]);
+                this.eventEmitter.emit('valChange', key, this.allData[key]);
             });
         }
         this.allData[key].codeText = val.codeText;

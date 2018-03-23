@@ -7,5 +7,10 @@ export default class extends Obj {
         super();
         this.props = Array.from(arguments);
         this.type = 'function';
+        this.dom = document.createElement('div');
+    }
+
+    render() {
+        this.dom.innerHTML = this.value;
     }
 }

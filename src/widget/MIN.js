@@ -7,11 +7,6 @@ class MIN extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
         this.name = 'MIN';
-        this.dom = document.createElement('div');
-    }
-
-    render() {
-        this.dom.innerHTML = this.value;
     }
 
     get value() {
@@ -29,7 +24,7 @@ class MIN extends FuncObj {
     }
 }
 export default {
-    match: /^MIN/,
+    match: /^MIN$/,
     title: '最小值',
     type: 'function',
     name: 'MIN',

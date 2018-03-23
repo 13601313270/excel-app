@@ -34,7 +34,7 @@ export default {
     },
     mounted() {
         let self = this;
-        AllVarClass.on('ready', function(key, val) {
+        AllVarClass.on('valChange', function(key, val) {
             self.$set(self.datas, key, {
                 code: val.codeText,
                 value: val.value
