@@ -14,7 +14,6 @@ class INPUT_DATE extends FuncObj {
             this_.dep.update();// release
         });
         this.valueee = defaultVallue;// 0正常,1锁定
-        this_.dep.update();// release
     }
 
     get value() {

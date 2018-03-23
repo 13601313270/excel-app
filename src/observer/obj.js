@@ -15,7 +15,6 @@ class obj {
         this.dep.listen(obj.dep);
     }
 
-    // 渲染
     render() {
     }
 }

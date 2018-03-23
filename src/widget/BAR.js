@@ -14,7 +14,6 @@ class BAR extends FuncObj {
             this.value33 = params.data;
             this.dep.update();// release
         });
-        this.render();
     }
 
     get value() {

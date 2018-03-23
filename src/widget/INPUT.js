@@ -9,17 +9,16 @@ class INPUT extends FuncObj {
         this.name = 'INPUT';
         this.dom = document.createElement('input');
         // this.dom.type = type;
-        let this_ = this;
+        let self = this;
         this.dom.addEventListener('change', function() {
             if (type === 'number') {
-                this_.valueee = parseFloat(this.value);
+                self.valueee = parseFloat(this.value);
             } else {
-                this_.valueee = this.value.toString();
+                self.valueee = this.value.toString();
             }
-            this_.dep.update();// release
+            self.dep.update();// release
         });
         this.valueee = value;// 0正常,1锁定
-        this.dep.update();// release
     }
 
     get value() {

@@ -5,7 +5,7 @@
 // runObj执行这个方法的对象
 import Obj from './observer/obj';
 import __allMatch__ from './allMatch';
-import allVar from './allVar';
+// import allVar from './allVar';
 
 class __runObj__ extends Obj {
     constructor(runObj, funcName, params) {
@@ -13,17 +13,16 @@ class __runObj__ extends Obj {
         this.runObj = runObj;
         this.funcName = funcName;
         this.params = params;
-        // this.sentEvent = [];
-        // this.using = [];
         this.state = 0;// 0正常,1锁定
         // 如果是函数调用,则有函数名
+        this.dom = document.createElement('div');
     }
 
     get value() {
         // 取值
-        var runParams = [];
+        let runParams = [];
         for (let i = 0; i < this.params.length; i++) {
-            var insert = this.params[i];
+            let insert = this.params[i];
             if (insert instanceof Obj) {
                 this.listen(insert);
                 insert = insert.value;
@@ -57,6 +56,10 @@ class __runObj__ extends Obj {
             }
         }
     }
+
+    render() {
+        this.dom.innerHTML = this.value;
+    }
 }
 function getEvalObj(tableNum, str) {
     // 解释器梭子
@@ -64,23 +67,23 @@ function getEvalObj(tableNum, str) {
     let maxLen = 255;
 
     function forword(putBack) {
-        var oldPutBakc = forwordStrNum;
-        var strSplit = '';
-        var allUseWord = ['\n', '=', '(', ')', ',', ';', '"', '\'', ':', '+', '-', '*', '/', '.', '!', '>', '<', '[', ']'];
+        let oldPutBakc = forwordStrNum;
+        let strSplit = '';
+        let allUseWord = ['\n', '=', '(', ')', ',', ';', '"', '\'', ':', '+', '-', '*', '/', '.', '!', '>', '<', '[', ']'];
         while (forwordStrNum < str.length && str[forwordStrNum] === ' ') {
             forwordStrNum++;
         }
         if (allUseWord.indexOf(str[forwordStrNum]) > -1) {
             forwordStrNum++;
-            var returnStr = str[forwordStrNum - 1];
+            let returnStr = str[forwordStrNum - 1];
             if (returnStr === '-') {
-                var nearNum = str.substr(forwordStrNum).match(/^[\d|.]+/);
+                let nearNum = str.substr(forwordStrNum).match(/^[\d|.]+/);
                 if (nearNum !== null) {
                     returnStr += nearNum[0];
                     forwordStrNum += nearNum[0].length;
                 }
             } else {
-                var allTwoWord = ['>=', '<=', '=='];
+                let allTwoWord = ['>=', '<=', '=='];
                 for (let i = 0; i < allTwoWord.length; i++) {
                     if (returnStr === allTwoWord[i][0] && str[forwordStrNum] === allTwoWord[i][1]) {
                         returnStr += str[forwordStrNum];
@@ -110,8 +113,8 @@ function getEvalObj(tableNum, str) {
         }
     }
 
-    function functionCall(tableNum, word, baseWord) {
-        var funcName = word;
+    function functionCall(word, baseWord) {
+        let funcName = word;
         if (word === '.') {
             funcName = forword();
         }
@@ -140,9 +143,9 @@ function getEvalObj(tableNum, str) {
             }
 
             if (typeof func === 'function' && func.prototype instanceof Obj) {
-                var applyArgs = [window].concat(params || []);
-                var Temp = Function.prototype.bind.apply(func, applyArgs);
-                var baseWord2 = new Temp();
+                let applyArgs = [window].concat(params || []);
+                let Temp = Function.prototype.bind.apply(func, applyArgs);
+                let baseWord2 = new Temp();
                 baseWord2.className = funcName;
                 for (let i = 0; i < params.length; i++) {
                     if (params[i] instanceof Obj) {
@@ -151,9 +154,9 @@ function getEvalObj(tableNum, str) {
                 }
                 return baseWord2;
             } else {
-                var returnObj;
+                let returnObj;
                 if (word === '.') {
-                    var oldBase = baseWord;
+                    let oldBase = baseWord;
                     returnObj = new __runObj__(oldBase, funcName, params);
                     returnObj.listen(oldBase);
                 } else {
@@ -170,63 +173,55 @@ function getEvalObj(tableNum, str) {
     }
 
     function forAction(endstrArr) {
-        var baseWord = null;
+        if (endstrArr === undefined) {
+            endstrArr = [];
+        }
+        let baseWord = null;
         while (true) {
             maxLen--;
             if (forwordStrNum > str.length - 1 || maxLen <= 0) {
                 break;
             }
-            var word = forword(true);
-            if (endstrArr !== undefined && endstrArr.indexOf(word) > -1) {
+            let word = forword(true);
+            if (endstrArr.includes(word)) {
                 return baseWord;
             }
             forword();
             if (['+', '-', '*', '/', '>', '<', '<=', '>='].indexOf(word) > -1) {
-                var innerStrArr = [];
+                let innerStrArr = [];
                 if (typeof baseWord === 'string') {
                     innerStrArr.push('"' + baseWord + '"');
                 } else {
                     innerStrArr.push(baseWord);
                 }
-                // console.log(baseWord);
                 innerStrArr.push(word);
                 while (true) {
-                    var temp = '';
-                    if (endstrArr !== undefined) {
-                        temp = forAction(endstrArr.concat(['+', '-', '*', '/', '>', '<']));
-                    } else {
-                        temp = forAction(['+', '-', '*', '/', '>', '<']);
-                    }
-                    // console.log(temp);
+                    let temp = forAction(endstrArr.concat(['+', '-', '*', '/', '>', '<']));
                     if (typeof temp === 'string') {
                         innerStrArr.push('"' + temp + '"');
                     } else {
                         innerStrArr.push(temp);
                     }
-                    var word2 = forword(true);
-                    if (word2 === '') {
-                        break;
-                    } else if (endstrArr !== undefined && endstrArr.indexOf(word2) > -1) {
+                    let word2 = forword(true);
+                    if (word2 === '' || endstrArr.includes(word2)) {
                         break;
                     } else {
                         innerStrArr.push(word2);
                         forword();
                     }
                 }
-                var insertObj = new __runObj__(window, '', innerStrArr);
-                baseWord = insertObj;
-                for (var i = 0; i < innerStrArr.length; i++) {
+                baseWord = new __runObj__(window, '', innerStrArr);
+                for (let i = 0; i < innerStrArr.length; i++) {
                     if (innerStrArr[i] instanceof Obj) {
                         baseWord.listen(innerStrArr[i]);
                     }
                 }
             }
             else if (word === '"' || word === '\'') {
-                var strTemp = '';
+                let strTemp = '';
                 for (let i = forwordStrNum; i < str.length; i++) {
                     if (str[i] === word) {
-                        if (strTemp.substr(strTemp.length - 1) === '\\') {
-                        } else {
+                        if (strTemp.substr(strTemp.length - 1) !== '\\') {
                             break;
                         }
                     }
@@ -236,37 +231,14 @@ function getEvalObj(tableNum, str) {
                 forwordStrNum++;
                 baseWord = strTemp;
             }
-            // else if (word === ':') {
-            //     if (endstrArr === undefined) {
-            //         var end = forAction(['+', '-', '*', '/', '>', '<', ')']);
-            //     } else {
-            //         var end = forAction(endstrArr.concat(['+', '-', '*', '/', '>', '<', ')']));
-            //     }
-            //     if (baseWord.tableId === end.tableId) {
-            //         var resultList = new tdList(baseWord, end);
-            //         var tableId = baseWord.tableId;
-            //         for (let i = baseWord.hang; i <= end.hang; i++) {
-            //             for (let j = baseWord.lie; j <= end.lie; j++) {
-            //                 var tdStr = getCellTemp2(i, j);
-            //                 var bindTemp = baseWord.table.findChild(tdStr);
-            //                 if (isBind) {
-            //                     bindTemp.listen(resultList);
-            //                 }
-            //             }
-            //         }
-            //         baseWord = resultList;
-            //     } else {
-            //         throw new DOMException('tdList必须在一张表上');
-            //     }
-            // }
             else if (word === '.' || typeof window[word] === 'function') {
-                baseWord = functionCall(tableNum, word, baseWord);
+                baseWord = functionCall(word, baseWord);
             }
             else {
-                var matchObj = null;
+                let matchObj = null;
                 for (let i = 0; i < __allMatch__.length; i++) {
                     if (__allMatch__[i].type === 'function' && word.match(__allMatch__[i].match)) {
-                        matchObj = functionCall(tableNum, __allMatch__[i].func, baseWord);
+                        matchObj = functionCall(__allMatch__[i].func, baseWord);
                     } else if (word.match(__allMatch__[i].match)) {
                         matchObj = __allMatch__[i].value(tableNum, word, baseWord, function(endStrArrStep, extendParentEnd) {
                             if (extendParentEnd === false) {
@@ -285,14 +257,7 @@ function getEvalObj(tableNum, str) {
                     }
                 }
                 if (matchObj === null) {
-                    var isTableName = false;
-                    // for (var i = 0; i < tdData.length; i++) {
-                    //     if (tdData[i].tableTitle === word) {
-                    //         isTableName = true;
-                    //         baseWord = word;
-                    //         break;
-                    //     }
-                    // }
+                    let isTableName = false;
                     if (isTableName === false) {
                         // console.log('----------');
                         // // console.log(str);
@@ -321,7 +286,7 @@ function getEvalObj(tableNum, str) {
         }
         forword();
     }
-    allVar.start();
+    // allVar.start();
     return allAction;
 }
 export default getEvalObj;

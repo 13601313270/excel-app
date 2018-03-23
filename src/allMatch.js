@@ -14,7 +14,7 @@ var __allMatch__ = [
                 forword();
                 if (forword(true).match(/^\d+$/)) {
                     word += '.' + forword(true);
-                    forword()
+                    forword();
                 }
             }
             return parseFloat(word);
@@ -45,7 +45,7 @@ var __allMatch__ = [
         title: '变量',
         value(tableNum, word, baseWord) {
             if (allVar.getVar(word) === undefined) {
-                allVar.setVar(word, new Obj());
+                // allVar.setVar(word, new Obj());
             }
             return allVar.getVar(word);
         }
@@ -93,6 +93,5 @@ var __allMatch__ = [
             return returnBase;
         }
     }
-
 ];
 export default __allMatch__;

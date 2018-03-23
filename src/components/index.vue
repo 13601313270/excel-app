@@ -52,7 +52,6 @@
 
 <script>
 import evalObjAndStr from '../evalObjAndStr';
-import Obj from '../observer/obj';
 import allMatch from '../allMatch';
 import allVar from '../allVar';
 import INPUT from '../widget/INPUT';
@@ -62,31 +61,8 @@ import MIN from '../widget/MIN';
 import BAR from '../widget/BAR';
 
 import dashboard from './dashboard';
-import allVars from './allVars.vue';
+import allPageVars from './allVars.vue';
 import propsCom from './props.vue';
-
-class Var extends Obj {
-    get value() {
-        if (this.value_ instanceof Obj) {
-            return this.value_.value;
-        } else {
-            return this.value_;
-        }
-    }
-
-    set value(value) {
-        this.dep.lock();
-        // 释放原有的监听
-        if (this.value_ instanceof Obj) {
-            this.dep.unListen(this.value_.dep);
-        }
-        this.value_ = value;
-        if (value instanceof Obj) {
-            this.dep.listen(value.dep);
-        }
-        this.dep.update();// release
-    }
-}
 
 allMatch.push(INPUT);
 allMatch.push(INPUT_DATE);
@@ -97,7 +73,6 @@ allMatch.push(MIN);
 export default {
     data() {
         return {
-            allVar: allVar,
             currentView: dashboard(),
             dragDomFunc: undefined,
             insertProps: {},
@@ -107,7 +82,7 @@ export default {
         }
     },
     components: {
-        'all-vars': allVars,
+        'all-vars': allPageVars,
         'props-com': propsCom
     },
     computed: {
@@ -121,8 +96,7 @@ export default {
             let widgePanel = allVar.getVar(this.insertVarName).value_.dom.parentNode;
             allVar.getVar(this.insertVarName).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
-            allVar.getVar(this.insertVarName).codeText = code;
-            allVar.getVar(this.insertVarName).value = insertObj[0];
+            allVar.setVar(this.insertVarName, insertObj[0]);
             widgePanel.appendChild(allVar.getVar(this.insertVarName).value_.dom);
         },
         drag(func) {
@@ -158,8 +132,6 @@ export default {
 </div>`;
 
         evalObjAndStr(1, fileContent);
-        this.allVar = allVar;
-
         let this_ = this;
 
         window.addData = function(id) {
@@ -206,13 +178,10 @@ export default {
                     let newVarName = '$' + window.prompt('请输入名称', 'a7').replace(/^\$/, '');
                     this_.insertVarName = newVarName;
                     let insertObj = evalObjAndStr(1, code);
-                    allVar.setVar(newVarName, new Var());
-                    allVar.getVar(newVarName).codeText = code;
-                    allVar.getVar(newVarName).value = insertObj[0];
-                    // console.log(insertObj[0]);
+                    insertObj[0].codeText = code;
+                    allVar.setVar(newVarName, insertObj[0]);
                     this_.insertProps = insertObj[0];
                     this_.insertCode = code;
-                    // evalObjAndStr(1, newVarName + ' = ' + code);
                     let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
                     this_.html = this_.html.replace(reg, '<widget random-id="' + id + '" data="' + newVarName + '">');
                     return allVar.getVar(newVarName);

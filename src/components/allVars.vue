@@ -31,12 +31,10 @@ export default {
     mounted() {
         let self = this;
         AllVarClass.on('ready', function(key, val) {
-            if (val) {
-                self.$set(self.datas, key, {
-                    code: val.codeText,
-                    value: val.value
-                });
-            }
+            self.$set(self.datas, key, {
+                code: val.codeText,
+                value: val.value
+            });
         });
     },
     methods: {}

@@ -8,7 +8,6 @@ class MIN extends FuncObj {
         super(...Array.from(arguments));
         this.name = 'MIN';
         this.dom = document.createElement('div');
-        this.render();
     }
 
     render() {
