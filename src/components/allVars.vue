@@ -37,7 +37,6 @@ export default {
     mounted() {
         let self = this;
         AllVarClass.on('valChange', function(key, val) {
-            console.log(val.value_);
             self.$set(self.datas, key, val.value_);
         });
     },

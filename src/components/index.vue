@@ -85,7 +85,6 @@ export default {
     },
     methods: {
         addData(varName, id, dom) {
-            console.log(varName, id, dom);
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
                 if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
@@ -145,7 +144,6 @@ export default {
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
         codeUpdate(code) {
-            console.log(this.varToDom);
             this.insertCode = code;
             let updateVar = allVar.getVar(this.insertVarName);
             let widgePanel = this.varToDom.get(updateVar);
@@ -154,7 +152,7 @@ export default {
             let insertObj = evalObjAndStr(1, code);
             allVar.setVar(this.insertVarName, insertObj[0]);
             let value_ = updateVar.value_;
-            if (value_ instanceof Obj) {
+            if (value_ instanceof Obj && value_.dom) {
                 widgePanel.appendChild(value_.dom);
             } else {
                 widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值

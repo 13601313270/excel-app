@@ -184,7 +184,7 @@ export default {
             } else if (typeof innerOption === 'string') {
                 code = '"' + innerOption + '"';
             } else if (typeof innerOption === 'number') {
-                code = innerOption;
+                code = innerOption.toString();
             } else if (typeof innerOption === 'boolean') {
                 code = innerOption ? 'TRUE' : 'FALSE';
             }
