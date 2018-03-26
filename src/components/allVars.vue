@@ -14,7 +14,7 @@
             <tr v-for="(item,key) in datas">
                 <td v-html="key"></td>
                 <td v-html="getCodeByVal(item)"></td>
-                <td v-if="['string','number'].includes(typeof item)" v-html="item"></td>
+                <td v-if="['string','number','boolean'].includes(typeof item)" v-html="item"></td>
                 <td v-else v-html="item.value"></td>
                 <td>
                     <button @click="change(key)">修改</button>

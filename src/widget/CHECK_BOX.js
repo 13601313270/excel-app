@@ -30,7 +30,7 @@ export default {
     match: /^CHECK_BOX$/,
     type: 'function',
     name: 'CHECK_BOX',
-    title: '输入框',
+    title: '开关器',
     func: CHECK_BOX,
     props: [
         {
