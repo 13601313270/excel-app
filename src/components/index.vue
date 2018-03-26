@@ -43,8 +43,8 @@
                 <div style="flex-grow: 1;padding: 3px 3px;">
                     <all-vars @change="editVar"></all-vars>
                 </div>
-                <div style="overflow: scroll;border: solid 1px black;"><textarea :value="saveHtml"
-                                                                                 style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
+                <div style="overflow: scroll;border: solid 1px black;">
+                    <textarea :value="saveHtml" style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
                 </div>
             </div>
 
@@ -60,6 +60,7 @@ import dashboard from './dashboard';
 import allPageVars from './allVars.vue';
 import propsCom from './props.vue';
 import Obj from '../observer/obj';
+import getStrByObj from '../getStrByObj';
 
 export default {
     data() {
@@ -124,7 +125,6 @@ export default {
                     let newVarName = '$' + varName.replace(/^\$/, '');
                     this.insertVarName = newVarName;
                     let insertObj = evalObjAndStr(1, code);
-                    insertObj[0].codeText = code;
                     allVar.setVar(newVarName, insertObj[0]);
                     this.insertProps = insertObj[0];
                     this.insertCode = code;
@@ -181,7 +181,7 @@ export default {
             let Var = allVar.getVar(key);
             this.insertVarName = key;
             this.insertProps = Var.value_;
-            this.insertCode = Var.codeText;
+            this.insertCode = getStrByObj(Var.value_);
         }
     },
     mounted() {

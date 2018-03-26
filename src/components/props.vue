@@ -98,6 +98,7 @@
 import innerDom from './props.vue';
 import allMatch from '../allMatch';
 import allVar from '../observer/allVar';
+// import getStrByObj from '../getStrByObj';
 export default {
     name: 'inner-dom',
     props: {
@@ -230,8 +231,7 @@ export default {
                 }
             }
             this.$emit('input', this.innerOption);
-            var code = this.createCodeText(this.innerOption);
-            this.$emit('change', code);
+            this.$emit('change', this.createCodeText(this.innerOption));
         }
     }
 }

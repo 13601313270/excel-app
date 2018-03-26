@@ -267,14 +267,8 @@ function getEvalObj(tableNum, str) {
 
     let allAction = [];
     while (forwordStrNum < str.length) {
-        let begin = forwordStrNum;
         let codeLine = forAction('\n');
         if (codeLine !== null) {
-            let codeText = str.substring(begin, forwordStrNum);
-            codeText = codeText.replace(/^\s*\$[A-Z|a-z|\d]+\s*=\s*/, '');
-            if (codeLine instanceof Obj) {
-                codeLine.codeText = codeText;
-            }
             allAction.push(codeLine);
         }
         forword();

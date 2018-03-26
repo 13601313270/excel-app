@@ -85,7 +85,6 @@ var __allMatch__ = [
             // console.log(befordWord);
             if (befordWord instanceof Var) {
                 let varObj = forAction(['\n', ';']);
-                varObj.codeText = 'ssss';
                 allVar.setVar(befordWord.name, varObj);
             } else if (befordWord instanceof Obj) {
                 befordWord.value = forAction(['\n', ';']);

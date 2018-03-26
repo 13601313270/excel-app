@@ -15,16 +15,10 @@ class AllVarClass extends Dep {
                 this.eventEmitter.emit('valChange', key, this.allData[key]);
             });
         }
-        this.allData[key].codeText = val.codeText;
         this.allData[key].value = val;
         if (val instanceof Obj) {
             val.dep.update();
         } else {
-            if (typeof val === 'number') {
-                this.allData[key].codeText = val;
-            } else if (typeof val === 'string') {
-                this.allData[key].codeText = '"' + val + '"';
-            }
             this.allData[key].dep.update();
         }
     }
