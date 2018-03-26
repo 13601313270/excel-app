@@ -152,8 +152,12 @@ export default {
             let insertObj = evalObjAndStr(1, code);
             allVar.setVar(this.insertVarName, insertObj[0]);
             let value_ = updateVar.value_;
-            if (value_ instanceof Obj && value_.dom) {
-                widgePanel.appendChild(value_.dom);
+            if (value_ instanceof Obj) {
+                if (value_.dom) {
+                    widgePanel.appendChild(value_.dom);
+                } else {
+                    widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
+                }
             } else {
                 widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值
             }

@@ -3,6 +3,7 @@ class Var extends Obj {
     constructor(name) {
         super();
         this.name = name;
+        this.dom = document.createElement('div');
     }
 
     get value() {
@@ -13,7 +14,12 @@ class Var extends Obj {
         }
     }
 
+    render() {
+        this.dom.innerHTML = this.value;
+    }
+
     set value(varObj) {
+        // console.log(varObj);
         this.dep.lock();
         // 释放原有的监听
         if (this.value_ instanceof Obj) {
