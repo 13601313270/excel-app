@@ -2,17 +2,14 @@
     <div class="widget" ref="content" @dragover="allowDrop($event)" @drop="ondrop($event)"></div>
 </template>
 <script>
-import allVar from '../observer/allVar';
 export default {
     props: ['data', 'randomId'],
     data() {
         return {};
     },
     mounted() {
-        let data = allVar.getVar(this.data);
-        if (data && data.value_.dom) {
-            this.$refs.content.innerHTML = '';
-            this.$refs.content.appendChild(data.value_.dom);
+        if (this.data !== undefined) {
+            this.$emit('init', this.data, this.randomId, this.$refs.content);
         }
     },
     methods: {
@@ -20,7 +17,10 @@ export default {
             e.preventDefault();
         },
         ondrop(e) {
-            this.$emit('change', this.randomId, this.$refs.content);
+            let varName = window.prompt('请输入名称', 'a7');
+            if (varName !== null) {
+                this.$emit('change', varName, this.randomId, this.$refs.content);
+            }
         }
     }
 }

@@ -1,27 +1,6 @@
 import Dep from './dep';
 import Obj from './obj';
-class Var extends Obj {
-    get value() {
-        if (this.value_ instanceof Obj) {
-            return this.value_.value;
-        } else {
-            return this.value_;
-        }
-    }
-
-    set value(varObj) {
-        this.dep.lock();
-        // 释放原有的监听
-        if (this.value_ instanceof Obj) {
-            this.dep.unListen(this.value_.dep);
-            this.value_.destory();
-        }
-        this.value_ = varObj;
-        if (varObj instanceof Obj) {
-            this.listen(varObj);
-        }
-    }
-}
+import Var from './Var';
 class AllVarClass extends Dep {
     constructor() {
         super();
@@ -30,7 +9,7 @@ class AllVarClass extends Dep {
 
     setVar(key, val) {
         if (this.allData[key] === undefined) {
-            this.allData[key] = new Var();
+            this.allData[key] = new Var(key);
             this.listen(this.allData[key].dep);
             this.allData[key].dep.on('ready', () => {
                 this.eventEmitter.emit('valChange', key, this.allData[key]);
@@ -38,7 +17,16 @@ class AllVarClass extends Dep {
         }
         this.allData[key].codeText = val.codeText;
         this.allData[key].value = val;
-        val.dep.update();
+        if (val instanceof Obj) {
+            val.dep.update();
+        } else {
+            if (typeof val === 'number') {
+                this.allData[key].codeText = val;
+            } else if (typeof val === 'string') {
+                this.allData[key].codeText = '"' + val + '"';
+            }
+            this.allData[key].dep.update();
+        }
     }
 
     getAllData() {

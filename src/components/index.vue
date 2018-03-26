@@ -36,15 +36,16 @@
             </div>
         </div>
         <div style="flex-grow:1;display: flex;flex-direction: column;" id="content">
-            <div style="flex-grow: 1;background-color: #f9f9f9;padding: 10px;">
-                <component :is="currentView" style="width: 100%;" @addData="addData"></component>
+            <div style="flex-grow: 1;overflow:scroll;background-color: #f9f9f9;padding: 10px;">
+                <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
             </div>
             <div style="display: flex;">
                 <div style="flex-grow: 1;padding: 3px 3px;">
                     <all-vars @change="editVar"></all-vars>
                 </div>
-                <textarea :value="saveHtml"
-                          style="flex-grow: 1;width: 400px;height:200px;"></textarea>
+                <div style="overflow: scroll;border: solid 1px black;"><textarea :value="saveHtml"
+                                                                                 style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
+                </div>
             </div>
 
         </div>
@@ -55,25 +56,10 @@
 import evalObjAndStr from '../evalObjAndStr';
 import allMatch from '../allMatch';
 import allVar from '../observer/allVar';
-import INPUT from '../widget/INPUT';
-import CHECK_BOX from '../widget/CHECK_BOX';
-import INPUT_DATE from '../widget/INPUT_DATE';
-import TEXT from '../widget/TEXT';
-import MIN from '../widget/MIN';
-import IF from '../widget/IF';
-import BAR from '../widget/BAR';
-
 import dashboard from './dashboard';
 import allPageVars from './allVars.vue';
 import propsCom from './props.vue';
-
-allMatch.push(INPUT);
-allMatch.push(CHECK_BOX);
-allMatch.push(INPUT_DATE);
-allMatch.push(TEXT);
-allMatch.push(BAR);
-allMatch.push(MIN);
-allMatch.push(IF);
+import Obj from '../observer/obj';
 
 export default {
     data() {
@@ -83,7 +69,8 @@ export default {
             insertProps: {},
             insertCode: '',
             insertVarName: '',
-            html: ''
+            html: '',
+            varToDom: new Map()
         }
     },
     components: {
@@ -92,11 +79,12 @@ export default {
     },
     computed: {
         saveHtml() {
-            return this.html.replace(/ @change="addData" random-id="r(\d+)"/g, '');
+            return this.html.replace(/ @change="addData" @init="dataInit" random-id="r(\d+)"/g, '');
         }
     },
     methods: {
-        addData(id, dom) {
+        addData(varName, id, dom) {
+            console.log(varName, id, dom);
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
                 if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
@@ -132,32 +120,45 @@ export default {
                         }
                     });
                     code += propsArr.join(',');
-
                     code += ')';
-                    let shuru = window.prompt('请输入名称', 'a7');
-                    if (shuru !== null) {
-                        let newVarName = '$' + shuru.replace(/^\$/, '');
-                        this.insertVarName = newVarName;
-                        let insertObj = evalObjAndStr(1, code);
-                        insertObj[0].codeText = code;
-                        allVar.setVar(newVarName, insertObj[0]);
-                        this.insertProps = insertObj[0];
-                        this.insertCode = code;
-                        let reg = new RegExp('<widget @change="addData" random-id="' + id + '"[^>]*>', 'g');
-                        this.html = this.html.replace(reg, '<widget @change="addData" random-id="' + id + '" data="' + newVarName + '">');
-                        dom.innerHTML = '';
-                        dom.appendChild(allVar.getVar(newVarName).value_.dom);
-                    }
+                    let newVarName = '$' + varName.replace(/^\$/, '');
+                    this.insertVarName = newVarName;
+                    let insertObj = evalObjAndStr(1, code);
+                    insertObj[0].codeText = code;
+                    allVar.setVar(newVarName, insertObj[0]);
+                    this.insertProps = insertObj[0];
+                    this.insertCode = code;
+
+                    let newVar = allVar.getVar(newVarName);
+                    this.varToDom.set(newVar, dom);
+                    let reg = new RegExp('<widget @change="addData" @init="dataInit" random-id="' + id + '"[^>]*>', 'g');
+                    this.html = this.html.replace(reg, '<widget @change="addData" @init="dataInit" random-id="' + id + '" data="' + newVarName + '">');
+                    this.varToDom.get(newVar).innerHTML = '';
+                    this.varToDom.get(newVar).appendChild(newVar.value_.dom);
                 }
             }
         },
+        dataInit(varName, id, dom) {
+            let initVar = allVar.getVar(varName);
+            this.varToDom.set(initVar, dom);
+            this.varToDom.get(initVar).innerHTML = '';
+            this.varToDom.get(initVar).appendChild(initVar.value_.dom);
+        },
         codeUpdate(code) {
+            console.log(this.varToDom);
             this.insertCode = code;
-            let widgePanel = allVar.getVar(this.insertVarName).value_.dom.parentNode;
-            allVar.getVar(this.insertVarName).value_.dom.remove();
+            let updateVar = allVar.getVar(this.insertVarName);
+            let widgePanel = this.varToDom.get(updateVar);
+            widgePanel.innerHTML = '';
+            // allVar.getVar(this.insertVarName).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
             allVar.setVar(this.insertVarName, insertObj[0]);
-            widgePanel.appendChild(allVar.getVar(this.insertVarName).value_.dom);
+            let value_ = updateVar.value_;
+            if (value_ instanceof Obj) {
+                widgePanel.appendChild(value_.dom);
+            } else {
+                widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值
+            }
         },
         drag(func) {
             this.dragDomFunc = func;
@@ -184,11 +185,11 @@ export default {
         }
     },
     mounted() {
-        let fileContent = `$a1 = BAR()`;
-        fileContent = '';
+        let fileContent = `$a1 = TEXT(9999)`;
+        // fileContent = '';
         this.html = `<div>
     <div>
-        <div><h4>时间</h4><widget></widget><widget></widget></div>
+        <div><h4>时间</h4><widget data="$a1"></widget><widget></widget></div>
         <div><h4>人民币</h4><widget></widget></div>
         <div><h4>汇率</h4><widget></widget></div>
         <div><h4>美元</h4><widget></widget></div>
@@ -200,7 +201,7 @@ export default {
         evalObjAndStr(1, fileContent);
         let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {
-            return '<widget @change="addData" random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
+            return '<widget @change="addData" @init="dataInit" random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
         });
         newDash.template = this.html;
         this.currentView = newDash;

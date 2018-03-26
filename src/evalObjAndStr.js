@@ -216,20 +216,6 @@ function getEvalObj(tableNum, str) {
                     }
                 }
             }
-            else if (word === '"' || word === '\'') {
-                let strTemp = '';
-                for (let i = forwordStrNum; i < str.length; i++) {
-                    if (str[i] === word) {
-                        if (strTemp.substr(strTemp.length - 1) !== '\\') {
-                            break;
-                        }
-                    }
-                    forwordStrNum++;
-                    strTemp += str[i];
-                }
-                forwordStrNum++;
-                baseWord = strTemp;
-            }
             else if (word === '.' || typeof window[word] === 'function') {
                 baseWord = functionCall(word, baseWord);
             }
@@ -251,6 +237,12 @@ function getEvalObj(tableNum, str) {
                                 return undefined;
                             }
                             return nextWord;
+                        }, function(putBack) {
+                            let returnWord = str[forwordStrNum];
+                            if (!putBack) {
+                                forwordStrNum++;
+                            }
+                            return returnWord;
                         });
                         break;
                     }
@@ -280,7 +272,9 @@ function getEvalObj(tableNum, str) {
         if (codeLine !== null) {
             let codeText = str.substring(begin, forwordStrNum);
             codeText = codeText.replace(/^\s*\$[A-Z|a-z|\d]+\s*=\s*/, '');
-            codeLine.codeText = codeText;
+            if (codeLine instanceof Obj) {
+                codeLine.codeText = codeText;
+            }
             allAction.push(codeLine);
         }
         forword();

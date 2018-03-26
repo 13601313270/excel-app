@@ -2,22 +2,51 @@
  * Created by ptmind on 2018/3/8.
  */
 import allVar from './observer/allVar';
+import Var from './observer/Var';
 import Obj from './observer/obj';
+import CHECK_BOX from './widget/CHECK_BOX';
+import INPUT from './widget/INPUT';
+import INPUT_DATE from './widget/INPUT_DATE';
+import TEXT from './widget/TEXT';
+import MIN from './widget/MIN';
+import IF from './widget/IF';
+import BAR from './widget/BAR';
+
 var __allMatch__ = [
     {
         match: /^-?\d+$/,
         type: 'number',
         title: '数字',
         name: 'number',
-        value: function(tableNum, word, baseWord, forAction, forword) {
-            if (forword(true) === '.') {
-                forword();
-                if (forword(true).match(/^\d+$/)) {
-                    word += '.' + forword(true);
-                    forword();
+        value: function(tableNum, word, baseWord, forAction, forWord, forCharacter) {
+            if (forWord(true) === '.') {
+                forWord();
+                if (forWord(true).match(/^\d+$/)) {
+                    word += '.' + forWord(true);
+                    forWord();
                 }
             }
             return parseFloat(word);
+        }
+    },
+    {
+        match: /^'|"$/,
+        type: 'string',
+        title: '字符串',
+        name: 'string',
+        value: function(tableNum, word, baseWord, forAction, forWord, forCharacter) {
+            let strTemp = '';
+            let s = 0;
+            while (s++ < 10000) {
+                let nextCharacter = forCharacter();
+                if (nextCharacter === word) {
+                    if (strTemp.substr(strTemp.length - 1) !== '\\') {
+                        break;
+                    }
+                }
+                strTemp += nextCharacter;
+            }
+            return strTemp;
         }
     },
     {
@@ -53,7 +82,12 @@ var __allMatch__ = [
     {
         match: /^=$/,
         value(tableNum, word, befordWord, forAction) {
-            if (befordWord instanceof Obj) {
+            // console.log(befordWord);
+            if (befordWord instanceof Var) {
+                let varObj = forAction(['\n', ';']);
+                varObj.codeText = 'ssss';
+                allVar.setVar(befordWord.name, varObj);
+            } else if (befordWord instanceof Obj) {
                 befordWord.value = forAction(['\n', ';']);
             } else {
                 befordWord.value = 'hear 开发中 test';
@@ -94,4 +128,12 @@ var __allMatch__ = [
         }
     }
 ];
+__allMatch__.push(CHECK_BOX);
+__allMatch__.push(INPUT);
+__allMatch__.push(INPUT_DATE);
+__allMatch__.push(TEXT);
+__allMatch__.push(BAR);
+__allMatch__.push(MIN);
+__allMatch__.push(IF);
+
 export default __allMatch__;

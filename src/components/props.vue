@@ -2,50 +2,7 @@
     <div class="prop">
         <table>
             <tbody>
-            <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
-                <tr>
-                    <td>
-                        <select :value="typeof innerOption" @change="changeType($event.target.value)">
-                            <option value="string">字符串</option>
-                            <option value="var">变量</option>
-                            <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input :value="innerOption" v-if="typeof innerOption==='number'"
-                               @change="inputChange(parseFloat($event.target.value))"/>
-                        <input :value="innerOption" v-else @change="inputChange($event.target.value.toString())"/>
-                    </td>
-                </tr>
-            </template>
-            <template v-else-if="typeof innerOption==='boolean'">
-                <tr>
-                    <td>
-                        <select :value="innerOption===true?'TRUE':'FALSE'" @change="changeType($event.target.value)">
-                            <option value="string">字符串</option>
-                            <option value="var">变量</option>
-                            <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}</option>
-                        </select>
-                    </td>
-                </tr>
-            </template>
-            <template v-else-if="innerOption.type === 'var'">
-                <tr>
-                    <td>
-                        <select :value="innerOption.type" @change="changeType($event.target.value)">
-                            <option value="string">字符串</option>
-                            <option value="var">变量</option>
-                            <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select :value="innerOption.name" @change="inputChange({type:'var',name:$event.target.value})">
-                            <option v-for="item,key in allVar" :value="key">【{{key}}】---{{item.value}}</option>
-                        </select>
-                    </td>
-                </tr>
-            </template>
-            <template v-else-if="innerOption.type === 'function'">
+            <template v-if="innerOption.type === 'function'">
                 <tr>
                     <td>函数{{innerOption.name}}</td>
                     <td>
@@ -88,6 +45,49 @@
                         </template>
                     </td>
                     <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
+                </tr>
+            </template>
+            <template v-else>
+                <tr>
+                    <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
+                        <td>
+                            <select :value="typeof innerOption" @change="changeType($event.target.value)">
+                                <option value="var">变量</option>
+                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <input :value="innerOption" v-if="typeof innerOption==='number'"
+                                   @change="inputChange(parseFloat($event.target.value))"/>
+                            <input :value="innerOption" v-else @change="inputChange($event.target.value.toString())"/>
+                        </td>
+                    </template>
+                    <template v-else-if="typeof innerOption==='boolean'">
+                        <td>
+                            <select :value="innerOption===true?'TRUE':'FALSE'"
+                                    @change="changeType($event.target.value)">
+                                <option value="var">变量</option>
+                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
+                                </option>
+                            </select>
+                        </td>
+                    </template>
+                    <template v-else-if="innerOption.type === 'var'">
+                        <td>
+                            <select :value="innerOption.type" @change="changeType($event.target.value)">
+                                <option value="var">变量</option>
+                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <select :value="innerOption.name"
+                                    @change="inputChange({type:'var',name:$event.target.value})">
+                                <option v-for="item,key in allVar" :value="key">【{{key}}】---{{item.value}}</option>
+                            </select>
+                        </td>
+                    </template>
                 </tr>
             </template>
             </tbody>
@@ -159,19 +159,17 @@ export default {
     },
     methods: {
         childCodeChange(childCode) {
-            var code = this.createCodeText(this.innerOption);
-            this.$emit('change', code);
+            this.$emit('change', this.createCodeText(this.innerOption));
         },
         inputChange(val) {
             if (val !== undefined) {
                 this.innerOption = val;
             }
             this.$emit('input', this.innerOption);
-            var code = this.createCodeText(this.innerOption);
-            this.$emit('change', code);
+            this.$emit('change', this.createCodeText(this.innerOption));
         },
         createCodeText(innerOption) {
-            var code = '';
+            let code = '';
             if (innerOption.type === 'function') {
                 code += innerOption.name + '(';
                 let TempPropArr = [];
