@@ -19,9 +19,6 @@
                         <template v-if="value instanceof Array">
                             <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"></inner-dom>
                         </template>
-                        <template v-else-if="value instanceof Object">
-                            <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"></inner-dom>
-                        </template>
                         <template
                             v-else-if="key>=codeOption.props.length-1 && codeOption.props[codeOption.props.length-1].dataType instanceof Array">
                             <select v-if="codeOption.props[codeOption.props.length-1].enum">
@@ -34,8 +31,11 @@
                                 <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"></inner-dom>
                             </template>
                             <template v-if="key==innerOption.props.length-1">
-                                添加
+                                <button @click="innerOption.props.push(''),childCodeChange()">添加</button>
                             </template>
+                        </template>
+                        <template v-else-if="value instanceof Object">
+                            <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"></inner-dom>
                         </template>
                         <select v-else-if="codeOption.props[key].enum" v-model="innerOption.props[key]">
                             <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>

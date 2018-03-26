@@ -112,10 +112,6 @@ export default {
                         }
                         propsArr.push(pushProp);
                         if (isArr) {
-                            propsArr.push(pushProp);
-                            propsArr.push(pushProp);
-                            propsArr.push(pushProp);
-                            propsArr.push(pushProp);
                             item2.dataType = [item2.dataType];
                         }
                     });
