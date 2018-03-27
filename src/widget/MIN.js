@@ -3,6 +3,7 @@
  */
 import FuncObj from '../FuncObj';
 import Obj from '../observer/obj';
+import __allMatch__ from '../languageParser/allMatch';
 class MIN extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
@@ -23,7 +24,7 @@ class MIN extends FuncObj {
         return min;
     }
 }
-export default {
+__allMatch__.push({
     match: /^MIN$/,
     title: '最小值',
     type: 'function',
@@ -34,4 +35,4 @@ export default {
         title: '比较项',
         dataType: ['number']
     }]
-};
+});

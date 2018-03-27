@@ -3,6 +3,7 @@
  */
 import FuncObj from '../FuncObj';
 import Obj from '../observer/obj';
+import __allMatch__ from '../languageParser/allMatch';
 class TEXT extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
@@ -23,7 +24,7 @@ class TEXT extends FuncObj {
         this.dom.innerHTML = this.value;
     }
 }
-export default {
+__allMatch__.push({
     match: /^TEXT$/,
     title: '文本',
     type: 'function',
@@ -36,4 +37,4 @@ export default {
             dataType: 'string'
         }
     ]
-};
+});

@@ -1,16 +1,9 @@
 /**
  * Created by ptmind on 2018/3/8.
  */
-import allVar from './observer/allVar';
-import Var from './observer/Var';
-import Obj from './observer/obj';
-import CHECK_BOX from './widget/CHECK_BOX';
-import INPUT from './widget/INPUT';
-import INPUT_DATE from './widget/INPUT_DATE';
-import TEXT from './widget/TEXT';
-import MIN from './widget/MIN';
-import IF from './widget/IF';
-import BAR from './widget/BAR';
+import allVar from '../observer/allVar';
+import Var from '../observer/Var';
+import Obj from '../observer/obj';
 
 var __allMatch__ = [
     {
@@ -127,12 +120,4 @@ var __allMatch__ = [
         }
     }
 ];
-__allMatch__.push(CHECK_BOX);
-__allMatch__.push(INPUT);
-__allMatch__.push(INPUT_DATE);
-__allMatch__.push(TEXT);
-__allMatch__.push(BAR);
-__allMatch__.push(MIN);
-__allMatch__.push(IF);
-
 export default __allMatch__;

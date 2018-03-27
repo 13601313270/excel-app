@@ -2,7 +2,7 @@
  * Created by ptmind on 2018/3/9.
  */
 import FuncObj from '../FuncObj';
-
+import __allMatch__ from '../languageParser/allMatch';
 class CHECK_BOX extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
@@ -26,7 +26,7 @@ class CHECK_BOX extends FuncObj {
         this.dom.value = this.isSelect;
     }
 }
-export default {
+__allMatch__.push({
     match: /^CHECK_BOX$/,
     type: 'function',
     name: 'CHECK_BOX',
@@ -40,4 +40,4 @@ export default {
             default: ''
         }
     ]
-};
+});

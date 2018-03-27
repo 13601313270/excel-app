@@ -26,7 +26,7 @@
 </template>
 <script>
 import AllVarClass from '../observer/allVar.js';
-import getStrByObj from '../getStrByObj';
+import getStrByObj from '../languageParser/getStrByObj';
 export default {
     props: ['data', 'randomId'],
     data() {

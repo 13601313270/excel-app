@@ -4,6 +4,7 @@
 import echarts from 'echarts';
 import FuncObj from '../FuncObj';
 import Obj from '../observer/obj';
+import __allMatch__ from '../languageParser/allMatch';
 class BAR extends FuncObj {
     constructor(source, x, y, begin, end) {
         super(...Array.from(arguments));
@@ -67,7 +68,7 @@ class BAR extends FuncObj {
         }, 2000);
     }
 }
-export default {
+__allMatch__.push({
     match: /^BAR/,
     type: 'function',
     name: 'BAR',
@@ -105,4 +106,4 @@ export default {
             default: ''
         }
     ]
-};
+});

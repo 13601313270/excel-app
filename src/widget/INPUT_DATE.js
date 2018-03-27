@@ -2,6 +2,7 @@
  * Created by ptmind on 2018/3/9.
  */
 import FuncObj from '../FuncObj';
+import __allMatch__ from '../languageParser/allMatch';
 class INPUT_DATE extends FuncObj {
     constructor(defaultVallue) {
         super(...Array.from(arguments));
@@ -25,7 +26,7 @@ class INPUT_DATE extends FuncObj {
     }
 }
 
-export default {
+__allMatch__.push({
     match: /^INPUT_DATE/,
     type: 'function',
     name: 'INPUT_DATE',
@@ -39,4 +40,4 @@ export default {
             default: ''
         }
     ]
-};
+});

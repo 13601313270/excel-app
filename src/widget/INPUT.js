@@ -2,7 +2,7 @@
  * Created by ptmind on 2018/3/9.
  */
 import FuncObj from '../FuncObj';
-
+import __allMatch__ from '../languageParser/allMatch';
 class INPUT extends FuncObj {
     constructor(type, value) {
         super(...Array.from(arguments));
@@ -29,7 +29,7 @@ class INPUT extends FuncObj {
         this.dom.value = this.valueee;
     }
 }
-export default {
+__allMatch__.push({
     match: /^INPUT$/,
     type: 'function',
     name: 'INPUT',
@@ -52,4 +52,4 @@ export default {
             default: ''
         }
     ]
-};
+});

@@ -53,14 +53,22 @@
 </template>
 
 <script>
-import evalObjAndStr from '../evalObjAndStr';
-import allMatch from '../allMatch';
+import evalObjAndStr from '../languageParser/evalObjAndStr';
+import allMatch from '../languageParser/allMatch';
+import '../widget/CHECK_BOX';
+import '../widget/BAR';
+import '../widget/INPUT';
+import '../widget/IF';
+import '../widget/INPUT_DATE';
+import '../widget/MIN';
+import '../widget/TEXT';
+
 import allVar from '../observer/allVar';
 import dashboard from './dashboard';
 import allPageVars from './allVars.vue';
 import propsCom from './props.vue';
 import Obj from '../observer/obj';
-import getStrByObj from '../getStrByObj';
+import getStrByObj from '../languageParser/getStrByObj';
 
 export default {
     data() {

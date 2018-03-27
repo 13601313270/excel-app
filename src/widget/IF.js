@@ -3,6 +3,7 @@
  */
 import FuncObj from '../FuncObj';
 import Obj from '../observer/obj';
+import __allMatch__ from '../languageParser/allMatch';
 class IF extends FuncObj {
     constructor(judge, obj1, obj2) {
         super(...Array.from(arguments));
@@ -22,7 +23,7 @@ class IF extends FuncObj {
         }
     }
 }
-export default {
+__allMatch__.push({
     match: /^IF$/,
     title: '判断',
     type: 'function',
@@ -41,4 +42,4 @@ export default {
         title: '假值运算',
         dataType: 'number'
     }]
-};
+});

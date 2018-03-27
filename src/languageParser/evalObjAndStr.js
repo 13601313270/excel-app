@@ -3,7 +3,7 @@
  */
 // 函数调用对象
 // runObj执行这个方法的对象
-import Obj from './observer/obj';
+import Obj from '../observer/obj';
 import __allMatch__ from './allMatch';
 import __runObj__ from './__runObj__';
 function getEvalObj(tableNum, str) {

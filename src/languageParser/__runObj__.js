@@ -1,7 +1,7 @@
 /**
  * Created by ptmind on 2018/3/26.
  */
-import Obj from './observer/obj';
+import Obj from '../observer/obj';
 class __runObj__ extends Obj {
     constructor(runObj, funcName, params) {
         super();

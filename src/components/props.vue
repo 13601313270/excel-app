@@ -96,7 +96,7 @@
 </template>
 <script>
 import innerDom from './props.vue';
-import allMatch from '../allMatch';
+import allMatch from '../languageParser/allMatch';
 import allVar from '../observer/allVar';
 // import getStrByObj from '../getStrByObj';
 export default {
