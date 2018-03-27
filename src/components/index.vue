@@ -41,7 +41,7 @@
             </div>
             <div style="display: flex;">
                 <div style="flex-grow: 1;padding: 3px 3px;">
-                    <all-vars @change="editVar"></all-vars>
+                    <all-vars @change="editVar" @hover="hover"></all-vars>
                 </div>
                 <div style="overflow: scroll;border: solid 1px black;">
                     <textarea :value="saveHtml" style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
@@ -117,17 +117,16 @@ export default {
                     });
                     code += propsArr.join(',');
                     code += ')';
-                    let newVarName = '$' + varName.replace(/^\$/, '');
-                    this.insertVarName = newVarName;
+                    this.insertVarName = varName;
                     let insertObj = evalObjAndStr(1, code);
-                    allVar.setVar(newVarName, insertObj[0]);
+                    allVar.setVar(varName, insertObj[0]);
                     this.insertProps = insertObj[0];
                     this.insertCode = code;
 
-                    let newVar = allVar.getVar(newVarName);
+                    let newVar = allVar.getVar(varName);
                     this.varToDom.set(newVar, dom);
                     let reg = new RegExp('<widget @change="addData" @init="dataInit" random-id="' + id + '"[^>]*>', 'g');
-                    this.html = this.html.replace(reg, '<widget @change="addData" @init="dataInit" random-id="' + id + '" data="' + newVarName + '">');
+                    this.html = this.html.replace(reg, '<widget @change="addData" @init="dataInit" random-id="' + id + '" data="' + varName + '">');
                     this.varToDom.get(newVar).innerHTML = '';
                     this.varToDom.get(newVar).appendChild(newVar.value_.dom);
                 }
@@ -180,6 +179,9 @@ export default {
             this.insertVarName = key;
             this.insertProps = Var.value_;
             this.insertCode = getStrByObj(Var.value_);
+        },
+        hover(key, messageType) {
+            this.$store.commit('varHighlightSet', {key, 'info': messageType});
         }
     },
     mounted() {

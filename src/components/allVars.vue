@@ -11,7 +11,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(item,key) in datas">
+            <tr v-for="(item,key) in datas" @mouseover="hover(key)" @mouseout="leave(key)">
                 <td v-html="key"></td>
                 <td v-html="getCodeByVal(item)"></td>
                 <td v-if="['string','number','boolean'].includes(typeof item)" v-html="item"></td>
@@ -46,6 +46,12 @@ export default {
         },
         change(key) {
             this.$emit('change', key);
+        },
+        hover(key) {
+            this.$emit('hover', key, 'info');
+        },
+        leave(key) {
+            this.$emit('hover', key, 'none');
         }
     }
 }

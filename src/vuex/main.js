@@ -1,10 +1,10 @@
 export default {
     state: {
-        count: 10
+        varHighlight: {}
     },
     mutations: {
-        increment(state) {
-            state.count++;
+        varHighlightSet(state, data) {
+            state.varHighlight = data;
         }
     }
 };
