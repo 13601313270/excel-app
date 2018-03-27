@@ -1,7 +1,7 @@
 /**
  * Created by ptmind on 2018/3/26.
  */
-import FuncObj from '../FuncObj';
+import FuncObj from '../widget/FuncObj';
 import Var from '../observer/Var';
 import Obj from '../observer/obj';
 import __runObj__ from './__runObj__';

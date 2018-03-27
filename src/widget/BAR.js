@@ -2,7 +2,7 @@
  * Created by ptmind on 2018/3/9.
  */
 import echarts from 'echarts';
-import FuncObj from '../FuncObj';
+import FuncObj from './FuncObj';
 import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
 class BAR extends FuncObj {

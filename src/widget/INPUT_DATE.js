@@ -1,7 +1,7 @@
 /**
  * Created by ptmind on 2018/3/9.
  */
-import FuncObj from '../FuncObj';
+import FuncObj from './FuncObj';
 import __allMatch__ from '../languageParser/allMatch';
 class INPUT_DATE extends FuncObj {
     constructor(defaultVallue) {

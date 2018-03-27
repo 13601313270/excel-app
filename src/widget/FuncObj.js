@@ -1,7 +1,7 @@
 /**
  * Created by ptmind on 2018/3/7.
  */
-import Obj from './observer/obj';
+import Obj from '../observer/obj';
 export default class extends Obj {
     constructor() {
         super();
