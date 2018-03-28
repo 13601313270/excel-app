@@ -7,7 +7,6 @@
                     <td>函数{{innerOption.name}}</td>
                     <td>
                         <select :value="innerOption.name" @change="changeType($event.target.value)">
-                            <option value="string">字符串</option>
                             <option value="var">变量</option>
                             <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}</option>
                         </select>
@@ -88,6 +87,23 @@
                             </select>
                         </td>
                     </template>
+                    <template v-else-if="innerOption.type==='array'">
+                        <td>
+                            <select :value="innerOption.type" @change="changeType($event.target.value)">
+                                <option value="var">变量</option>
+                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <template v-for="(item,key) in innerOption.props">
+                                <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"></inner-dom>
+                                <template v-if="key==innerOption.props.length-1">
+                                    <button @click="innerOption.props.push(''),childCodeChange()">添加</button>
+                                </template>
+                            </template>
+                        </td>
+                    </template>
                 </tr>
             </template>
             </tbody>
@@ -99,6 +115,7 @@ import innerDom from './props.vue';
 import allMatch from '../languageParser/allMatch';
 import allVar from '../observer/allVar';
 // import getStrByObj from '../getStrByObj';
+import __array__ from '../languageParser/array';
 export default {
     name: 'inner-dom',
     props: {
@@ -124,6 +141,11 @@ export default {
                         break;
                     }
                 }
+            } else if (val instanceof __array__) {
+                this.innerOption = {
+                    type: 'array',
+                    props: val.value_
+                };
             } else {
                 this.innerOption = val;
             }
@@ -141,6 +163,11 @@ export default {
     mounted() {
         if (['boolean', 'number', 'string'].includes(typeof this.value)) {
             this.innerOption = this.value;
+        } else if (this.value instanceof __array__) {
+            this.innerOption = {
+                type: 'array',
+                props: this.value.value_
+            };
         } else {
             this.innerOption = {
                 type: this.value.type,
@@ -187,6 +214,22 @@ export default {
                 code = innerOption.toString();
             } else if (typeof innerOption === 'boolean') {
                 code = innerOption ? 'TRUE' : 'FALSE';
+            } else if (innerOption.type === 'array') {
+                code = '[';
+                let childArr = [];
+                innerOption.props.forEach((item) => {
+                    childArr.push(this.createCodeText(item));
+                });
+                code += childArr.join(',');
+                code += ']';
+            } else if (innerOption instanceof __array__) {
+                code = '[';
+                let childArr = [];
+                innerOption.value_.forEach((item) => {
+                    childArr.push(this.createCodeText(item));
+                });
+                code += childArr.join(',');
+                code += ']';
             }
             return code;
         },

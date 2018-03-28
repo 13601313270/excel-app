@@ -5,8 +5,9 @@ import echarts from 'echarts';
 import FuncObj from './FuncObj';
 import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
+import ajax from '../api/ajax';
 class BAR extends FuncObj {
-    constructor(source, x, y, begin, end) {
+    constructor(source, table, x, y) {
         super(...Array.from(arguments));
         this.name = 'BAR';
         this.dom = document.createElement('div');
@@ -26,16 +27,11 @@ class BAR extends FuncObj {
     }
 
     render() {
-        console.log('bar render');
-        let begin = this.props[3];
-        if (begin instanceof Obj) {
-            begin = begin.value;
-        }
-        let end = this.props[4];
-        if (end instanceof Obj) {
-            end = end.value;
-        }
-        var option = {
+        let source = this.props[0] instanceof Obj ? this.props[0].value : this.props[0];
+        let table = this.props[1] instanceof Obj ? this.props[1].value : this.props[1];
+        let x = this.props[2] instanceof Obj ? this.props[2].value : this.props[2];
+        let y = this.props[3] instanceof Obj ? this.props[3].value : this.props[3];
+        let option = {
             tooltip: {},
             // legend: {
             //     data: ['销量']
@@ -44,28 +40,44 @@ class BAR extends FuncObj {
                 data: []
             },
             yAxis: {},
-            series: [{
-                type: 'bar',
-                data: [6.71, 6.6, 6.57, 6.5, 6.68, 6.73, 6.71, 6.6, 6.57, 6.5, 6.68, 6.73]
-            }]
+            series: []
         };
-        option.xAxis.data = [];
-        var timeItem = new Date(begin);
-        for (var i = 0; i < 100; i++) {
-            option.xAxis.data.push((timeItem.getYear() + 1900) + '-' + (timeItem.getMonth() + 1) + '-' + (timeItem.getDate()));
-            timeItem = new Date(timeItem.getTime() + 24 * 60 * 60 * 1000);
-            if (timeItem > new Date(end)) {
-                break;
+        ajax({
+            type: 'POST',
+            url: 'http://www.tablehub.cn/action/mysql.html',
+            data: {
+                type: 'run',
+                connection: parseInt(source),
+                table: table,
+                sql: {
+                    select: y.concat(x),
+                    groupBy: x
+                }
             }
-        }
-        option.series[0].data = option.series[0].data.splice(0, option.xAxis.data.length);
-        // 使用刚指定的配置项和数据显示图表。
-        this.myChart.setOption(option);
-        setTimeout(() => {
-            this.dom.style.width = '500px';
-            this.dom.style.height = '300px';
-            this.myChart.resize();
-        }, 2000);
+        }).then((data) => {
+            option.xAxis.data = [];
+            option.series = [];
+            // [{"count(33)":"1","count(email)":"1","state":"1"}]
+            data.forEach((item, index) => {
+                for (let i in item) {
+                    if (y.includes(i)) {
+                        if (option.series[y.indexOf(i)] === undefined) {
+                            option.series[y.indexOf(i)] = {type: 'bar', data: []};
+                        }
+                        option.series[y.indexOf(i)].data.push(item[i]);
+                    } else if (i === x) {
+                        option.xAxis.data.push(item[i]);
+                    }
+                }
+            });
+            // 使用刚指定的配置项和数据显示图表。
+            this.myChart.setOption(option);
+            setTimeout(() => {
+                this.dom.style.width = '500px';
+                this.dom.style.height = '300px';
+                this.myChart.resize();
+            }, 0);
+        });
     }
 }
 __allMatch__.push({
@@ -82,6 +94,12 @@ __allMatch__.push({
             default: ''
         },
         {
+            name: 'table:',
+            title: '表',
+            dataType: 'string',
+            default: ''
+        },
+        {
             name: 'x:',
             title: 'X轴',
             dataType: 'string',
@@ -90,19 +108,7 @@ __allMatch__.push({
         {
             name: 'y:',
             title: 'Y轴',
-            dataType: 'string',
-            default: ''
-        },
-        {
-            name: 'begin:',
-            title: '开始时间',
-            dataType: 'string',
-            default: ''
-        },
-        {
-            name: 'end:',
-            title: '结束时间',
-            dataType: 'string',
+            dataType: 'array',
             default: ''
         }
     ]

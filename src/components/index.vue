@@ -1,19 +1,51 @@
 <template>
-    <div style="display: flex;width: 100%;height: 100%;">
-        <div style="width: 200px;border-right: solid 1px black;text-align: center;background-color: #333;color:#999">
-            <h2>表单</h2>
-            <div draggable="true" @dragstart='drag("INPUT")'>输入框</div>
-            <div draggable="true" @dragstart='drag("INPUT_DATE")'>日期</div>
-            <!--<div draggable="true" @dragstart='drag($event)'>下拉框</div>-->
-            <div draggable="true" @dragstart='drag("CHECK_BOX")'>开关器</div>
-            <div draggable="true" @dragstart='drag("TEXT")'>文本</div>
+    <div style="width: 100%;height: 100%;">
+        <div style="display: flex;width: 100%;height: 100%;">
+            <div
+                style="width: 200px;border-right: solid 1px black;text-align: center;background-color: #333;color:#999">
+                <h2>表单</h2>
+                <div draggable="true" @dragstart='drag("INPUT")'>输入框</div>
+                <div draggable="true" @dragstart='drag("INPUT_DATE")'>日期</div>
+                <!--<div draggable="true" @dragstart='drag($event)'>下拉框</div>-->
+                <div draggable="true" @dragstart='drag("CHECK_BOX")'>开关器</div>
+                <div draggable="true" @dragstart='drag("TEXT")'>文本</div>
 
-            <h2>图表</h2>
-            <div draggable="true" @dragstart='drag("BAR")'>柱状图</div>
+                <h2>图表</h2>
+                <div draggable="true" @dragstart='drag("BAR")'>柱状图</div>
 
-            <h2>计算</h2>
-            <div draggable="true" @dragstart='drag("MIN")'>最小值</div>
-            <div draggable="true" @dragstart='drag("IF")'>IF判断</div>
+                <h2>计算</h2>
+                <div draggable="true" @dragstart='drag("MIN")'>最小值</div>
+                <div draggable="true" @dragstart='drag("IF")'>IF判断</div>
+            </div>
+            <div style="flex-grow:1;display: flex;flex-direction: column;" id="content">
+                <div style="flex-grow: 1;overflow:scroll;background-color: #f9f9f9;padding: 10px;">
+                    <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
+                </div>
+                <div style="display: flex;">
+                    <div style="flex-grow: 1;padding: 3px 3px;">
+                        <all-vars @change="editVar" @hover="hover"></all-vars>
+                    </div>
+                    <div style="overflow: scroll;border: solid 1px black;">
+                        <textarea :value="saveHtml"
+                                  style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div style="width: 200px;background-color: #d0d0d0;">
+                <h2>数据链接</h2>
+                <div v-for="item in connections">
+                    <div v-html="item.name"></div>
+                    <div style="display: none">
+                        <div v-html="item.id"></div>
+                        <div v-html="item.uid"></div>
+                        <div v-html="item.type"></div>
+                        <div v-html="item.info.db"></div>
+                        <div v-html="item.info.host"></div>
+                        <div v-html="item.info.port"></div>
+                        <div v-html="item.info.username"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div v-if="insertVarName!==''"
              style="position: fixed;z-index: 2;top:0%;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
@@ -35,26 +67,13 @@
                 </div>
             </div>
         </div>
-        <div style="flex-grow:1;display: flex;flex-direction: column;" id="content">
-            <div style="flex-grow: 1;overflow:scroll;background-color: #f9f9f9;padding: 10px;">
-                <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
-            </div>
-            <div style="display: flex;">
-                <div style="flex-grow: 1;padding: 3px 3px;">
-                    <all-vars @change="editVar" @hover="hover"></all-vars>
-                </div>
-                <div style="overflow: scroll;border: solid 1px black;">
-                    <textarea :value="saveHtml" style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
-                </div>
-            </div>
-
-        </div>
     </div>
 </template>
 
 <script>
 import evalObjAndStr from '../languageParser/evalObjAndStr';
 import allMatch from '../languageParser/allMatch';
+import '../languageParser/array';
 import '../widget/CHECK_BOX';
 import '../widget/BAR';
 import '../widget/INPUT';
@@ -70,6 +89,7 @@ import propsCom from './props.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 
+import ajax from '../api/ajax';
 export default {
     data() {
         return {
@@ -78,6 +98,7 @@ export default {
             insertProps: {},
             insertCode: '',
             insertVarName: '',
+            connections: [],
             html: '',
             varToDom: new Map()
         }
@@ -193,7 +214,25 @@ export default {
         }
     },
     mounted() {
-        let fileContent = `$a1 = TEXT(9999)`;
+        /**
+         * showTables
+         * showCreateTable
+         * run
+         * */
+        ajax({
+            type: 'POST',
+            url: 'http://www.tablehub.cn/action/mysql.html',
+            data: {
+                type: 'getConnections'
+                // table: 'user',
+                // sql: 'id>0'
+            }
+        }).then((data) => {
+            this.connections = data;
+        });
+
+        // let fileContent = `$a1 = TEXT(9999)`;
+        let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';
         this.html = `<div>
     <div>

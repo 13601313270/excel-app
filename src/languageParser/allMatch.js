@@ -88,30 +88,6 @@ var __allMatch__ = [
         }
     },
     {
-        match: /^\[$/,
-        value(tableNum, word, befordWord, forAction, forword) {
-            var params = [];
-            if (forword(true) === ']') {
-                forword();
-            } else {
-                let lll = 0;
-                while (lll++ < 4) {
-                    params.push(forAction([',', ';', ']']));
-                    var nextKey = forword(true);
-                    if (nextKey === undefined) {
-                        break;
-                    } else if ([',', ';'].indexOf(nextKey) > -1) {
-                        forword();
-                    } else if (nextKey === ']') {
-                        forword();
-                        break;
-                    }
-                }
-            }
-            return params;
-        }
-    },
-    {
         match: /^\($/,
         value(tableNum, word, baseWord, forAction, forword) {
             let returnBase = forAction([')'], false);
