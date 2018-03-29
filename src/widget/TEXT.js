@@ -9,19 +9,15 @@ class TEXT extends FuncObj {
         super(...Array.from(arguments));
         this.name = 'TEXT';
         this.dom = document.createElement('div');
-        this.valueeee = value;
+        this.data = value;
     }
 
     get value() {
-        if (this.valueeee instanceof Obj) {
-            return this.valueeee.value;
+        if (this.data instanceof Obj) {
+            return this.data.value;
         } else {
-            return this.valueeee;
+            return this.data;
         }
-    }
-
-    render() {
-        this.dom.innerHTML = this.value;
     }
 }
 __allMatch__.push({

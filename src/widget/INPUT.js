@@ -48,7 +48,9 @@ __allMatch__.push({
         {
             name: 'value:',
             title: '默认值',
-            dataType: 'string',
+            dataType: function(props) {
+                return props[0] + ',bool';
+            },
             default: ''
         }
     ]

@@ -7,40 +7,40 @@
                     <td>函数{{innerOption.name}}</td>
                     <td>
                         <select :value="innerOption.name" @change="changeType($event.target.value)">
-                            <option value="var">变量</option>
-                            <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}</option>
+                            <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量</option>
+                            <option v-for="item in allMatch"
+                                    v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
+                                    :value="item.name">{{item.title}}
+                            </option>
                         </select>
                     </td>
                 </tr>
                 <tr v-for="(value,key) in innerOption.props">
                     <td v-html="key>=codeOption.props.length?codeOption.props[codeOption.props.length-1].title:codeOption.props[key].title"></td>
                     <td>
-                        <template v-if="value instanceof Array">
-                            <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"></inner-dom>
-                        </template>
                         <template
-                            v-else-if="key>=codeOption.props.length-1 && codeOption.props[codeOption.props.length-1].dataType instanceof Array">
+                            v-if="key>=codeOption.props.length-1 && getDataType(codeOption.props.length-1) instanceof Array">
                             <select v-if="codeOption.props[codeOption.props.length-1].enum">
                                 <option v-for="title,val in codeOption.props[codeOption.props.length-1].enum"
                                         :value="val">{{title}}
                                 </option>
                             </select>
                             <template
-                                v-if="['number','string','bool'].includes(codeOption.props[codeOption.props.length-1].dataType[0])">
-                                <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"></inner-dom>
+                                v-if="['number','string','bool'].includes(getDataType(codeOption.props.length-1)[0])">
+                                <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"
+                                           :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
                             </template>
                             <template v-if="key==innerOption.props.length-1">
                                 <button @click="innerOption.props.push(''),childCodeChange()">添加</button>
                             </template>
                         </template>
-                        <template v-else-if="value instanceof Object">
-                            <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"></inner-dom>
-                        </template>
-                        <select v-else-if="codeOption.props[key].enum" v-model="innerOption.props[key]">
+                        <select v-else-if="codeOption.props[key].enum" v-model="innerOption.props[key]"
+                                @change="changeProp">
                             <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
                         </select>
-                        <template v-else-if="['number','string','bool'].includes(codeOption.props[key].dataType)">
-                            <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"></inner-dom>
+                        <template v-else>
+                            <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"
+                                       :dataType="getDataType(key)"></inner-dom>
                         </template>
                     </td>
                     <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
@@ -51,8 +51,12 @@
                     <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
                         <td>
                             <select :value="typeof innerOption" @change="changeType($event.target.value)">
-                                <option value="var">变量</option>
-                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
+                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
+                                </option>
+                                <option v-for="item in allMatch"
+                                        v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
+                                        :value="item.name">
+                                    {{item.title}}
                                 </option>
                             </select>
                         </td>
@@ -66,8 +70,12 @@
                         <td>
                             <select :value="innerOption===true?'TRUE':'FALSE'"
                                     @change="changeType($event.target.value)">
-                                <option value="var">变量</option>
-                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
+                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
+                                </option>
+                                <option v-for="item in allMatch"
+                                        v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
+                                        :value="item.name">
+                                    {{item.title}}
                                 </option>
                             </select>
                         </td>
@@ -75,8 +83,12 @@
                     <template v-else-if="innerOption.type === 'var'">
                         <td>
                             <select :value="innerOption.type" @change="changeType($event.target.value)">
-                                <option value="var">变量</option>
-                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
+                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
+                                </option>
+                                <option v-for="item in allMatch"
+                                        v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
+                                        :value="item.name">
+                                    {{item.title}}
                                 </option>
                             </select>
                         </td>
@@ -97,7 +109,8 @@
                         </td>
                         <td>
                             <template v-for="(item,key) in innerOption.props">
-                                <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"></inner-dom>
+                                <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"
+                                           dataType=""></inner-dom>
                                 <template v-if="key==innerOption.props.length-1">
                                     <button @click="innerOption.props.push(''),childCodeChange()">添加</button>
                                 </template>
@@ -119,7 +132,8 @@ import __array__ from '../languageParser/array';
 export default {
     name: 'inner-dom',
     props: {
-        value: {}
+        value: {},
+        dataType: ''
     },
     components: {
         'inner-dom': innerDom
@@ -186,6 +200,13 @@ export default {
         }
     },
     methods: {
+        getDataType(key) {
+            if (typeof this.codeOption.props[key].dataType === 'function') {
+                return this.codeOption.props[key].dataType(this.innerOption.props);
+            } else {
+                return this.codeOption.props[key].dataType;
+            }
+        },
         childCodeChange(childCode) {
             this.$emit('change', this.createCodeText(this.innerOption));
         },
@@ -233,7 +254,55 @@ export default {
             }
             return code;
         },
+        changeProp() {
+            for (let i = 0; i < this.allMatch.length; i++) {
+                if (this.innerOption.name.match(this.allMatch[i].match)) {
+                    this.codeOption = this.allMatch[i];
+                    this.codeOption.props.forEach((item, key) => {
+                        if (typeof item.dataType === 'function') {
+                            let dataType = item.dataType(this.innerOption.props);
+                            console.log(dataType);
+                            let replace = false;
+                            if (typeof this.innerOption.props[key] === 'number') {
+                                if (!dataType.split(',').includes('number')) {
+                                    replace = true;
+                                }
+                            } else if (typeof this.innerOption.props[key] === 'string') {
+                                if (!dataType.split(',').includes('string')) {
+                                    replace = true;
+                                }
+                            } else if (typeof this.innerOption.props[key] === 'boolean') {
+                                if (!dataType.split(',').includes('bool')) {
+                                    replace = true;
+                                }
+                            } else if (this.innerOption.props[key] instanceof Array) {
+                                if (!dataType.split(',').includes('bool')) {
+                                    replace = true;
+                                }
+                            }
+                            if (replace) {
+                                if (dataType.split(',').includes('number')) {
+                                    this.innerOption.props[key] = 1;
+                                } else if (dataType.split(',').includes('string')) {
+                                    this.innerOption.props[key] = '';
+                                } else if (dataType.split(',').includes('bool')) {
+                                    this.innerOption.props[key] = true;
+                                } else if (dataType.split(',').includes('array')) {
+                                    this.innerOption.props[key] = [];
+                                }
+                            }
+                        } else {
+                            console.log(item.dataType);
+                        }
+                    });
+                    this.$emit('input', this.innerOption);
+                    this.$emit('change', this.createCodeText(this.innerOption));
+                }
+            }
+        },
         changeType(name) {
+            console.log(name);
+            // codeOption.props
             if (name === 'var') {
                 this.innerOption = 1;
                 for (let i in this.allVar) {
@@ -259,19 +328,38 @@ export default {
                         this.codeOption = this.allMatch[i];
                         this.innerOption.type = this.codeOption.type;
                         this.allMatch[i].props.forEach((item) => {
+                            let dataType = item.dataType;
+                            if (dataType instanceof Array) {
+                                dataType = dataType[0];
+                            }
+                            console.log('-------');
+                            console.log(dataType);
                             if (item.enum) {
                                 for (let j in item.enum) {
                                     this.innerOption.props.push(j);
                                     break;
                                 }
-                            } else if (item.dataType === 'number') {
+                            } else if (typeof dataType === 'function') {
+                                this.innerOption.props.push(dataType);
+                            } else if (dataType.split(',').includes('number')) {
                                 this.innerOption.props.push(1);
-                            } else {
+                            } else if (dataType.split(',').includes('string')) {
                                 this.innerOption.props.push('');
+                            } else if (dataType.split(',').includes('bool')) {
+                                this.innerOption.props.push(true);
+                            } else if (dataType.split(',').includes('array')) {
+                                this.innerOption.props.push([]);
                             }
                         });
                     }
                 }
+                console.log(this.innerOption.props);
+                for (let i = 0; i < this.innerOption.props.length; i++) {
+                    if (typeof this.innerOption.props[i] === 'function') {
+                        this.innerOption.props[i] = this.innerOption.props[i](this.innerOption.props);
+                    }
+                }
+                console.log(this.innerOption.props);
             }
             this.$emit('input', this.innerOption);
             this.$emit('change', this.createCodeText(this.innerOption));
