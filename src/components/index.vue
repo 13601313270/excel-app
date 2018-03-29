@@ -86,7 +86,7 @@ import '../widget/TEXT';
 import allVar from '../observer/allVar';
 import dashboard from './dashboard';
 import allPageVars from './allVars.vue';
-import propsCom from './props.vue';
+import propsCom from './props/props.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 

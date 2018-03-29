@@ -6,13 +6,11 @@
                 <tr>
                     <td>函数{{innerOption.name}}</td>
                     <td>
-                        <select :value="innerOption.name" @change="changeType($event.target.value)">
-                            <option v-for="item in allMatch"
-                                    v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
-                                    :value="item.name">{{item.title}}
-                            </option>
-                            <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量</option>
-                        </select>
+                        <select-type
+                            :value="innerOption.name"
+                            @change="changeType"
+                            :dataType="dataType"
+                        ></select-type>
                     </td>
                 </tr>
                 <tr v-for="(value,key) in innerOption.props">
@@ -47,15 +45,11 @@
                 <tr>
                     <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
                         <td>
-                            <select :value="typeof innerOption" @change="changeType($event.target.value)">
-                                <option v-for="item in allMatch"
-                                        v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
-                                        :value="item.name">
-                                    {{item.title}}
-                                </option>
-                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
-                                </option>
-                            </select>
+                            <select-type
+                                :value="typeof innerOption"
+                                @change="changeType"
+                                :dataType="dataType"
+                            ></select-type>
                         </td>
                         <td>
                             <input :value="innerOption" v-if="typeof innerOption==='number'"
@@ -65,29 +59,20 @@
                     </template>
                     <template v-else-if="typeof innerOption==='boolean'">
                         <td>
-                            <select :value="innerOption===true?'TRUE':'FALSE'"
-                                    @change="changeType($event.target.value)">
-                                <option v-for="item in allMatch"
-                                        v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
-                                        :value="item.name">
-                                    {{item.title}}
-                                </option>
-                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
-                                </option>
-                            </select>
+                            <select-type
+                                :value="innerOption===true?'TRUE':'FALSE'"
+                                @change="changeType"
+                                :dataType="dataType"
+                            ></select-type>
                         </td>
                     </template>
                     <template v-else-if="innerOption.type === 'var'">
                         <td>
-                            <select :value="innerOption.type" @change="changeType($event.target.value)">
-                                <option v-for="item in allMatch"
-                                        v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
-                                        :value="item.name">
-                                    {{item.title}}
-                                </option>
-                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
-                                </option>
-                            </select>
+                            <select-type
+                                :value="innerOption.type"
+                                @change="changeType"
+                                :dataType="dataType"
+                            ></select-type>
                         </td>
                         <td>
                             <select :value="innerOption.name"
@@ -97,13 +82,7 @@
                         </td>
                     </template>
                     <template v-else-if="innerOption.type==='array'">
-                        <td>
-                            <select :value="innerOption.type" @change="changeType($event.target.value)">
-                                <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
-                                </option>
-                                <option value="var">变量</option>
-                            </select>
-                        </td>
+                        <td>数组</td>
                         <td>
                             <template v-for="(item,key) in innerOption.props">
                                 <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"
@@ -125,10 +104,11 @@
 </template>
 <script>
 import innerDom from './props.vue';
-import allMatch from '../languageParser/allMatch';
-import allVar from '../observer/allVar';
+import allMatch from '../../languageParser/allMatch';
+import allVar from '../../observer/allVar';
 // import getStrByObj from '../getStrByObj';
-import __array__ from '../languageParser/array';
+import __array__ from '../../languageParser/array';
+import selectType from './typeSelect.vue';
 export default {
     name: 'inner-dom',
     props: {
@@ -136,7 +116,8 @@ export default {
         dataType: ''
     },
     components: {
-        'inner-dom': innerDom
+        'inner-dom': innerDom,
+        'select-type': selectType
     },
     computed: {},
     watch: {
@@ -395,6 +376,7 @@ export default {
         border-collapse: collapse;
         td {
             border: solid 1px black;
+            padding: 2px;
         }
     }
 </style>
