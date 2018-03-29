@@ -32,14 +32,14 @@ __allMatch__.push({
     props: [{
         name: 'judge',
         title: '判断条件',
-        dataType: 'bool'
+        dataType: 'bool,function,var'
     }, {
         name: 'obj1',
         title: '真值运算',
-        dataType: 'number'
+        dataType: 'number,function,var'
     }, {
         name: 'obj2',
         title: '假值运算',
-        dataType: 'number'
+        dataType: 'number,function,var'
     }]
 });

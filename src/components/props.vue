@@ -7,11 +7,11 @@
                     <td>函数{{innerOption.name}}</td>
                     <td>
                         <select :value="innerOption.name" @change="changeType($event.target.value)">
-                            <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量</option>
                             <option v-for="item in allMatch"
                                     v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
                                     :value="item.name">{{item.title}}
                             </option>
+                            <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量</option>
                         </select>
                     </td>
                 </tr>
@@ -48,12 +48,12 @@
                     <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
                         <td>
                             <select :value="typeof innerOption" @change="changeType($event.target.value)">
-                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
-                                </option>
                                 <option v-for="item in allMatch"
                                         v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
                                         :value="item.name">
                                     {{item.title}}
+                                </option>
+                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
                                 </option>
                             </select>
                         </td>
@@ -67,12 +67,12 @@
                         <td>
                             <select :value="innerOption===true?'TRUE':'FALSE'"
                                     @change="changeType($event.target.value)">
-                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
-                                </option>
                                 <option v-for="item in allMatch"
                                         v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
                                         :value="item.name">
                                     {{item.title}}
+                                </option>
+                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
                                 </option>
                             </select>
                         </td>
@@ -80,12 +80,12 @@
                     <template v-else-if="innerOption.type === 'var'">
                         <td>
                             <select :value="innerOption.type" @change="changeType($event.target.value)">
-                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
-                                </option>
                                 <option v-for="item in allMatch"
                                         v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
                                         :value="item.name">
                                     {{item.title}}
+                                </option>
+                                <option value="var" v-if="(dataType===''||dataType.split(',').includes('var'))">变量
                                 </option>
                             </select>
                         </td>
@@ -99,9 +99,9 @@
                     <template v-else-if="innerOption.type==='array'">
                         <td>
                             <select :value="innerOption.type" @change="changeType($event.target.value)">
-                                <option value="var">变量</option>
                                 <option v-for="item in allMatch" v-if="item.name" :value="item.name">{{item.title}}
                                 </option>
+                                <option value="var">变量</option>
                             </select>
                         </td>
                         <td>
@@ -111,6 +111,9 @@
                                 <template v-if="key==innerOption.props.length-1">
                                     <button @click="addProp('string')">添加</button>
                                 </template>
+                            </template>
+                            <template v-if="innerOption.props.length==0">
+                                <button @click="addProp('string')">添加</button>
                             </template>
                         </td>
                     </template>

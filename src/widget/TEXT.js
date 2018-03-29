@@ -29,8 +29,8 @@ __allMatch__.push({
     props: [
         {
             name: 'value',
-            title: '默认文字值',
-            dataType: 'string'
+            title: '文字值',
+            dataType: 'string,number,bool,function,var'
         }
     ]
 });

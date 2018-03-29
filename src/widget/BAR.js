@@ -102,7 +102,7 @@ __allMatch__.push({
         {
             name: 'x:',
             title: 'X轴',
-            dataType: 'string',
+            dataType: 'string,function,var',
             default: ''
         },
         {
