@@ -1,7 +1,7 @@
 /**
  * Created by ptmind on 2018/3/22.
  */
-var events = require('events');
+const events = require('events');
 
 class Dep {
     constructor() {
@@ -9,7 +9,7 @@ class Dep {
         this.sentEvent = [];
         this.using = [];
         this.value_ = null;
-        this.state = 0;// 0正常ready状态,1锁定,正在执行
+        this.state = 0;// 0正常ready状态,1锁定
     }
 
     listen(obj) {
@@ -43,14 +43,10 @@ class Dep {
         }
     }
 
-    render() {
-        this.eventEmitter.emit('ready');
-    }
-
     lock() {
         this.state = 1;
         if (this.sentEvent instanceof Array && this.sentEvent.length > 0) {
-            for (var i = 0; i < this.sentEvent.length; i++) {
+            for (let i = 0; i < this.sentEvent.length; i++) {
                 this.sentEvent[i].lock();
             }
         }
@@ -58,9 +54,9 @@ class Dep {
 
     // 所有前置依赖是否state都是0
     __allBeforeIsState0() {
-        var isReady = true;
+        let isReady = true;
         if (this.using.length > 0) {
-            for (var i = 0; i < this.using.length; i++) {
+            for (let i = 0; i < this.using.length; i++) {
                 if (this.using[i].state === 1) {
                     isReady = false;
                 }
@@ -69,17 +65,21 @@ class Dep {
         return isReady;
     }
 
-    // 请求判断当前是否可以释放，如果可以则释放并通知下家
-    update() {
+    action() {
         // 当有多个上级的时候，会收到多个render，所以只捕捉最后一次
-        if (this.__allBeforeIsState0()) {
-            // console.log('render');
-            this.render();
+        if (this.__allBeforeIsState0() && this.state === 1) {
             this.state = 0;
+            this.eventEmitter.emit('ready');
             if (this.sentEvent.length > 0) {
-                this.sentEvent.forEach(i => i.update());
+                this.sentEvent.forEach(i => i.action());
             }
         }
+    }
+
+    // 请求判断当前是否可以释放，如果可以则释放并通知下家
+    update() {
+        this.lock();
+        this.action();
     }
 
     // 当变为孤立点时，则会删除(sentEvent为空，说明不会再被任何对象使用)
