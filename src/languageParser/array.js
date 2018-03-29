@@ -24,7 +24,6 @@ class __array__ extends Obj {
 __allMatch__.push({
     match: /^\[$/,
     type: 'array',
-    name: 'array',
     title: '数组',
     value(tableNum, word, befordWord, forAction, forword) {
         var params = [];

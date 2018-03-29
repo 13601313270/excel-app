@@ -142,7 +142,7 @@ export default {
                             pushProp = '""';
                         } else if (dataType.split(',').includes('bool')) {
                             pushProp = 'TRUE';
-                        } else if (dataType.split(',').includes('array')) {
+                        } else if (dataType.match(/array\((.*)\)/)) {
                             pushProp = '[]';
                         }
                         propsArr.push(pushProp);

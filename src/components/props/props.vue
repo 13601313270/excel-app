@@ -43,7 +43,22 @@
             </template>
             <template v-else>
                 <tr>
-                    <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
+                    <template v-if="dataType==='dbCompute'">
+                        <td>
+                            <div></div>
+                        </td>
+                        <td>
+                            <select-type
+                                :value="typeof innerOption"
+                                @change="changeType"
+                                :dataType="dataType"
+                            ></select-type>
+                            <input :value="innerOption" v-if="typeof innerOption==='number'"
+                                   @change="inputChange(parseFloat($event.target.value))"/>
+                            <input :value="innerOption" v-else @change="inputChange($event.target.value.toString())"/>
+                        </td>
+                    </template>
+                    <template v-else-if="typeof innerOption==='number'||typeof innerOption==='string'">
                         <td>
                             <select-type
                                 :value="typeof innerOption"
@@ -86,13 +101,13 @@
                         <td>
                             <template v-for="(item,key) in innerOption.props">
                                 <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"
-                                           dataType=""></inner-dom>
+                                           :dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>
                                 <template v-if="key==innerOption.props.length-1">
-                                    <button @click="addProp('string')">添加</button>
+                                    <button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>
                                 </template>
                             </template>
                             <template v-if="innerOption.props.length==0">
-                                <button @click="addProp('string')">添加</button>
+                                <button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>
                             </template>
                         </td>
                     </template>
@@ -125,7 +140,7 @@ export default {
             if (val instanceof Object) {
                 this.innerOption = {
                     type: val.type,
-                    name: val.name.toString(),
+                    name: val.name ? val.name.toString() : '',
                     props: val.props
                 };
 
@@ -248,7 +263,7 @@ export default {
             } else if (dataTypeNew === 'array') {
                 this.innerOption.props.push([]);
             } else {
-                this.innerOption.props.push([]);
+                this.innerOption.props.push('');
             }
             this.childCodeChange();
         },
@@ -329,8 +344,6 @@ export default {
                             if (dataType instanceof Array) {
                                 dataType = dataType[0];
                             }
-                            console.log('-------');
-                            console.log(dataType);
                             if (item.enum) {
                                 for (let j in item.enum) {
                                     this.innerOption.props.push(j);
@@ -344,8 +357,10 @@ export default {
                                 this.innerOption.props.push('');
                             } else if (dataType.split(',').includes('bool')) {
                                 this.innerOption.props.push(true);
-                            } else if (dataType.split(',').includes('array')) {
-                                this.innerOption.props.push([]);
+                            } else if (dataType.match(/array\((.*)\)/)) {
+                                this.innerOption.props.push(new __array__([]));
+                            } else {
+                                this.innerOption.props.push('');
                             }
                         });
                     }
@@ -359,12 +374,14 @@ export default {
                             this.innerOption.props[i] = '';
                         } else if (this.innerOption.props[i].split(',').includes('bool')) {
                             this.innerOption.props[i] = true;
-                        } else if (this.innerOption.props[i].split(',').includes('array')) {
+                        } else if (this.innerOption.props[i].match(/array\((.*)\)/)) {
                             this.innerOption.props[i] = [];
                         }
                     }
                 }
             }
+            console.log('-------');
+            console.log(this.innerOption.props);
             this.$emit('input', this.innerOption);
             this.$emit('change', this.createCodeText(this.innerOption));
         }
