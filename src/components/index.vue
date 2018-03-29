@@ -59,6 +59,7 @@
                 <props-com @change="codeUpdate"
                            ref="insertProps"
                            v-model="insertProps"
+                           dataType=""
                            style="min-height: 250px;"></props-com>
                 <div>
                     <textarea @change="codeUpdate($event.target.value)"
@@ -121,10 +122,11 @@ export default {
                     let propsArr = [];
                     item.props.forEach((item) => {
                         let item2 = item;
-                        let isArr = false;
-                        if (item2.dataType instanceof Array) {
-                            isArr = true;
-                            item2.dataType = item2.dataType[0];
+                        let dataType = item2.dataType;
+                        // let isArr = false;
+                        if (dataType instanceof Array) {
+                            // isArr = true;
+                            dataType = dataType[0];
                         }
                         let pushProp = '';
                         if (item2.enum) {
@@ -132,18 +134,45 @@ export default {
                                 pushProp = '"' + j + '"';
                                 break;
                             }
-                        } else if (item2.dataType === 'number') {
+                        } else if (typeof dataType === 'function') {
+                            pushProp = dataType;
+                        } else if (dataType.split(',').includes('number')) {
                             pushProp = 1;
-                        } else if (item2.dataType === 'string') {
+                        } else if (dataType.split(',').includes('string')) {
                             pushProp = '""';
-                        } else {
+                        } else if (dataType.split(',').includes('bool')) {
                             pushProp = 'TRUE';
+                        } else if (dataType.split(',').includes('array')) {
+                            pushProp = '[]';
                         }
                         propsArr.push(pushProp);
-                        if (isArr) {
-                            item2.dataType = [item2.dataType];
-                        }
+                        // if (isArr) {
+                        //     dataType = [dataType];
+                        // }
                     });
+                    let temp2 = [];
+                    for (let j = 0; j < propsArr.length; j++) {
+                        if (typeof propsArr[j] === 'function') {
+                            temp2.push(null);
+                        } else {
+                            temp2.push(evalObjAndStr(1, propsArr[j])[0]);
+                        }
+                    }
+                    for (let j = 0; j < propsArr.length; j++) {
+                        if (typeof propsArr[j] === 'function') {
+                            propsArr[j] = propsArr[j](temp2);
+                            console.log(propsArr[j]);
+                            if (propsArr[j].split(',').includes('number')) {
+                                propsArr[j] = 1;
+                            } else if (propsArr[j].split(',').includes('string')) {
+                                propsArr[j] = '""';
+                            } else if (propsArr[j].split(',').includes('bool')) {
+                                propsArr[j] = 'TRUE';
+                            } else if (propsArr[j].split(',').includes('array')) {
+                                propsArr[j] = '[]';
+                            }
+                        }
+                    }
                     code += propsArr.join(',');
                     code += ')';
                     this.insertVarName = varName;
@@ -231,8 +260,10 @@ export default {
             this.connections = data;
         });
 
-        // let fileContent = `$a1 = TEXT(9999)`;
-        let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
+        // let fileContent = `$a1 = INPUT('number',9999)`;
+        // let fileContent = `$a1 = CHECK_BOX(TRUE)`;
+        let fileContent = `$a1 = MIN(1,2,3)`;
+        // let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';
         this.html = `<div>
     <div>

@@ -25,13 +25,10 @@
                                         :value="val">{{title}}
                                 </option>
                             </select>
-                            <template
-                                v-if="['number','string','bool'].includes(getDataType(codeOption.props.length-1)[0])">
-                                <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"
-                                           :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
-                            </template>
+                            <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"
+                                       :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
                             <template v-if="key==innerOption.props.length-1">
-                                <button @click="innerOption.props.push(''),childCodeChange()">添加</button>
+                                <button @click="addProp(getDataType(codeOption.props.length-1)[0])">添加</button>
                             </template>
                         </template>
                         <select v-else-if="codeOption.props[key].enum" v-model="innerOption.props[key]"
@@ -112,7 +109,7 @@
                                 <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"
                                            dataType=""></inner-dom>
                                 <template v-if="key==innerOption.props.length-1">
-                                    <button @click="innerOption.props.push(''),childCodeChange()">添加</button>
+                                    <button @click="addProp('string')">添加</button>
                                 </template>
                             </template>
                         </td>
@@ -207,7 +204,8 @@ export default {
                 return this.codeOption.props[key].dataType;
             }
         },
-        childCodeChange(childCode) {
+        childCodeChange() {
+            this.$emit('input', this.innerOption);
             this.$emit('change', this.createCodeText(this.innerOption));
         },
         inputChange(val) {
@@ -254,6 +252,22 @@ export default {
             }
             return code;
         },
+        addProp(dataType) {
+            let dataTypeNew = dataType.split(',')[0];
+            console.log(dataTypeNew);
+            if (dataTypeNew === 'number') {
+                this.innerOption.props.push(1);
+            } else if (dataTypeNew === 'string') {
+                this.innerOption.props.push('');
+            } else if (dataTypeNew === 'bool') {
+                this.innerOption.props.push(true);
+            } else if (dataTypeNew === 'array') {
+                this.innerOption.props.push([]);
+            } else {
+                this.innerOption.props.push([]);
+            }
+            this.childCodeChange();
+        },
         changeProp() {
             for (let i = 0; i < this.allMatch.length; i++) {
                 if (this.innerOption.name.match(this.allMatch[i].match)) {
@@ -261,7 +275,6 @@ export default {
                     this.codeOption.props.forEach((item, key) => {
                         if (typeof item.dataType === 'function') {
                             let dataType = item.dataType(this.innerOption.props);
-                            console.log(dataType);
                             let replace = false;
                             if (typeof this.innerOption.props[key] === 'number') {
                                 if (!dataType.split(',').includes('number')) {
@@ -353,13 +366,20 @@ export default {
                         });
                     }
                 }
-                console.log(this.innerOption.props);
                 for (let i = 0; i < this.innerOption.props.length; i++) {
                     if (typeof this.innerOption.props[i] === 'function') {
                         this.innerOption.props[i] = this.innerOption.props[i](this.innerOption.props);
+                        if (this.innerOption.props[i].split(',').includes('number')) {
+                            this.innerOption.props[i] = 1;
+                        } else if (this.innerOption.props[i].split(',').includes('string')) {
+                            this.innerOption.props[i] = '';
+                        } else if (this.innerOption.props[i].split(',').includes('bool')) {
+                            this.innerOption.props[i] = true;
+                        } else if (this.innerOption.props[i].split(',').includes('array')) {
+                            this.innerOption.props[i] = [];
+                        }
                     }
                 }
-                console.log(this.innerOption.props);
             }
             this.$emit('input', this.innerOption);
             this.$emit('change', this.createCodeText(this.innerOption));

@@ -33,6 +33,6 @@ __allMatch__.push({
     props: [{
         name: 'value',
         title: '比较项',
-        dataType: ['number']
+        dataType: ['number,var,function']
     }]
 });
