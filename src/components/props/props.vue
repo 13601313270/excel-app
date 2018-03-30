@@ -43,22 +43,7 @@
             </template>
             <template v-else>
                 <tr>
-                    <template v-if="dataType==='dbCompute'">
-                        <td>
-                            <div></div>
-                        </td>
-                        <td>
-                            <select-type
-                                :value="typeof innerOption"
-                                @change="changeType"
-                                :dataType="dataType"
-                            ></select-type>
-                            <input :value="innerOption" v-if="typeof innerOption==='number'"
-                                   @change="inputChange(parseFloat($event.target.value))"/>
-                            <input :value="innerOption" v-else @change="inputChange($event.target.value.toString())"/>
-                        </td>
-                    </template>
-                    <template v-else-if="typeof innerOption==='number'||typeof innerOption==='string'">
+                    <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
                         <td>
                             <select-type
                                 :value="typeof innerOption"
