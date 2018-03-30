@@ -5,19 +5,44 @@ import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
 import funcLanguageParser from '../languageParser/functionCall';
 import createCodeText from '../languageParser/getStrByObj';
+import ajax from '../api/ajax';
 
 class relationalModel extends Obj {
     constructor() {
-        console.log(Array.from(arguments));
         super();
         this.props = Array.from(arguments);
         this.name = 'RELATIONAL_MODEL';
         this.type = 'relationalModel';
-        this.dom = document.createElement('div');
+        this.dataValue = [];
     }
 
-    render() {
-        this.dom.innerHTML = this.value;
+    get value() {
+        return this.dataValue;
+    }
+
+    render(handle) {
+        handle(new Promise((resolve, reject) => {
+            let source = this.props[0] instanceof Obj ? this.props[0].value : this.props[0];
+            let table = this.props[1] instanceof Obj ? this.props[1].value : this.props[1];
+            let x = this.props[2] instanceof Obj ? this.props[2].value : this.props[2];
+            let y = this.props[3] instanceof Obj ? this.props[3].value : this.props[3];
+            ajax({
+                type: 'POST',
+                url: 'http://www.tablehub.cn/action/mysql.html',
+                data: {
+                    type: 'run',
+                    connection: parseInt(source),
+                    table: table,
+                    sql: {
+                        select: y.concat(x),
+                        groupBy: x
+                    }
+                }
+            }).then((data) => {
+                this.dataValue = data;
+                resolve();
+            });
+        }));
     }
 
     getCodeByObj() {

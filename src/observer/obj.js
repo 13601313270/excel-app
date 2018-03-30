@@ -5,8 +5,8 @@ import Dep from './dep';
 class obj {
     constructor() {
         this.dep = new Dep();
-        this.dep.eventEmitter.on('ready', () => {
-            this.render();
+        this.dep.eventEmitter.on('ready', (handle) => {
+            this.render(handle);
         });
         this.value_ = null;
     }

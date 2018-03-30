@@ -68,10 +68,34 @@ class Dep {
     action() {
         // 当有多个上级的时候，会收到多个render，所以只捕捉最后一次
         if (this.__allBeforeIsState0() && this.state === 1) {
-            this.state = 0;
-            this.eventEmitter.emit('ready');
-            if (this.sentEvent.length > 0) {
-                this.sentEvent.forEach(i => i.action());
+            let result = [];
+            this.eventEmitter.emit('ready', function(listenResult) {
+                result.push(listenResult);
+            });
+            let allPromise = [];
+            let hasFalse = false;
+            result.forEach((item) => {
+                if (item === false) {
+                    hasFalse = true;
+                } else if (item instanceof Promise) {
+                    allPromise.push(item);
+                }
+            });
+            if (hasFalse) {
+                return;
+            }
+            if (allPromise.length > 0) {
+                Promise.all(allPromise).then(() => {
+                    this.state = 0;
+                    if (this.sentEvent.length > 0) {
+                        this.sentEvent.forEach(i => i.action());
+                    }
+                });
+            } else {
+                this.state = 0;
+                if (this.sentEvent.length > 0) {
+                    this.sentEvent.forEach(i => i.action());
+                }
             }
         }
     }
