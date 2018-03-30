@@ -2,7 +2,24 @@
     <div class="prop">
         <table>
             <tbody>
-            <template v-if="innerOption.type === 'function'">
+            <template v-if="dataType==='relationalModel'">
+                <tr>
+                    <td>关系模型</td>
+                    <td></td>
+                </tr>
+                <tr v-for="(value,key) in codeOption.props">
+                    <td v-html="codeOption.props[key].title"></td>
+                    <td>
+                        <inner-dom v-if="innerOption.props[key]"
+                                   @change="childCodeChange"
+                                   v-model="innerOption.props[key]"
+                                   :dataType="getDataType(key)"
+                        ></inner-dom>
+                    </td>
+                    <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
+                </tr>
+            </template>
+            <template v-else-if="innerOption.type === 'function'">
                 <tr>
                     <td>函数{{innerOption.name}}</td>
                     <td>
@@ -23,8 +40,23 @@
                                         :value="val">{{title}}
                                 </option>
                             </select>
-                            <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"
+
+
+                            <div v-if="getDataType(codeOption.props.length-1)[0]==='relationalModel'">
+                                <select :value="innerOption.props[key].name"
+                                        @change="inputChange({type:'var',name:$event.target.value})">
+                                    <option v-for="(item,key) in allVar" :value="key"
+                                            v-if="item.value_ instanceof relationalModel">
+                                        {{key}}
+                                    </option>
+                                </select>
+                                <br/>
+                                <button>新建</button>
+                            </div>
+                            <inner-dom v-else @change="childCodeChange" v-model="innerOption.props[key]"
                                        :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
+
+
                             <template v-if="key==innerOption.props.length-1">
                                 <button @click="addProp(getDataType(codeOption.props.length-1)[0])">添加</button>
                             </template>
@@ -34,7 +66,18 @@
                             <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
                         </select>
                         <template v-else>
-                            <inner-dom @change="childCodeChange" v-model="innerOption.props[key]"
+                            <div v-if="getDataType(key)==='relationalModel'">
+                                <select :value="innerOption.props[key].name"
+                                        @change="innerOption.props[key]={type:'var',name:$event.target.value},childCodeChange()">
+                                    <option v-for="(item,key) in allVar" :value="key"
+                                            v-if="item.value_ instanceof relationalModel">
+                                        {{key}}
+                                    </option>
+                                </select>
+                                <br/>
+                                <button>新建</button>
+                            </div>
+                            <inner-dom v-else @change="childCodeChange" v-model="innerOption.props[key]"
                                        :dataType="getDataType(key)"></inner-dom>
                         </template>
                     </td>
@@ -107,6 +150,7 @@ import innerDom from './props.vue';
 import allMatch from '../../languageParser/allMatch';
 import allVar from '../../observer/allVar';
 // import getStrByObj from '../getStrByObj';
+import relationalModel from '../../widget/relationalModel';
 import __array__ from '../../languageParser/array';
 import selectType from './typeSelect.vue';
 export default {
@@ -152,7 +196,8 @@ export default {
             innerOption: {},
             codeOption: {},
             allMatch: {},
-            allVar: allVar.getAllData()
+            allVar: allVar.getAllData(),
+            relationalModel: relationalModel
         };
     },
     mounted() {
@@ -196,8 +241,7 @@ export default {
             if (val !== undefined) {
                 this.innerOption = val;
             }
-            this.$emit('input', this.innerOption);
-            this.$emit('change', this.createCodeText(this.innerOption));
+            this.childCodeChange();
         },
         createCodeText(innerOption) {
             let code = '';
@@ -238,7 +282,6 @@ export default {
         },
         addProp(dataType) {
             let dataTypeNew = dataType.split(',')[0];
-            console.log(dataTypeNew);
             if (dataTypeNew === 'number') {
                 this.innerOption.props.push(1);
             } else if (dataTypeNew === 'string') {
@@ -292,13 +335,11 @@ export default {
                             console.log(item.dataType);
                         }
                     });
-                    this.$emit('input', this.innerOption);
-                    this.$emit('change', this.createCodeText(this.innerOption));
+                    this.childCodeChange();
                 }
             }
         },
         changeType(name) {
-            console.log(name);
             // codeOption.props
             if (name === 'var') {
                 this.innerOption = 1;
@@ -365,10 +406,7 @@ export default {
                     }
                 }
             }
-            console.log('-------');
-            console.log(this.innerOption.props);
-            this.$emit('input', this.innerOption);
-            this.$emit('change', this.createCodeText(this.innerOption));
+            this.childCodeChange();
         }
     }
 }

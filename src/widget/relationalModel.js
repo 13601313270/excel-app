@@ -11,7 +11,8 @@ class relationalModel extends Obj {
         console.log(Array.from(arguments));
         super();
         this.props = Array.from(arguments);
-        this.type = 'function';
+        this.name = 'RELATIONAL_MODEL';
+        this.type = 'relationalModel';
         this.dom = document.createElement('div');
     }
 
@@ -33,9 +34,35 @@ class relationalModel extends Obj {
 __allMatch__.push({
     match: /^RELATIONAL_MODEL/,
     type: 'relationalModel',
-    name: 'relationalModel',
+    name: 'RELATIONAL_MODEL',
     title: '关系模型',
     func: relationalModel,
-    value: funcLanguageParser
+    value: funcLanguageParser,
+    props: [
+        {
+            name: 'source:',
+            title: '关系模型',
+            dataType: 'string',
+            default: ''
+        },
+        {
+            name: 'table:',
+            title: '表',
+            dataType: 'string',
+            default: ''
+        },
+        {
+            name: 'x:',
+            title: 'X轴',
+            dataType: 'string',
+            default: ''
+        },
+        {
+            name: 'y:',
+            title: 'Y轴',
+            dataType: 'array(string)',
+            default: ''
+        }
+    ]
 });
 export default relationalModel;

@@ -59,7 +59,7 @@
                 <props-com @change="codeUpdate"
                            ref="insertProps"
                            v-model="insertProps"
-                           dataType=""
+                           :dataType="editDataType"
                            style="min-height: 250px;"></props-com>
                 <div>
                     <textarea @change="codeUpdate($event.target.value)"
@@ -82,7 +82,7 @@ import '../widget/IF';
 import '../widget/INPUT_DATE';
 import '../widget/MIN';
 import '../widget/TEXT';
-import '../widget/relationalModel';
+import relationalModel from '../widget/relationalModel';
 
 import allVar from '../observer/allVar';
 import dashboard from './dashboard';
@@ -98,6 +98,7 @@ export default {
             currentView: dashboard(),
             dragDomFunc: undefined,
             insertProps: {},
+            editDataType: '',
             insertCode: '',
             insertVarName: '',
             connections: [],
@@ -115,71 +116,78 @@ export default {
         }
     },
     methods: {
+        getCodeByMatchItem(item) {
+            let code = item.name + '(';
+            let propsArr = [];
+            item.props.forEach((item) => {
+                let item2 = item;
+                let dataType = item2.dataType;
+                // let isArr = false;
+                if (dataType instanceof Array) {
+                    // isArr = true;
+                    dataType = dataType[0];
+                }
+                let pushProp = '';
+                if (item2.enum) {
+                    for (let j in item2.enum) {
+                        pushProp = '"' + j + '"';
+                        break;
+                    }
+                } else if (typeof dataType === 'function') {
+                    pushProp = dataType;
+                } else if (dataType.split(',').includes('number')) {
+                    pushProp = 1;
+                } else if (dataType.split(',').includes('string')) {
+                    pushProp = '""';
+                } else if (dataType.split(',').includes('bool')) {
+                    pushProp = 'TRUE';
+                } else if (dataType.match(/array\((.*)\)/)) {
+                    pushProp = '[]';
+                } else {
+                    pushProp = '""';
+                }
+                propsArr.push(pushProp);
+                // if (isArr) {
+                //     dataType = [dataType];
+                // }
+            });
+            let temp2 = [];
+            for (let j = 0; j < propsArr.length; j++) {
+                if (typeof propsArr[j] === 'function') {
+                    temp2.push(null);
+                } else {
+                    temp2.push(evalObjAndStr(1, propsArr[j])[0]);
+                }
+            }
+            for (let j = 0; j < propsArr.length; j++) {
+                if (typeof propsArr[j] === 'function') {
+                    propsArr[j] = propsArr[j](temp2);
+                    console.log(propsArr[j]);
+                    if (propsArr[j].split(',').includes('number')) {
+                        propsArr[j] = 1;
+                    } else if (propsArr[j].split(',').includes('string')) {
+                        propsArr[j] = '""';
+                    } else if (propsArr[j].split(',').includes('bool')) {
+                        propsArr[j] = 'TRUE';
+                    } else if (propsArr[j].split(',').includes('array')) {
+                        propsArr[j] = '[]';
+                    }
+                }
+            }
+            code += propsArr.join(',');
+            code += ')';
+            return code;
+        },
         addData(varName, id, dom) {
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
                 if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
-                    let code = item.name + '(';
-                    let propsArr = [];
-                    item.props.forEach((item) => {
-                        let item2 = item;
-                        let dataType = item2.dataType;
-                        // let isArr = false;
-                        if (dataType instanceof Array) {
-                            // isArr = true;
-                            dataType = dataType[0];
-                        }
-                        let pushProp = '';
-                        if (item2.enum) {
-                            for (let j in item2.enum) {
-                                pushProp = '"' + j + '"';
-                                break;
-                            }
-                        } else if (typeof dataType === 'function') {
-                            pushProp = dataType;
-                        } else if (dataType.split(',').includes('number')) {
-                            pushProp = 1;
-                        } else if (dataType.split(',').includes('string')) {
-                            pushProp = '""';
-                        } else if (dataType.split(',').includes('bool')) {
-                            pushProp = 'TRUE';
-                        } else if (dataType.match(/array\((.*)\)/)) {
-                            pushProp = '[]';
-                        }
-                        propsArr.push(pushProp);
-                        // if (isArr) {
-                        //     dataType = [dataType];
-                        // }
-                    });
-                    let temp2 = [];
-                    for (let j = 0; j < propsArr.length; j++) {
-                        if (typeof propsArr[j] === 'function') {
-                            temp2.push(null);
-                        } else {
-                            temp2.push(evalObjAndStr(1, propsArr[j])[0]);
-                        }
-                    }
-                    for (let j = 0; j < propsArr.length; j++) {
-                        if (typeof propsArr[j] === 'function') {
-                            propsArr[j] = propsArr[j](temp2);
-                            console.log(propsArr[j]);
-                            if (propsArr[j].split(',').includes('number')) {
-                                propsArr[j] = 1;
-                            } else if (propsArr[j].split(',').includes('string')) {
-                                propsArr[j] = '""';
-                            } else if (propsArr[j].split(',').includes('bool')) {
-                                propsArr[j] = 'TRUE';
-                            } else if (propsArr[j].split(',').includes('array')) {
-                                propsArr[j] = '[]';
-                            }
-                        }
-                    }
-                    code += propsArr.join(',');
-                    code += ')';
+                    let code = this.getCodeByMatchItem(item);
                     this.insertVarName = varName;
                     let insertObj = evalObjAndStr(1, code);
                     allVar.setVar(varName, insertObj[0]);
                     this.insertProps = insertObj[0];
+                    this.editDataType = '';
                     this.insertCode = code;
 
                     let newVar = allVar.getVar(varName);
@@ -237,6 +245,12 @@ export default {
             let Var = allVar.getVar(key);
             this.insertVarName = key;
             this.insertProps = Var.value_;
+            if (Var.value_ instanceof relationalModel) {
+                this.editDataType = 'relationalModel';
+            } else {
+                this.editDataType = '';
+            }
+
             this.insertCode = getStrByObj(Var.value_);
         },
         hover(key, messageType) {
@@ -264,7 +278,7 @@ export default {
         // let fileContent = `$a1 = INPUT('number',9999)`;
         // let fileContent = `$a1 = CHECK_BOX(TRUE)`;
         let fileContent = `$a1 = MIN(1,2,3)+2
-        $a2 = RELATIONAL_MODEL('hello',$a1)`;
+        $a2 = RELATIONAL_MODEL(1,'user','uid',['count(id)'])`;
         // let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';
         this.html = `<div>
