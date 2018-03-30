@@ -6,6 +6,7 @@
 import Obj from '../observer/obj';
 import __allMatch__ from './allMatch';
 import __runObj__ from './__runObj__';
+import functionCall from './functionCall';
 function getEvalObj(tableNum, str) {
     // 解释器梭子
     let forwordStrNum = 0;
@@ -58,65 +59,6 @@ function getEvalObj(tableNum, str) {
         }
     }
 
-    function functionCall(word, baseWord) {
-        let funcName = word;
-        if (word === '.') {
-            funcName = forword();
-        }
-        if (forword(true) === '(') {
-            forword();
-            let params = [];
-            // 参数
-            if (forword(true) === ')') {
-                forword();
-            } else {
-                while (forwordStrNum < str.length - 1) {
-                    params.push(forAction([',', ';', ')']));
-                    if ([',', ';'].indexOf(forword(true)) > -1) {
-                        forword();
-                    } else if (forword(true) === ')') {
-                        forword();
-                        break;
-                    }
-                }
-            }
-            let func;
-            if (typeof funcName === 'function') {
-                func = funcName;
-            } else {
-                func = window[funcName];
-            }
-
-            if (typeof func === 'function' && func.prototype instanceof Obj) {
-                let applyArgs = [window].concat(params || []);
-                let Temp = Function.prototype.bind.apply(func, applyArgs);
-                let baseWord2 = new Temp();
-                baseWord2.className = funcName;
-                for (let i = 0; i < params.length; i++) {
-                    if (params[i] instanceof Obj) {
-                        baseWord2.listen(params[i]);
-                    }
-                }
-                return baseWord2;
-            } else {
-                let returnObj;
-                if (word === '.') {
-                    let oldBase = baseWord;
-                    returnObj = new __runObj__(oldBase, funcName, params);
-                    returnObj.listen(oldBase);
-                } else {
-                    returnObj = new __runObj__(window, funcName, params);
-                }
-                for (let i = 0; i < params.length; i++) {
-                    if (params[i] instanceof Obj) {
-                        returnObj.listen(params[i]);
-                    }
-                }
-                return returnObj;
-            }
-        }
-    }
-
     function forAction(endstrArr) {
         if (endstrArr === undefined) {
             endstrArr = [];
@@ -163,13 +105,13 @@ function getEvalObj(tableNum, str) {
                 }
             }
             else if (word === '.' || typeof window[word] === 'function') {
-                baseWord = functionCall(word, baseWord);
+                baseWord = functionCall(tableNum, word, baseWord, forAction, forword);
             }
             else {
                 let matchObj = null;
                 for (let i = 0; i < __allMatch__.length; i++) {
                     if (__allMatch__[i].func !== undefined && word.match(__allMatch__[i].match)) {
-                        matchObj = functionCall(__allMatch__[i].func, baseWord);
+                        matchObj = functionCall(tableNum, __allMatch__[i].func, baseWord, forAction, forword);
                     } else if (word.match(__allMatch__[i].match)) {
                         matchObj = __allMatch__[i].value(tableNum, word, baseWord, function(endStrArrStep, extendParentEnd) {
                             if (extendParentEnd === false) {

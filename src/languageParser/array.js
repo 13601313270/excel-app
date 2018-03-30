@@ -3,6 +3,8 @@
  */
 import Obj from '../observer/obj';
 import __allMatch__ from './allMatch';
+import createCodeText from './getStrByObj';
+
 class __array__ extends Obj {
     constructor(value) {
         super();
@@ -20,6 +22,17 @@ class __array__ extends Obj {
         });
         return result;
     }
+
+    getCodeByObj() {
+        let code = '[';
+        let childArr = [];
+        this.value_.forEach((item) => {
+            childArr.push(createCodeText(item));
+        });
+        code += childArr.join(',');
+        code += ']';
+        return code;
+    }
 }
 __allMatch__.push({
     match: /^\[$/,
@@ -30,10 +43,10 @@ __allMatch__.push({
         if (forword(true) === ']') {
             forword();
         } else {
-            let lll = 0;
-            while (lll++ < 4) {
+            let limit = 0;
+            while (limit++ < 9999) {
                 params.push(forAction([',', ';', ']']));
-                var nextKey = forword(true);
+                let nextKey = forword(true);
                 if (nextKey === undefined) {
                     break;
                 } else if ([',', ';'].indexOf(nextKey) > -1) {

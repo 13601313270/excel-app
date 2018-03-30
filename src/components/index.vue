@@ -82,6 +82,7 @@ import '../widget/IF';
 import '../widget/INPUT_DATE';
 import '../widget/MIN';
 import '../widget/TEXT';
+import '../widget/relationalModel';
 
 import allVar from '../observer/allVar';
 import dashboard from './dashboard';
@@ -262,7 +263,8 @@ export default {
 
         // let fileContent = `$a1 = INPUT('number',9999)`;
         // let fileContent = `$a1 = CHECK_BOX(TRUE)`;
-        let fileContent = `$a1 = MIN(1,2,3)`;
+        let fileContent = `$a1 = MIN(1,2,3)+2
+        $a2 = RELATIONAL_MODEL('hello',$a1)`;
         // let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';
         this.html = `<div>

@@ -2,6 +2,7 @@
  * Created by ptmind on 2018/3/26.
  */
 import Obj from '../observer/obj';
+import createCodeText from './getStrByObj';
 class __runObj__ extends Obj {
     constructor(runObj, funcName, params) {
         super();
@@ -54,6 +55,26 @@ class __runObj__ extends Obj {
 
     render() {
         this.dom.innerHTML = this.value;
+    }
+
+    getCodeByObj() {
+        let code = '';
+        if (this.funcName) {
+            code += this.funcName + '(';
+        }
+        let runParams = [];
+        for (let i = 0; i < this.params.length; i++) {
+            let insert = this.params[i];
+            if (insert instanceof Obj) {
+                insert = createCodeText(insert);
+            }
+            runParams.push(insert);
+        }
+        code += runParams.join('');
+        if (this.funcName) {
+            code += ')';
+        }
+        return code;
     }
 }
 export default __runObj__;

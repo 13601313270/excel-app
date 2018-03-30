@@ -2,6 +2,7 @@
  * Created by ptmind on 2018/3/7.
  */
 import Obj from '../observer/obj';
+import createCodeText from '../languageParser/getStrByObj';
 export default class extends Obj {
     constructor() {
         super();
@@ -12,5 +13,16 @@ export default class extends Obj {
 
     render() {
         this.dom.innerHTML = this.value;
+    }
+
+    getCodeByObj() {
+        let code = this.name + '(';
+        let TempPropArr = [];
+        this.props.forEach((item) => {
+            TempPropArr.push(createCodeText(item));
+        });
+        code += TempPropArr.join(',');
+        code += ')';
+        return code;
     }
 }
