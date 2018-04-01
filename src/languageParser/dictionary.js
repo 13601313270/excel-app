@@ -32,10 +32,19 @@ class DictionaryGet extends Obj {
         super();
         this.dictionary = dictionary;
         this.key = key;
+        this.dom = document.createElement('div');
+    }
+
+    render() {
+        this.dom.innerHTML = this.value;
     }
 
     get value() {
-        return this.dictionary.value.get(this.key);
+        let value = this.dictionary.value.get(this.key);
+        if (value instanceof Obj) {
+            value = value.value;
+        }
+        return value;
     }
 
     getCodeByObj() {
@@ -49,6 +58,7 @@ __allMatch__.push({
     title: '字典',
     value(tableNum, word, befordWord, forAction, forword) {
         let params = new Map();
+        let listenList = [];
         if (forword(true) === '}') {
             forword();
         } else {
@@ -57,6 +67,9 @@ __allMatch__.push({
                 let key = forAction(':');
                 forword();
                 let value = forAction([',', ';', '}']);
+                if (value instanceof Obj) {
+                    listenList.push(value);
+                }
                 params.set(key, value);
                 let nextKey = forword(true);
                 if (nextKey === undefined) {
@@ -69,7 +82,11 @@ __allMatch__.push({
                 }
             }
         }
-        return new __dictionary__(params);
+        let returnData = new __dictionary__(params);
+        listenList.forEach(item => {
+            returnData.listen(item);
+        });
+        return returnData;
     }
 });
 __allMatch__.push({
@@ -82,7 +99,9 @@ __allMatch__.push({
             before = before.value_;
         }
         if (before instanceof __dictionary__) {
-            return new DictionaryGet(befordWord, forword());
+            let returnData = new DictionaryGet(befordWord, forword());
+            returnData.listen(befordWord);
+            return returnData;
         }
     }
 });
