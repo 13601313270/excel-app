@@ -41,7 +41,7 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style scoped lang="less">
     .warning {
         background-color: rgba(193, 42, 12, 0.71);
     }
@@ -51,5 +51,10 @@ export default {
         min-width: 20px;
         min-height: 20px;
         display: inline-block;
+    }
+</style>
+<style>
+    .warning input {
+        background-color: rgba(255, 255, 255, 0.21);
     }
 </style>

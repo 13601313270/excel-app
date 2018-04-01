@@ -1,13 +1,10 @@
 /**
  * Created by ptmind on 2018/3/26.
  */
-import Var from '../observer/Var';
 import Obj from '../observer/obj';
 function createCodeText(runObj) {
     let code = '';
-    if (runObj instanceof Var) {
-        code = runObj.name;
-    } else if (typeof runObj === 'string') {
+    if (typeof runObj === 'string') {
         code = '"' + runObj + '"';
     } else if (typeof runObj === 'number') {
         code = runObj;

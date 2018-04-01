@@ -15,7 +15,7 @@ function getEvalObj(tableNum, str) {
     function forword(putBack) {
         let oldPutBakc = forwordStrNum;
         let strSplit = '';
-        let allUseWord = ['\n', '=', '(', ')', ',', ';', '"', '\'', ':', '+', '-', '*', '/', '.', '!', '>', '<', '[', ']'];
+        let allUseWord = ['\n', '=', '(', ')', ',', ';', '"', '\'', ':', '+', '-', '*', '/', '.', '!', '>', '<', '[', ']', '{', '}'];
         while (forwordStrNum < str.length && str[forwordStrNum] === ' ') {
             forwordStrNum++;
         }
@@ -104,7 +104,7 @@ function getEvalObj(tableNum, str) {
                     }
                 }
             }
-            else if (word === '.' || typeof window[word] === 'function') {
+            else if (typeof window[word] === 'function') {
                 baseWord = functionCall(tableNum, word, baseWord, forAction, forword);
             }
             else {

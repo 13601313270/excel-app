@@ -31,5 +31,9 @@ class Var extends Obj {
             this.listen(varObj);
         }
     }
+
+    getCodeByObj() {
+        return this.name;
+    }
 }
 export default Var;
