@@ -5,7 +5,8 @@ import echarts from 'echarts';
 import FuncObj from './FuncObj';
 import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
-import ajax from '../api/ajax';
+import Var from '../observer/Var';
+// import ajax from '../api/ajax';
 class BAR extends FuncObj {
     constructor(source, table, x, y) {
         super(...Array.from(arguments));
@@ -26,58 +27,57 @@ class BAR extends FuncObj {
         }
     }
 
-    render() {
-        let source = this.props[0] instanceof Obj ? this.props[0].value : this.props[0];
-        let table = this.props[1] instanceof Obj ? this.props[1].value : this.props[1];
-        let x = this.props[2] instanceof Obj ? this.props[2].value : this.props[2];
-        let y = this.props[3] instanceof Obj ? this.props[3].value : this.props[3];
+    render(handle) {
+        let model = this.props[0];
+        if (model instanceof Var) {
+            model = model.value_;
+        }
+        if (model === '') {
+            handle(false);
+            return;
+        }
+        let data = model.value;
         let option = {
             tooltip: {},
-            // legend: {
-            //     data: ['销量']
-            // },
+            legend: {
+                data: model.dataColumn
+            },
             xAxis: {
                 data: []
             },
             yAxis: {},
             series: []
         };
-        ajax({
-            type: 'POST',
-            url: 'http://www.tablehub.cn/action/mysql.html',
-            data: {
-                type: 'run',
-                connection: parseInt(source),
-                table: table,
-                sql: {
-                    select: y.concat(x),
-                    groupBy: x
-                }
-            }
-        }).then((data) => {
-            option.xAxis.data = [];
-            option.series = [];
-            // [{"count(33)":"1","count(email)":"1","state":"1"}]
-            data.forEach((item, index) => {
-                for (let i in item) {
-                    if (y.includes(i)) {
-                        if (option.series[y.indexOf(i)] === undefined) {
-                            option.series[y.indexOf(i)] = {type: 'bar', data: []};
-                        }
-                        option.series[y.indexOf(i)].data.push(item[i]);
-                    } else if (i === x) {
-                        option.xAxis.data.push(item[i]);
+        option.xAxis.data = [];
+        option.series = [];
+        // [{"count(33)":"1","count(email)":"1","state":"1"}]
+        data.forEach((item) => {
+            let dataItem = {
+                type: 'bar', data: []
+            };
+            item.forEach((item2, key) => {
+                if (key < model.groupColumn.length) {
+                    option.xAxis.data.push(item2);
+                } else {
+                    if (option.series[key - model.groupColumn.length] === undefined) {
+                        option.series[key - model.groupColumn.length] = {
+                            type: 'bar',
+                            name: model.dataColumn[key - model.groupColumn.length],
+                            data: []
+                        };
                     }
+                    option.series[key - model.groupColumn.length].data.push(item2);
                 }
             });
-            // 使用刚指定的配置项和数据显示图表。
-            this.myChart.setOption(option);
-            setTimeout(() => {
-                this.dom.style.width = '500px';
-                this.dom.style.height = '300px';
-                this.myChart.resize();
-            }, 0);
+            option.series.push(dataItem);
         });
+        // 使用刚指定的配置项和数据显示图表。
+        this.myChart.setOption(option);
+        setTimeout(() => {
+            this.dom.style.width = '500px';
+            this.dom.style.height = '300px';
+            this.myChart.resize();
+        }, 0);
     }
 }
 __allMatch__.push({
@@ -89,27 +89,8 @@ __allMatch__.push({
     props: [
         {
             name: 'source:',
-            title: '数据源',
-            dataType: 'string',
-            default: ''
-        },
-        {
-            name: 'table:',
-            title: '表',
-            dataType: 'string',
-            default: ''
-        },
-        {
-            name: 'x:',
-            title: 'X轴',
-            dataType: 'string,function,var',
-            default: ''
-        },
-        {
-            name: 'y:',
-            title: 'Y轴',
-            dataType: 'array',
-            default: ''
+            title: '关系模型',
+            dataType: 'relationalModel'
         }
     ]
 });

@@ -13,6 +13,8 @@ class relationalModel extends Obj {
         this.props = Array.from(arguments);
         this.name = 'RELATIONAL_MODEL';
         this.type = 'relationalModel';
+        this.groupColumn = [];
+        this.dataColumn = [];
         this.dataValue = [];
     }
 
@@ -39,7 +41,23 @@ class relationalModel extends Obj {
                     }
                 }
             }).then((data) => {
-                this.dataValue = data;
+                this.groupColumn = [];
+                this.dataColumn = [];
+                this.dataValue = [];
+                let x = this.props[2];
+                if (x instanceof Obj) {
+                    x = x.value;
+                }
+                let y = this.props[3].value;
+                this.groupColumn.push(x);
+                this.dataColumn.push(...y);
+                data.forEach((item) => {
+                    let insert = [item[x]];
+                    y.forEach((eachY) => {
+                        insert.push(item[eachY]);
+                    });
+                    this.dataValue.push(insert);
+                });
                 resolve();
             });
         }));

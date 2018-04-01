@@ -82,6 +82,7 @@ class Dep {
                 }
             });
             if (hasFalse) {
+                this.state = 0;
                 return;
             }
             if (allPromise.length > 0) {
@@ -90,6 +91,8 @@ class Dep {
                     if (this.sentEvent.length > 0) {
                         this.sentEvent.forEach(i => i.action());
                     }
+                }).catch(() => {
+                    this.state = 0;
                 });
             } else {
                 this.state = 0;
