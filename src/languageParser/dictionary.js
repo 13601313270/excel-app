@@ -10,6 +10,13 @@ class __dictionary__ extends Obj {
     constructor(value) {
         super();
         this.map = value;
+        this.dom = document.createElement('div');
+    }
+
+    render() {
+        console.log('render');
+        console.log(this.value);
+        this.dom.innerHTML = this.value;
     }
 
     get value() {
@@ -28,7 +35,6 @@ class __dictionary__ extends Obj {
     getCodeByObj() {
         let code = '{';
         let childArr = [];
-        console.log(this.map);
         for (let i in this.map) {
             childArr.push(createCodeText(i) + ':' + createCodeText(this.map[i]));
         }
@@ -50,10 +56,11 @@ class DictionaryGet extends Obj {
     }
 
     get value() {
-        let value = this.dictionary.value[this.key];
-        if (value instanceof Obj) {
-            value = value.value;
+        let list = this.dictionary;
+        if (list instanceof Obj) {
+            list = list.value;
         }
+        let value = list[this.key];
         return value;
     }
 
@@ -102,13 +109,15 @@ __allMatch__.push({
 __allMatch__.push({
     match: /^\.$/,
     type: 'dict',
+    name: 'dict',
     title: '字典',
     value(tableNum, word, befordWord, forAction, forword) {
         let before = befordWord;
         if (before instanceof Var) {
             before = before.value_;
         }
-        if (before instanceof __dictionary__) {
+        if (before instanceof Obj) {
+            console.log(befordWord);
             let returnData = new DictionaryGet(befordWord, forword());
             returnData.listen(befordWord);
             return returnData;

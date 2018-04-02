@@ -4,7 +4,6 @@
 import Obj from '../observer/obj';
 import __allMatch__ from './allMatch';
 import createCodeText from './getStrByObj';
-
 class __array__ extends Obj {
     constructor(value) {
         super();
@@ -37,6 +36,7 @@ class __array__ extends Obj {
 __allMatch__.push({
     match: /^\[$/,
     type: 'array',
+    name: 'array',
     title: '数组',
     value(tableNum, word, befordWord, forAction, forword) {
         var params = [];

@@ -120,7 +120,9 @@
                         <td>
                             <select :value="innerOption.name"
                                     @change="inputChange({type:'var',name:$event.target.value})">
-                                <option v-for="item,key in allVar" :value="key">【{{key}}】---{{item.value}}</option>
+                                <option v-for="item,key in allVar" :value="key">
+                                    【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
+                                </option>
                             </select>
                         </td>
                     </template>
@@ -142,14 +144,25 @@
                     <template v-else-if="innerOption.type==='dict'">
                         <td>字典</td>
                         <td>
-                            <template v-for="(item,key) in innerOption.props">
-                                <div v-html="key"></div>
+                            <div class="dictList">
+                                <div v-for="(item,key) in innerOption.props">
+                                    <div class="key" v-html="key"></div>
+                                    <div>:&nbsp;</div>
+                                    <div>
+                                        <!--:dataType="getDataType(key)"-->
+                                        <inner-dom @change="childCodeChange"
+                                                   v-model="innerOption.props[key]"
+                                                   :dataType="''"
+                                        ></inner-dom>
+                                    </div>
+                                </div>
                                 <div>
-                                    <!--:dataType="getDataType(key)"-->
-                                    <inner-dom @change="childCodeChange"
-                                               v-model="innerOption.props[key]"
-                                               :dataType="''"
-                                    ></inner-dom>
+                                    <div class="key">
+                                        <button
+                                            @click="innerOption.props[prompt('请输入键名', 'a7')]='val',childCodeChange()">
+                                            添加
+                                        </button>
+                                    </div>
                                 </div>
                                 <!--<inner-dom v-model="innerOption.props[key]" @change="childCodeChange"-->
                                 <!--:dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>-->
@@ -159,7 +172,7 @@
                                 <!--</template>-->
                                 <!--<template v-if="innerOption.props.length==0">-->
                                 <!--<button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>-->
-                            </template>
+                            </div>
                         </td>
                     </template>
                 </tr>
@@ -264,8 +277,12 @@ export default {
                 }
             }
         }
+        console.log(this.innerOption);
     },
     methods: {
+        prompt(text, defaultVal) {
+            return window.prompt(text, defaultVal);
+        },
         getDataType(key) {
             if (typeof this.codeOption.props[key].dataType === 'function') {
                 return this.codeOption.props[key].dataType(this.innerOption.props);
@@ -318,10 +335,16 @@ export default {
                 code += childArr.join(',');
                 code += ']';
             } else if (innerOption.type === 'dict') {
+                let props;
+                if (innerOption.type === 'dict') {
+                    props = innerOption.props;
+                } else {
+                    props = innerOption.map;
+                }
                 code = '{';
                 let childArr = [];
-                for (let i in innerOption.props) {
-                    childArr.push(this.createCodeText(i) + ':' + this.createCodeText(innerOption.props[i]));
+                for (let i in props) {
+                    childArr.push(this.createCodeText(i) + ':' + this.createCodeText(props[i]));
                 }
                 code += childArr.join(',');
                 code += '}';
@@ -404,6 +427,11 @@ export default {
                 this.innerOption = '';
             } else if (['TRUE', 'FALSE'].includes(name)) {
                 this.innerOption = name === 'TRUE';
+            } else if (name === 'dict') {
+                this.innerOption = {
+                    type: 'dict',
+                    props: {}
+                };
             } else {
                 this.innerOption = {
                     name: name,
@@ -454,6 +482,7 @@ export default {
                     }
                 }
             }
+            console.log(this.innerOption);
             this.childCodeChange();
         }
     }
@@ -465,6 +494,38 @@ export default {
         td {
             border: solid 1px black;
             padding: 2px;
+            .dictList {
+                position: relative;
+                margin-left: 10px;
+                &:before {
+                    content: '<';
+                    font-weight: bold;
+                    color: green;
+                    background-color: white;
+                    position: absolute;
+                    top: 50%;
+                    line-height: 8px;
+                    height: 8px;
+                    margin-top: -5px;
+                    left: -8px;
+                }
+                > div {
+                    border-left: solid 2px green;
+                    &:first-child {
+                        border-radius: 10px 0;
+                    }
+                    display: flex;
+                    .key {
+                        min-width: 70px;
+                        font-weight: bold;
+                        color: black;
+                        padding-left: 10px;
+                    }
+                    &:last-child {
+                        border-radius: 0 10px;
+                    }
+                }
+            }
         }
     }
 </style>

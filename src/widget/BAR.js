@@ -6,25 +6,45 @@ import FuncObj from './FuncObj';
 import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
 import Var from '../observer/Var';
-// import ajax from '../api/ajax';
+import Dict from '../languageParser/dictionary';
+class Temp extends Obj {
+    get value() {
+        return this.value_;
+    }
+
+    set value(varObj) {
+        this.dep.lock();
+        this.value_ = varObj;
+        this.dep.update();
+    }
+}
+
 class BAR extends FuncObj {
     constructor(source, table, x, y) {
         super(...Array.from(arguments));
         this.name = 'BAR';
         this.dom = document.createElement('div');
         this.myChart = echarts.init(this.dom);
+        let xColumn = new Temp();
+        let select = new Temp();
+        let value = new Temp();
+        this.dict = new Dict({
+            x: xColumn,
+            select: select,
+            value: value
+        });
         this.myChart.on('click', (params) => {
-            this.value33 = params.data;
-            this.dep.update();// release
+            xColumn.value = params.name;
+            select.value = params.seriesName;
+            value.value = parseFloat(params.data);
+            console.log(params);
+            console.log(this.value);
+            this.dep.update();
         });
     }
 
     get value() {
-        if (this.value33 instanceof Obj) {
-            return this.value33.value;
-        } else {
-            return this.value33;
-        }
+        return this.dict.value;
     }
 
     render(handle) {

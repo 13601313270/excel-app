@@ -22,7 +22,7 @@
                     <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
                 </div>
                 <div style="display: flex;">
-                    <div style="flex-grow: 1;padding: 3px 3px;">
+                    <div style="flex-grow: 1;padding: 3px 3px;overflow: scroll">
                         <all-vars @change="editVar" @hover="hover"></all-vars>
                     </div>
                     <div style="overflow: scroll;border: solid 1px black;">
@@ -75,6 +75,7 @@
 import evalObjAndStr from '../languageParser/evalObjAndStr';
 import allMatch from '../languageParser/allMatch';
 import '../languageParser/array';
+import '../languageParser/dictionary';
 import '../widget/CHECK_BOX';
 import '../widget/BAR';
 import '../widget/INPUT';
@@ -209,19 +210,25 @@ export default {
             this.insertCode = code;
             let updateVar = allVar.getVar(this.insertVarName);
             let widgePanel = this.varToDom.get(updateVar);
-            widgePanel.innerHTML = '';
+            console.log(code);
+            if (widgePanel !== undefined) {
+                widgePanel.innerHTML = '';
+            }
             // allVar.getVar(this.insertVarName).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
+            console.log(insertObj);
             allVar.setVar(this.insertVarName, insertObj[0]);
             let value_ = updateVar.value_;
-            if (value_ instanceof Obj) {
-                if (value_.dom) {
-                    widgePanel.appendChild(value_.dom);
+            if (widgePanel !== undefined) {
+                if (value_ instanceof Obj) {
+                    if (value_.dom) {
+                        widgePanel.appendChild(value_.dom);
+                    } else {
+                        widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
+                    }
                 } else {
-                    widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
+                    widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值
                 }
-            } else {
-                widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值
             }
         },
         drag(func) {
@@ -277,14 +284,21 @@ export default {
 
         // let fileContent = `$a1 = INPUT('number',9999)`;
         // let fileContent = `$a1 = CHECK_BOX(TRUE)`;
-        let fileContent = `$a1 = MIN(1,2,3)+2
-        $a2 = RELATIONAL_MODEL(1,'user','uid',['count(id)'])`;
+        // $a2 = RELATIONAL_MODEL(1,'user',$a1,['count(id)','count(id)+1'])
+        //
+        // id email
+        let fileContent = `$a1 = INPUT('string',10)
+        $a2 = RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1'])
+        $a3 = BAR($a2)
+        $a4 = $a3.value
+        `;
         // let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';
         this.html = `<div>
     <div>
-        <div><h4>时间</h4><widget data="$a1"></widget><widget></widget></div>
-        <div><h4>人民币</h4><widget></widget></div>
+        <div><h4>时间</h4><widget data="$a1"></widget>
+        <widget data="$a3"></widget></div>
+        <div><h4>人民币</h4><widget data="$a4"></widget></div>
         <div><h4>汇率</h4><widget></widget></div>
         <div><h4>美元</h4><widget></widget></div>
         <div><widget></widget></div>
@@ -293,6 +307,7 @@ export default {
 </div>`;
 
         evalObjAndStr(1, fileContent);
+        console.log(allVar);
         let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {
             return '<widget @change="addData" @init="dataInit" random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
