@@ -13,15 +13,25 @@ class __dictionary__ extends Obj {
     }
 
     get value() {
-        return this.map;
+        let returnObj = {};
+        for (let i in this.map) {
+            let item = this.map[i];
+            if (item instanceof Obj) {
+                returnObj[i] = item.value;
+            } else {
+                returnObj[i] = item;
+            }
+        }
+        return returnObj;
     }
 
     getCodeByObj() {
         let code = '{';
         let childArr = [];
-        this.map.forEach((item, key) => {
-            childArr.push(createCodeText(key) + ':' + createCodeText(item));
-        });
+        console.log(this.map);
+        for (let i in this.map) {
+            childArr.push(createCodeText(i) + ':' + createCodeText(this.map[i]));
+        }
         code += childArr.join(',');
         code += '}';
         return code;
@@ -40,7 +50,7 @@ class DictionaryGet extends Obj {
     }
 
     get value() {
-        let value = this.dictionary.value.get(this.key);
+        let value = this.dictionary.value[this.key];
         if (value instanceof Obj) {
             value = value.value;
         }
@@ -57,7 +67,7 @@ __allMatch__.push({
     type: 'dict',
     title: '字典',
     value(tableNum, word, befordWord, forAction, forword) {
-        let params = new Map();
+        let params = {};
         let listenList = [];
         if (forword(true) === '}') {
             forword();
@@ -70,7 +80,7 @@ __allMatch__.push({
                 if (value instanceof Obj) {
                     listenList.push(value);
                 }
-                params.set(key, value);
+                params[key] = value;
                 let nextKey = forword(true);
                 if (nextKey === undefined) {
                     break;

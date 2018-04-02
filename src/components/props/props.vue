@@ -139,6 +139,29 @@
                             </template>
                         </td>
                     </template>
+                    <template v-else-if="innerOption.type==='dict'">
+                        <td>字典</td>
+                        <td>
+                            <template v-for="(item,key) in innerOption.props">
+                                <div v-html="key"></div>
+                                <div>
+                                    <!--:dataType="getDataType(key)"-->
+                                    <inner-dom @change="childCodeChange"
+                                               v-model="innerOption.props[key]"
+                                               :dataType="''"
+                                    ></inner-dom>
+                                </div>
+                                <!--<inner-dom v-model="innerOption.props[key]" @change="childCodeChange"-->
+                                <!--:dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>-->
+                                <!--<template v-if="key==innerOption.props.length-1">-->
+                                <!--<button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>-->
+                                <!--</template>-->
+                                <!--</template>-->
+                                <!--<template v-if="innerOption.props.length==0">-->
+                                <!--<button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>-->
+                            </template>
+                        </td>
+                    </template>
                 </tr>
             </template>
             </tbody>
@@ -152,6 +175,8 @@ import allVar from '../../observer/allVar';
 // import getStrByObj from '../getStrByObj';
 import relationalModel from '../../widget/relationalModel';
 import __array__ from '../../languageParser/array';
+import __dictionary__ from '../../languageParser/dictionary';
+import Var from '../../observer/Var';
 import selectType from './typeSelect.vue';
 export default {
     name: 'inner-dom',
@@ -185,6 +210,11 @@ export default {
                     type: 'array',
                     props: val.value_
                 };
+            } else if (val instanceof __dictionary__) {
+                this.innerOption = {
+                    type: 'dict',
+                    props: val.value
+                };
             } else {
                 this.innerOption = val;
             }
@@ -207,6 +237,16 @@ export default {
             this.innerOption = {
                 type: 'array',
                 props: this.value.value_
+            };
+        } else if (this.value instanceof __dictionary__) {
+            this.innerOption = {
+                type: 'dict',
+                props: this.value.map
+            };
+        } else if (this.value instanceof Var) {
+            this.innerOption = {
+                type: 'var',
+                name: this.value.name
             };
         } else {
             this.innerOption = {
@@ -253,7 +293,7 @@ export default {
                 });
                 code += TempPropArr.join(',');
                 code += ')';
-            } else if (innerOption.type === 'var') {
+            } else if (innerOption.type === 'var' || innerOption instanceof Var) {
                 code = innerOption.name;
             } else if (typeof innerOption === 'string') {
                 code = '"' + innerOption + '"';
@@ -277,6 +317,14 @@ export default {
                 });
                 code += childArr.join(',');
                 code += ']';
+            } else if (innerOption.type === 'dict') {
+                code = '{';
+                let childArr = [];
+                for (let i in innerOption.props) {
+                    childArr.push(this.createCodeText(i) + ':' + this.createCodeText(innerOption.props[i]));
+                }
+                code += childArr.join(',');
+                code += '}';
             }
             return code;
         },
