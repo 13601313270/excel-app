@@ -121,7 +121,7 @@ function getEvalObj(tableNum, str) {
                             }
                         }, function(putback) {
                             let nextWord = forword(putback);
-                            if (forwordStrNum >= str.length) {
+                            if (forwordStrNum > str.length) {
                                 return undefined;
                             }
                             return nextWord;

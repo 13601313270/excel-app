@@ -11,7 +11,7 @@
                     <td v-html="codeOption.props[key].title"></td>
                     <td>
                         <inner-dom v-if="innerOption.props[key]"
-                                   @change="childCodeChange"
+                                   @change="emitChange"
                                    v-model="innerOption.props[key]"
                                    :dataType="getDataType(key)"
                         ></inner-dom>
@@ -44,7 +44,7 @@
 
                             <div v-if="getDataType(codeOption.props.length-1)[0]==='relationalModel'">
                                 <select :value="innerOption.props[key].name"
-                                        @change="inputChange({type:'var',name:$event.target.value})">
+                                        @change="setInnerOption({type:'var',name:$event.target.value})">
                                     <option v-for="(item,key) in allVar" :value="key"
                                             v-if="item.value_ instanceof relationalModel">
                                         {{key}}
@@ -53,7 +53,7 @@
                                 <br/>
                                 <button>新建</button>
                             </div>
-                            <inner-dom v-else @change="childCodeChange" v-model="innerOption.props[key]"
+                            <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
                                        :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
 
 
@@ -68,7 +68,7 @@
                         <template v-else>
                             <div v-if="getDataType(key)==='relationalModel'">
                                 <select :value="innerOption.props[key].name"
-                                        @change="innerOption.props[key]={type:'var',name:$event.target.value},childCodeChange()">
+                                        @change="innerOption.props[key]={type:'var',name:$event.target.value},emitChange()">
                                     <option v-for="(item,key) in allVar" :value="key"
                                             v-if="item.value_ instanceof relationalModel">
                                         {{key}}
@@ -77,7 +77,7 @@
                                 <br/>
                                 <button>新建</button>
                             </div>
-                            <inner-dom v-else @change="childCodeChange" v-model="innerOption.props[key]"
+                            <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
                                        :dataType="getDataType(key)"></inner-dom>
                         </template>
                     </td>
@@ -96,8 +96,9 @@
                         </td>
                         <td>
                             <input :value="innerOption" v-if="typeof innerOption==='number'"
-                                   @change="inputChange(parseFloat($event.target.value))"/>
-                            <input :value="innerOption" v-else @change="inputChange($event.target.value.toString())"/>
+                                   @change="setInnerOption(parseFloat($event.target.value))"/>
+                            <input :value="innerOption" v-else
+                                   @change="setInnerOption($event.target.value.toString())"/>
                         </td>
                     </template>
                     <template v-else-if="typeof innerOption==='boolean'">
@@ -119,7 +120,7 @@
                         </td>
                         <td>
                             <select :value="innerOption.name"
-                                    @change="inputChange({type:'var',name:$event.target.value})">
+                                    @change="setInnerOption({type:'var',name:$event.target.value})">
                                 <option v-for="item,key in allVar" :value="key">
                                     【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
                                 </option>
@@ -130,7 +131,7 @@
                         <td>数组</td>
                         <td>
                             <template v-for="(item,key) in innerOption.props">
-                                <inner-dom v-model="innerOption.props[key]" @change="childCodeChange"
+                                <inner-dom v-model="innerOption.props[key]" @change="emitChange"
                                            :dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>
                                 <template v-if="key==innerOption.props.length-1">
                                     <button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>
@@ -150,7 +151,7 @@
                                     <div>:&nbsp;</div>
                                     <div>
                                         <!--:dataType="getDataType(key)"-->
-                                        <inner-dom @change="childCodeChange"
+                                        <inner-dom @change="emitChange"
                                                    v-model="innerOption.props[key]"
                                                    :dataType="''"
                                         ></inner-dom>
@@ -159,20 +160,27 @@
                                 <div>
                                     <div class="key">
                                         <button
-                                            @click="innerOption.props[prompt('请输入键名', 'a7')]='val',childCodeChange()">
+                                            @click="innerOption.props[prompt('请输入键名', 'a7')]='val',emitChange()">
                                             添加
                                         </button>
                                     </div>
                                 </div>
-                                <!--<inner-dom v-model="innerOption.props[key]" @change="childCodeChange"-->
-                                <!--:dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>-->
-                                <!--<template v-if="key==innerOption.props.length-1">-->
-                                <!--<button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>-->
-                                <!--</template>-->
-                                <!--</template>-->
-                                <!--<template v-if="innerOption.props.length==0">-->
-                                <!--<button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>-->
                             </div>
+                        </td>
+                    </template>
+                    <template v-else-if="innerOption.type==='dictionaryGet'">
+                        <td>字典获取</td>
+                        <td>
+                            <inner-dom @change="changeDictObj"
+                                       v-model="innerOption.dictionary"
+                                       :dataType="''"
+                            ></inner-dom>
+
+                            <select @change="emitChange()" v-model="innerOption.key">
+                                <option v-for="item,key in innerOption.keys" :value="key">
+                                    【{{key}}】------{{item}}
+                                </option>
+                            </select>
                         </td>
                     </template>
                 </tr>
@@ -189,13 +197,15 @@ import allVar from '../../observer/allVar';
 import relationalModel from '../../widget/relationalModel';
 import __array__ from '../../languageParser/array';
 import __dictionary__ from '../../languageParser/dictionary';
+import dictionaryGet from '../../languageParser/dictionaryGet';
 import Var from '../../observer/Var';
 import selectType from './typeSelect.vue';
 export default {
     name: 'inner-dom',
     props: {
         value: {},
-        dataType: ''
+        isRoot: Boolean,
+        dataType: String
     },
     components: {
         'inner-dom': innerDom,
@@ -204,33 +214,11 @@ export default {
     computed: {},
     watch: {
         value(val) {
-            if (val instanceof Object) {
-                this.innerOption = {
-                    type: val.type,
-                    name: val.name ? val.name.toString() : '',
-                    props: val.props
-                };
-
-                for (let i = 0; i < this.allMatch.length; i++) {
-                    if (this.innerOption.name.match(this.allMatch[i].match)) {
-                        this.codeOption = this.allMatch[i];
-                        this.innerOption.type = this.codeOption.type;
-                        break;
-                    }
-                }
-            } else if (val instanceof __array__) {
-                this.innerOption = {
-                    type: 'array',
-                    props: val.value_
-                };
-            } else if (val instanceof __dictionary__) {
-                this.innerOption = {
-                    type: 'dict',
-                    props: val.value
-                };
-            } else {
-                this.innerOption = val;
-            }
+            // if (this.isRoot) {
+            //    this.innerOption = this.getOptionByObj(val);
+            // } else {
+            this.innerOption = val;
+            // }
         }
     },
     data() {
@@ -244,40 +232,12 @@ export default {
         };
     },
     mounted() {
-        if (['boolean', 'number', 'string'].includes(typeof this.value)) {
-            this.innerOption = this.value;
-        } else if (this.value instanceof __array__) {
-            this.innerOption = {
-                type: 'array',
-                props: this.value.value_
-            };
-        } else if (this.value instanceof __dictionary__) {
-            this.innerOption = {
-                type: 'dict',
-                props: this.value.map
-            };
-        } else if (this.value instanceof Var) {
-            this.innerOption = {
-                type: 'var',
-                name: this.value.name
-            };
-        } else {
-            this.innerOption = {
-                type: this.value.type,
-                name: this.value.name,
-                props: this.value.props
-            };
-        }
         this.allMatch = allMatch;
-        if (this.innerOption.name) {
-            for (let i = 0; i < this.allMatch.length; i++) {
-                if (this.innerOption.name.match(this.allMatch[i].match)) {
-                    this.codeOption = this.allMatch[i];
-                    this.innerOption.type = this.codeOption.type;
-                }
-            }
+        if (this.isRoot) {
+            this.innerOption = this.getOptionByObj(this.value);
+        } else {
+            this.innerOption = this.value;
         }
-        console.log(this.innerOption);
     },
     methods: {
         prompt(text, defaultVal) {
@@ -290,35 +250,102 @@ export default {
                 return this.codeOption.props[key].dataType;
             }
         },
-        childCodeChange() {
+        emitChange() {
             this.$emit('input', this.innerOption);
             this.$emit('change', this.createCodeText(this.innerOption));
         },
-        inputChange(val) {
-            if (val !== undefined) {
-                this.innerOption = val;
+        setInnerOption(val) {
+            this.innerOption = val;
+            this.emitChange();
+        },
+        getOptionByObj(obj) {
+            let returnOption = {};
+            if (['boolean', 'number', 'string'].includes(typeof obj)) {
+                returnOption = obj;
             }
-            this.childCodeChange();
+            else if (obj instanceof __array__) {
+                returnOption = {
+                    type: 'array',
+                    props: []
+                };
+                obj.value_.forEach((item) => {
+                    returnOption.props.push(this.getOptionByObj(item));
+                });
+            }
+            else if (obj instanceof __dictionary__) {
+                returnOption = {
+                    type: 'dict',
+                    props: obj.map
+                };
+            }
+            else if (obj instanceof dictionaryGet) {
+                returnOption = {
+                    type: 'dictionaryGet',
+                    dictionary: this.getOptionByObj(obj.dictionary),
+                    keys: obj.dictionary.value,
+                    key: obj.key
+                };
+                console.log(returnOption);
+            }
+            else if (obj instanceof Var) {
+                returnOption = {
+                    type: 'var',
+                    name: obj.name
+                };
+            }
+            else {
+                returnOption = {
+                    type: obj.type,
+                    name: obj.name,
+                    props: []
+                };
+                console.trace(obj);
+                console.log(obj.props);
+                obj.props.forEach(item => {
+                    returnOption.props.push(this.getOptionByObj(item))
+                });
+                for (let i = 0; i < this.allMatch.length; i++) {
+                    if (returnOption.name.match(this.allMatch[i].match)) {
+                        this.codeOption = this.allMatch[i];
+                        returnOption.type = this.codeOption.type;
+                    }
+                }
+            }
+            return returnOption;
+        },
+        getDefaultValueByType(type) {
+            if (type === 'number') {
+                return 0;
+            } else if (type === 'string') {
+                return '';
+            } else if (type === 'bool') {
+                return true;
+            } else if (type === 'dict') {
+                return {
+                    type: 'dict',
+                    props: {}
+                };
+            } else if (type === 'array') {
+                return {
+                    type: 'array',
+                    props: []
+                }
+            } else {
+                return '';
+            }
         },
         createCodeText(innerOption) {
             let code = '';
-            if (innerOption.type === 'function') {
-                code += innerOption.name + '(';
-                let TempPropArr = [];
-                innerOption.props.forEach((item) => {
-                    TempPropArr.push(this.createCodeText(item));
-                });
-                code += TempPropArr.join(',');
-                code += ')';
-            } else if (innerOption.type === 'var' || innerOption instanceof Var) {
-                code = innerOption.name;
-            } else if (typeof innerOption === 'string') {
+            if (typeof innerOption === 'string') {
                 code = '"' + innerOption + '"';
-            } else if (typeof innerOption === 'number') {
+            }
+            else if (typeof innerOption === 'number') {
                 code = innerOption.toString();
-            } else if (typeof innerOption === 'boolean') {
+            }
+            else if (typeof innerOption === 'boolean') {
                 code = innerOption ? 'TRUE' : 'FALSE';
-            } else if (innerOption.type === 'array') {
+            }
+            else if (innerOption.type === 'array') {
                 code = '[';
                 let childArr = [];
                 innerOption.props.forEach((item) => {
@@ -326,21 +353,9 @@ export default {
                 });
                 code += childArr.join(',');
                 code += ']';
-            } else if (innerOption instanceof __array__) {
-                code = '[';
-                let childArr = [];
-                innerOption.value_.forEach((item) => {
-                    childArr.push(this.createCodeText(item));
-                });
-                code += childArr.join(',');
-                code += ']';
-            } else if (innerOption.type === 'dict') {
-                let props;
-                if (innerOption.type === 'dict') {
-                    props = innerOption.props;
-                } else {
-                    props = innerOption.map;
-                }
+            }
+            else if (innerOption.type === 'dict') {
+                let props = innerOption.props;
                 code = '{';
                 let childArr = [];
                 for (let i in props) {
@@ -348,6 +363,21 @@ export default {
                 }
                 code += childArr.join(',');
                 code += '}';
+            }
+            else if (innerOption.type === 'dictionaryGet') {
+                code = this.createCodeText(innerOption.dictionary) + '.' + innerOption.key;
+            }
+            else if (innerOption.type === 'var') {
+                code = innerOption.name;
+            }
+            else if (innerOption.type === 'function') {
+                code += innerOption.name + '(';
+                let TempPropArr = [];
+                innerOption.props.forEach((item) => {
+                    TempPropArr.push(this.createCodeText(item));
+                });
+                code += TempPropArr.join(',');
+                code += ')';
             }
             return code;
         },
@@ -364,26 +394,20 @@ export default {
             } else {
                 this.innerOption.props.push('');
             }
-            this.childCodeChange();
+            this.emitChange();
         },
         changeProp() {
+            // dataType参数类型，支持函数返回值，这就意味着，当修改某一个类型的时候，可能会影响其他的类型，所以重新计算对应类型的默认值
             for (let i = 0; i < this.allMatch.length; i++) {
                 if (this.innerOption.name.match(this.allMatch[i].match)) {
                     this.codeOption = this.allMatch[i];
                     this.codeOption.props.forEach((item, key) => {
                         if (typeof item.dataType === 'function') {
+                            // this.innerOption.props并不是原始的Obj格式
                             let dataType = item.dataType(this.innerOption.props);
                             let replace = false;
-                            if (typeof this.innerOption.props[key] === 'number') {
-                                if (!dataType.split(',').includes('number')) {
-                                    replace = true;
-                                }
-                            } else if (typeof this.innerOption.props[key] === 'string') {
-                                if (!dataType.split(',').includes('string')) {
-                                    replace = true;
-                                }
-                            } else if (typeof this.innerOption.props[key] === 'boolean') {
-                                if (!dataType.split(',').includes('bool')) {
+                            if (['number', 'string', 'boolean'].includes(typeof this.innerOption.props[key])) {
+                                if (!dataType.split(',').includes(typeof this.innerOption.props[key])) {
                                     replace = true;
                                 }
                             } else if (this.innerOption.props[key] instanceof Array) {
@@ -402,11 +426,9 @@ export default {
                                     this.innerOption.props[key] = [];
                                 }
                             }
-                        } else {
-                            console.log(item.dataType);
                         }
                     });
-                    this.childCodeChange();
+                    this.emitChange();
                 }
             }
         },
@@ -414,6 +436,7 @@ export default {
             // codeOption.props
             if (name === 'var') {
                 this.innerOption = 1;
+                // 需要增加保证i不等于自己的逻辑
                 for (let i in this.allVar) {
                     this.innerOption = {
                         type: 'var',
@@ -421,17 +444,10 @@ export default {
                     };
                     break;
                 }
-            } else if (name === 'number') {
-                this.innerOption = 0;
-            } else if (name === 'string') {
-                this.innerOption = '';
             } else if (['TRUE', 'FALSE'].includes(name)) {
                 this.innerOption = name === 'TRUE';
-            } else if (name === 'dict') {
-                this.innerOption = {
-                    type: 'dict',
-                    props: {}
-                };
+            } else if (['number', 'string', 'dict', 'array'].includes(name)) {
+                this.innerOption = this.getDefaultValueByType(name);
             } else {
                 this.innerOption = {
                     name: name,
@@ -446,6 +462,10 @@ export default {
                             if (dataType instanceof Array) {
                                 dataType = dataType[0];
                             }
+                            let firstType = dataType.split(',')[0];
+                            if (firstType.match(/array\((.*)\)/)) {
+                                firstType = 'array';
+                            }
                             if (item.enum) {
                                 for (let j in item.enum) {
                                     this.innerOption.props.push(j);
@@ -453,16 +473,8 @@ export default {
                                 }
                             } else if (typeof dataType === 'function') {
                                 this.innerOption.props.push(dataType);
-                            } else if (dataType.split(',').includes('number')) {
-                                this.innerOption.props.push(1);
-                            } else if (dataType.split(',').includes('string')) {
-                                this.innerOption.props.push('');
-                            } else if (dataType.split(',').includes('bool')) {
-                                this.innerOption.props.push(true);
-                            } else if (dataType.match(/array\((.*)\)/)) {
-                                this.innerOption.props.push(new __array__([]));
                             } else {
-                                this.innerOption.props.push('');
+                                this.innerOption.props.push(this.getDefaultValueByType(firstType));
                             }
                         });
                     }
@@ -470,21 +482,28 @@ export default {
                 for (let i = 0; i < this.innerOption.props.length; i++) {
                     if (typeof this.innerOption.props[i] === 'function') {
                         this.innerOption.props[i] = this.innerOption.props[i](this.innerOption.props);
-                        if (this.innerOption.props[i].split(',').includes('number')) {
-                            this.innerOption.props[i] = 1;
-                        } else if (this.innerOption.props[i].split(',').includes('string')) {
-                            this.innerOption.props[i] = '';
-                        } else if (this.innerOption.props[i].split(',').includes('bool')) {
-                            this.innerOption.props[i] = true;
-                        } else if (this.innerOption.props[i].match(/array\((.*)\)/)) {
-                            this.innerOption.props[i] = [];
+                        let first = this.innerOption.props[i].split(',')[0];
+                        if (first.match(/array\((.*)\)/)) {
+                            first = 'array';
                         }
+                        this.innerOption.props[i] = this.getDefaultValueByType(first);
                     }
                 }
             }
-            console.log(this.innerOption);
-            this.childCodeChange();
-        }
+            this.emitChange();
+        },
+        changeDictObj() {
+            // ??目前只处理了dict是变量的情况，现实有更复杂的嵌套的情况
+            if (this.innerOption.dictionary.type === 'var') {
+                let map = this.allVar[this.innerOption.dictionary.name].value;
+                this.innerOption.keys = map;
+                for (let i in map) {
+                    this.innerOption.key = i;
+                    break;
+                }
+            }
+            this.emitChange();
+        },
     }
 }
 </script>

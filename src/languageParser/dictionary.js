@@ -3,7 +3,6 @@
  */
 import Obj from '../observer/obj';
 import __allMatch__ from './allMatch';
-import Var from '../observer/Var';
 import createCodeText from './getStrByObj';
 // 字典
 class __dictionary__ extends Obj {
@@ -41,31 +40,6 @@ class __dictionary__ extends Obj {
         code += childArr.join(',');
         code += '}';
         return code;
-    }
-}
-class DictionaryGet extends Obj {
-    constructor(dictionary, key) {
-        super();
-        this.dictionary = dictionary;
-        this.key = key;
-        this.dom = document.createElement('div');
-    }
-
-    render() {
-        this.dom.innerHTML = this.value;
-    }
-
-    get value() {
-        let list = this.dictionary;
-        if (list instanceof Obj) {
-            list = list.value;
-        }
-        let value = list[this.key];
-        return value;
-    }
-
-    getCodeByObj() {
-        return this.dictionary.getCodeByObj() + '.' + this.key;
     }
 }
 
@@ -106,23 +80,4 @@ __allMatch__.push({
         return returnData;
     }
 });
-__allMatch__.push({
-    match: /^\.$/,
-    type: 'dict',
-    name: 'dict',
-    title: '字典',
-    value(tableNum, word, befordWord, forAction, forword) {
-        let before = befordWord;
-        if (before instanceof Var) {
-            before = before.value_;
-        }
-        if (before instanceof Obj) {
-            console.log(befordWord);
-            let returnData = new DictionaryGet(befordWord, forword());
-            returnData.listen(befordWord);
-            return returnData;
-        }
-    }
-});
-
 export default __dictionary__;

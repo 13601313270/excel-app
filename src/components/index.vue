@@ -60,6 +60,7 @@
                            ref="insertProps"
                            v-model="insertProps"
                            :dataType="editDataType"
+                           :is-root="true"
                            style="min-height: 250px;"></props-com>
                 <div>
                     <textarea @change="codeUpdate($event.target.value)"
@@ -76,6 +77,7 @@ import evalObjAndStr from '../languageParser/evalObjAndStr';
 import allMatch from '../languageParser/allMatch';
 import '../languageParser/array';
 import '../languageParser/dictionary';
+import '../languageParser/dictionaryGet';
 import '../widget/CHECK_BOX';
 import '../widget/BAR';
 import '../widget/INPUT';
@@ -207,6 +209,8 @@ export default {
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
         codeUpdate(code) {
+            console.log('==============');
+            console.log(code);
             this.insertCode = code;
             let updateVar = allVar.getVar(this.insertVarName);
             let widgePanel = this.varToDom.get(updateVar);
@@ -216,7 +220,7 @@ export default {
             }
             // allVar.getVar(this.insertVarName).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
-            console.log(insertObj);
+            console.log(insertObj[0]);
             allVar.setVar(this.insertVarName, insertObj[0]);
             let value_ = updateVar.value_;
             if (widgePanel !== undefined) {
@@ -275,8 +279,6 @@ export default {
             url: 'http://www.tablehub.cn/action/mysql.html',
             data: {
                 type: 'getConnections'
-                // table: 'user',
-                // sql: 'id>0'
             }
         }).then((data) => {
             this.connections = data;
@@ -287,10 +289,10 @@ export default {
         // $a2 = RELATIONAL_MODEL(1,'user',$a1,['count(id)','count(id)+1'])
         //
         // id email
-        let fileContent = `$a1 = INPUT('string',10)
+        let fileContent = `$a1 = INPUT('string',"10")
         $a2 = RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1'])
         $a3 = BAR($a2)
-        $a4 = $a3.value
+        $a4 = $a3.select
         `;
         // let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';
