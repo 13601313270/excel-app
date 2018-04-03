@@ -11,7 +11,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(item,key) in datas" @mouseover="hover(key)" @mouseout="leave(key)">
+            <tr v-for="(item,key) in datas"
+                v-if="item.type!=='relationalModel'"
+                @mouseover="hover(key)"
+                @mouseout="leave(key)">
                 <td v-html="key"></td>
                 <td v-html="getCodeByVal(item)"></td>
                 <td v-if="['string','number','boolean'].includes(typeof item)" v-html="item"></td>
@@ -40,6 +43,7 @@ export default {
     mounted() {
         let self = this;
         AllVarClass.on('valChange', function(key, val) {
+            console.log(key);
             self.$set(self.datas, key, val.value_);
         });
     },

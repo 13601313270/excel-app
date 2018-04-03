@@ -44,21 +44,25 @@ class relationalModel extends Obj {
                 this.groupColumn = [];
                 this.dataColumn = [];
                 this.dataValue = [];
-                let x = this.props[2];
-                if (x instanceof Obj) {
-                    x = x.value;
-                }
-                let y = this.props[3].value;
-                this.groupColumn.push(x);
-                this.dataColumn.push(...y);
-                data.forEach((item) => {
-                    let insert = [item[x]];
-                    y.forEach((eachY) => {
-                        insert.push(item[eachY]);
+                if (data === false) {
+                    resolve();
+                } else {
+                    let x = this.props[2];
+                    if (x instanceof Obj) {
+                        x = x.value;
+                    }
+                    let y = this.props[3].value;
+                    this.groupColumn.push(x);
+                    this.dataColumn.push(...y);
+                    data.forEach((item) => {
+                        let insert = [item[x]];
+                        y.forEach((eachY) => {
+                            insert.push(item[eachY]);
+                        });
+                        this.dataValue.push(insert);
                     });
-                    this.dataValue.push(insert);
-                });
-                resolve();
+                    resolve();
+                }
             });
         }));
     }
@@ -97,7 +101,7 @@ __allMatch__.push({
         {
             name: 'x:',
             title: 'X轴',
-            dataType: 'string',
+            dataType: 'string,var',
             default: ''
         },
         {

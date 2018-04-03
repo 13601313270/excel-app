@@ -32,19 +32,7 @@
                 </div>
             </div>
             <div style="width: 200px;background-color: #d0d0d0;">
-                <h2>数据链接</h2>
-                <div v-for="item in connections">
-                    <div v-html="item.name"></div>
-                    <div style="display: none">
-                        <div v-html="item.id"></div>
-                        <div v-html="item.uid"></div>
-                        <div v-html="item.type"></div>
-                        <div v-html="item.info.db"></div>
-                        <div v-html="item.info.host"></div>
-                        <div v-html="item.info.port"></div>
-                        <div v-html="item.info.username"></div>
-                    </div>
-                </div>
+                <datas-vue :connections="connections" @change="editVar"></datas-vue>
             </div>
         </div>
         <div v-if="insertVarName!==''"
@@ -93,6 +81,7 @@ import allPageVars from './allVars.vue';
 import propsCom from './props/props.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
+import datasVue from '../components/datas.vue';
 
 import ajax from '../api/ajax';
 export default {
@@ -111,7 +100,8 @@ export default {
     },
     components: {
         'all-vars': allPageVars,
-        'props-com': propsCom
+        'props-com': propsCom,
+        'datas-vue': datasVue
     },
     computed: {
         saveHtml() {

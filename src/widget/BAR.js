@@ -37,8 +37,6 @@ class BAR extends FuncObj {
             xColumn.value = params.name;
             select.value = params.seriesName;
             value.value = parseFloat(params.data);
-            console.log(params);
-            console.log(this.value);
             this.dep.update();
         });
     }
@@ -70,29 +68,30 @@ class BAR extends FuncObj {
         };
         option.xAxis.data = [];
         option.series = [];
-        // [{"count(33)":"1","count(email)":"1","state":"1"}]
-        data.forEach((item) => {
-            let dataItem = {
-                type: 'bar', data: []
-            };
-            item.forEach((item2, key) => {
-                if (key < model.groupColumn.length) {
-                    option.xAxis.data.push(item2);
-                } else {
-                    if (option.series[key - model.groupColumn.length] === undefined) {
-                        option.series[key - model.groupColumn.length] = {
-                            type: 'bar',
-                            name: model.dataColumn[key - model.groupColumn.length],
-                            data: []
-                        };
+        if (data.length > 0) {
+            data.forEach((item) => {
+                let dataItem = {
+                    type: 'bar', data: []
+                };
+                item.forEach((item2, key) => {
+                    if (key < model.groupColumn.length) {
+                        option.xAxis.data.push(item2);
+                    } else {
+                        if (option.series[key - model.groupColumn.length] === undefined) {
+                            option.series[key - model.groupColumn.length] = {
+                                type: 'bar',
+                                name: model.dataColumn[key - model.groupColumn.length],
+                                data: []
+                            };
+                        }
+                        option.series[key - model.groupColumn.length].data.push(item2);
                     }
-                    option.series[key - model.groupColumn.length].data.push(item2);
-                }
+                });
+                option.series.push(dataItem);
             });
-            option.series.push(dataItem);
-        });
-        // 使用刚指定的配置项和数据显示图表。
-        this.myChart.setOption(option);
+        }
+        this.myChart.setOption(option, true);
+
         setTimeout(() => {
             this.dom.style.width = '500px';
             this.dom.style.height = '300px';

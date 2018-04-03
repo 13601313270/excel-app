@@ -125,7 +125,7 @@
                         <td>数组</td>
                         <td>
                             <template v-for="(item,key) in innerOption.props">
-                                <div style="position:relative;padding-right: 14px;">
+                                <div style="position:relative;padding-right: 15px;">
                                     <inner-dom v-model="innerOption.props[key]" @change="emitChange"
                                                :dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>
                                     <div class="closeButton"
