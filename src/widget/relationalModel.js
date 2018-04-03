@@ -16,6 +16,7 @@ class relationalModel extends Obj {
         this.groupColumn = [];
         this.dataColumn = [];
         this.dataValue = [];
+        this.dep.update();
     }
 
     get value() {
@@ -23,6 +24,7 @@ class relationalModel extends Obj {
     }
 
     render(handle) {
+        console.log(111);
         handle(new Promise((resolve, reject) => {
             let source = this.props[0] instanceof Obj ? this.props[0].value : this.props[0];
             let table = this.props[1] instanceof Obj ? this.props[1].value : this.props[1];
@@ -41,6 +43,7 @@ class relationalModel extends Obj {
                     }
                 }
             }).then((data) => {
+                console.log(data);
                 this.groupColumn = [];
                 this.dataColumn = [];
                 this.dataValue = [];

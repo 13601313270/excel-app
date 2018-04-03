@@ -44,12 +44,23 @@
                         X
                     </div>
                 </div>
-                <props-com @change="codeUpdate"
-                           ref="insertProps"
-                           v-model="insertProps"
-                           :dataType="editDataType"
-                           :is-root="true"
-                           style="min-height: 250px;"></props-com>
+                <template v-for="item,key in insertProps">
+                    <relational-model-props
+                        v-if="editDataType==='relationalModel'" @change="codeUpdate"
+                        ref="insertProps"
+                        v-model="insertProps[key]"
+                        :dataType="editDataType"
+                        :is-root="true"
+                        style="min-height: 250px;"></relational-model-props>
+                    <props-com
+                        v-else @change="codeUpdate"
+                        ref="insertProps"
+                        v-model="insertProps[key]"
+                        :dataType="editDataType"
+                        :is-root="true"
+                        style="min-height: 250px;"></props-com>
+                </template>
+
                 <div>
                     <textarea @change="codeUpdate($event.target.value)"
                               :value="insertCode"
@@ -79,6 +90,7 @@ import allVar from '../observer/allVar';
 import dashboard from './dashboard';
 import allPageVars from './allVars.vue';
 import propsCom from './props/props.vue';
+import relationalModelProps from './props/relationalModelProps.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 import datasVue from '../components/datas.vue';
@@ -89,7 +101,7 @@ export default {
         return {
             currentView: dashboard(),
             dragDomFunc: undefined,
-            insertProps: {},
+            insertProps: [],
             editDataType: '',
             insertCode: '',
             insertVarName: '',
@@ -101,7 +113,8 @@ export default {
     components: {
         'all-vars': allPageVars,
         'props-com': propsCom,
-        'datas-vue': datasVue
+        'datas-vue': datasVue,
+        'relational-model-props': relationalModelProps
     },
     computed: {
         saveHtml() {
@@ -179,7 +192,7 @@ export default {
                     this.insertVarName = varName;
                     let insertObj = evalObjAndStr(1, code);
                     allVar.setVar(varName, insertObj[0]);
-                    this.insertProps = insertObj[0];
+                    this.insertProps[0] = insertObj[0];
                     this.editDataType = '';
                     this.insertCode = code;
 
@@ -241,7 +254,10 @@ export default {
         editVar(key) {
             let Var = allVar.getVar(key);
             this.insertVarName = key;
-            this.insertProps = Var.value_;
+            this.insertProps[0] = Var.value_;
+            setTimeout(() => {
+                this.insertProps[1] = Var.value_;
+            },2000);
             if (Var.value_ instanceof relationalModel) {
                 this.editDataType = 'relationalModel';
             } else {
@@ -277,8 +293,7 @@ export default {
         //
         // id email
         let fileContent = `$a1 = INPUT('string',"10")
-        $a2 = RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1'])
-        $a3 = BAR($a2)
+        $a3 = BAR(RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1']))
         $a4 = $a3.select
         $a5 = MIN($a1,1)
         `;

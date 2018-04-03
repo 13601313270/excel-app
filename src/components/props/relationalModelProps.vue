@@ -1,240 +1,71 @@
 <template>
     <div class="prop">
-        <table>
+        <table v-if="codeOption.props">
             <tbody>
-            <template v-if="dataType==='relationalModel'">
-                <tr>
-                    <td>!!!!!!嵌套</td>
-                </tr>
-                <tr v-for="(value,key) in codeOption.props">
-                    <template v-if="key==0">
-                        <td v-html="codeOption.props[key].title"></td>
-                        <td>
-                            <select v-model="innerOption.props[key]">
-                                <option v-for="item in $store.state.connections" v-html="item.name"
-                                        :value="item.id"></option>
-                            </select>
-                        </td>
-                    </template>
-                    <template v-else>
-                        <td v-html="codeOption.props[key].title"></td>
-                        <td>
-                            <inner-dom v-if="innerOption.props[key]"
-                                       @change="emitChange"
-                                       v-model="innerOption.props[key]"
-                                       :dataType="getDataType(key)"
-                            ></inner-dom>
-                        </td>
-                    </template>
-                    <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
-                </tr>
-            </template>
-            <template v-else-if="innerOption.type === 'function'">
-                <tr>
-                    <td>函数{{innerOption.name}}</td>
-                    <td>
-                        <select-type
-                            :value="innerOption.name"
-                            @change="changeType"
-                            :dataType="dataType"
-                        ></select-type>
-                    </td>
-                </tr>
-                <tr v-for="(value,key) in innerOption.props">
-                    <td v-html="key>=codeOption.props.length?codeOption.props[codeOption.props.length-1].title:codeOption.props[key].title"></td>
-                    <td>
-                        <template
-                            v-if="key>=codeOption.props.length-1 && getDataType(codeOption.props.length-1) instanceof Array">
-                            <select v-if="codeOption.props[codeOption.props.length-1].enum">
-                                <option v-for="title,val in codeOption.props[codeOption.props.length-1].enum"
-                                        :value="val">{{title}}
-                                </option>
-                            </select>
-
-
-                            <div v-if="getDataType(codeOption.props.length-1)[0]==='relationalModel'">
-                                <select :value="innerOption.props[key].name"
-                                        @change="setInnerOption({type:'var',name:$event.target.value})">
-                                    <option v-for="(item,key) in allVar" :value="key"
-                                            v-if="item.value_ instanceof relationalModel">
-                                        {{key}}
-                                    </option>
-                                </select>
-                                <br/>
-                                <button>新建</button>
-                            </div>
-                            <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
-                                       :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
-
-
-                            <template v-if="key==innerOption.props.length-1">
-                                <button @click="addProp(getDataType(codeOption.props.length-1)[0])">添加</button>
-                            </template>
-                        </template>
-                        <select v-else-if="codeOption.props[key].enum" v-model="innerOption.props[key]"
-                                @change="changeProp">
-                            <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
-                        </select>
-                        <template v-else>
-                            <div v-if="getDataType(key)==='relationalModel'">
-
-
-                                <relational-model-props
-                                    @change="emitChange"
-                                    v-model="innerOption.props[key]"
-                                    :dataType="getDataType(key)"
-                                    :is-root="false"
-                                ></relational-model-props>
-
-
-                                <div v-html="innerOption.props[key]"></div>
-                                <select :value="innerOption.props[key].name"
-                                        @change="innerOption.props[key]={type:'var',name:$event.target.value},emitChange()">
-                                    <option v-for="(item,key) in allVar" :value="key"
-                                            v-if="item.value_ instanceof relationalModel">
-                                        {{key}}
-                                    </option>
-                                </select>
-                                <br/>
-                                <button>新建2</button>
-                            </div>
-                            <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
-                                       :dataType="getDataType(key)"></inner-dom>
-                        </template>
-                    </td>
-                    <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
-                </tr>
-            </template>
-            <template v-else>
-                <tr>
-                    <template v-if="typeof innerOption==='number'||typeof innerOption==='string'">
-                        <td :style="tdStyle">
-                            <select-type
-                                :value="typeof innerOption"
-                                @change="changeType"
-                                :dataType="dataType"
-                            ></select-type>
-                            <input :value="innerOption" v-if="typeof innerOption==='number'"
-                                   @change="setInnerOption(parseFloat($event.target.value))"/>
-                            <input :value="innerOption" v-else
-                                   @change="setInnerOption($event.target.value.toString())"/>
-                        </td>
-                    </template>
-                    <template v-else-if="typeof innerOption==='boolean'">
-                        <td :style="tdStyle">
-                            <select-type
-                                :value="innerOption===true?'TRUE':'FALSE'"
-                                @change="changeType"
-                                :dataType="dataType"
-                            ></select-type>
-                        </td>
-                    </template>
-                    <template v-else-if="innerOption.type==='array'">
-                        <td :style="tdStyle">数组</td>
-                        <td :style="tdStyle">
-                            <template v-for="(item,key) in innerOption.props">
-                                <div style="position:relative;padding-right: 15px;">
-                                    <inner-dom v-model="innerOption.props[key]" @change="emitChange"
-                                               :dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>
-                                    <div class="closeButton"
-                                         @click="innerOption.props.splice(key,1),emitChange()">X
-                                    </div>
-                                </div>
-                                <template v-if="key==innerOption.props.length-1">
-                                    <button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>
-                                </template>
-                            </template>
-                            <template v-if="innerOption.props.length==0">
-                                <button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>
-                            </template>
-                        </td>
-                    </template>
-                    <template v-else-if="innerOption.type === 'var'">
-                        <td :style="tdStyle">
-                            <select-type
-                                :value="innerOption.type"
-                                @change="changeType"
-                                :dataType="dataType"
-                            ></select-type>
-                        </td>
-                        <td :style="tdStyle">
-                            <select :value="innerOption.name"
-                                    @change="changeVar($event.target.value)">
-                                <option v-for="item,key in allVar" :value="key">
-                                    【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
-                                </option>
-                            </select>
-                        </td>
-                    </template>
-                    <template v-else-if="innerOption.type==='dict'">
-                        <td :style="tdStyle">字典</td>
-                        <td :style="tdStyle">
-                            <div class="dictList">
-                                <div v-for="(item,key) in innerOption.props">
-                                    <div class="key" v-html="key"></div>
-                                    <div>:&nbsp;</div>
-                                    <div>
-                                        <!--:dataType="getDataType(key)"-->
-                                        <inner-dom @change="emitChange"
-                                                   v-model="innerOption.props[key]"
-                                                   :dataType="''"
-                                        ></inner-dom>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="key">
-                                        <button
-                                            @click="innerOption.props[prompt('请输入键名', 'a7')]='val',emitChange()">
-                                            添加
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </template>
-                    <template v-else-if="innerOption.type==='dictionaryGet'">
-                        <template v-if="innerOption.dictionary.type='var'">
-                            <td :style="tdStyle">
-                                <select-type
-                                    :value="innerOption.dictionary.type"
-                                    @change="changeType"
-                                    :dataType="dataType"
-                                ></select-type>
-                            </td>
-                            <td :style="tdStyle">
-                                <select :value="innerOption.dictionary.name"
-                                        @change="changeVar($event.target.value)">
-                                    <option v-for="item,key in allVar" :value="key">
-                                        【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
-                                    </option>
-                                </select>
-                            </td>
-                            <td :style="tdStyle">
-                                <select @change="emitChange()" v-model="innerOption.key">
-                                    <option v-for="item,key in innerOption.keys" :value="key">
-                                        【{{key}}】--{{item}}
-                                    </option>
-                                </select>
-                            </td>
-                        </template>
-                        <template v-else>
-                            <td :style="tdStyle">字典获取</td>
-                            <td :style="tdStyle">
-                                <inner-dom @change="changeDictObj"
-                                           v-model="innerOption.dictionary"
-                                           :dataType="''"
-                                ></inner-dom>
-
-                                <select @change="emitChange()" v-model="innerOption.key">
-                                    <option v-for="item,key in innerOption.keys" :value="key">
-                                        【{{key}}】--{{item}}
-                                    </option>
-                                </select>
-                            </td>
-                        </template>
-                    </template>
-                </tr>
-            </template>
+            <tr>
+                <td>关系模型</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td v-html="codeOption.props[0].title"></td>
+                <td>
+                    <select v-model="innerOption.props[0]">
+                        <option v-for="item in $store.state.connections" v-html="item.name"
+                                :value="item.id"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td v-html="codeOption.props[1].title"></td>
+                <td>
+                    <inner-dom
+                        v-if="innerOption.props[1]"
+                        @change="emitChange"
+                        v-model="innerOption.props[1]"
+                        :dataType="getDataType(1)"
+                    ></inner-dom>
+                </td>
+            </tr>
+            <tr>
+                <td v-html="codeOption.props[2].title"></td>
+                <td>
+                    <inner-dom
+                        v-if="innerOption.props[2]"
+                        @change="emitChange"
+                        v-model="innerOption.props[2]"
+                        :dataType="getDataType(2)"
+                    ></inner-dom>
+                </td>
+            </tr>
+            <tr>
+                <td v-html="codeOption.props[3].title"></td>
+                <td>
+                    <div class="y-item" v-for="item,key in innerOption.props[3].props">
+                        <inner-dom
+                            @change="emitChange"
+                            :tdStyle="{border:'none'}"
+                            v-model="innerOption.props[3].props[key]"
+                            :dataType="'string,var'"
+                        ></inner-dom>
+                        <!--<select class="likeText">-->
+                            <!--<option>count</option>-->
+                            <!--<option>min</option>-->
+                            <!--<option>max</option>-->
+                        <!--</select>(-->
+                        <!--<inner-dom-->
+                            <!--@change="emitChange"-->
+                            <!--:tdStyle="{border:'none'}"-->
+                            <!--v-model="innerOption.props[3].props[key]"-->
+                            <!--:dataType="'string,var'"-->
+                        <!--&gt;</inner-dom>-->
+                        <!--)-->
+                        <div class="closeButton"
+                             @click="innerOption.props[3].props.splice(key,1),emitChange()">X
+                        </div>
+                    </div>
+                    <button @click="innerOption.props[3].props.push(''),emitChange()">添加</button>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
@@ -250,28 +81,20 @@ import __dictionary__ from '../../languageParser/dictionary';
 import dictionaryGet from '../../languageParser/dictionaryGet';
 import Var from '../../observer/Var';
 import selectType from './typeSelect.vue';
-import relationalModelProps from './relationalModelProps.vue'
 export default {
-    name: 'inner-dom',
     props: {
         value: {},
         isRoot: Boolean,
-        dataType: String,
-        tdStyle: {}
+        dataType: String
     },
     components: {
         'inner-dom': innerDom,
-        'select-type': selectType,
-        'relational-model-props': relationalModelProps
+        'select-type': selectType
     },
     computed: {},
     watch: {
         value(val) {
-            // if (this.isRoot) {
-            //    this.innerOption = this.getOptionByObj(val);
-            // } else {
             this.innerOption = val;
-            // }
         }
     },
     data() {
@@ -304,7 +127,7 @@ export default {
             }
         },
         emitChange() {
-            this.$emit('input', this.innerOption);// 根目录不用，但是子元素修改完修改影响父层
+            this.$emit('input', this.innerOption);
             this.$emit('change', this.createCodeText(this.innerOption));
         },
         setInnerOption(val) {
@@ -585,6 +408,11 @@ export default {
 }
 </script>
 <style scoped lang="less">
+    @borderColor: rgb(166, 166, 166);
+    select {
+        border: solid 1px @borderColor;
+    }
+
     table {
         border-collapse: collapse;
         td {
@@ -622,23 +450,38 @@ export default {
                     }
                 }
             }
-        }
-    }
-
-    .closeButton {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        width: 14px;
-        border: solid 1px black;
-        border-left: none;
-        text-align: center;
-        cursor: pointer;
-        &:hover {
-            background-color: #e77f7e;
-            border-left: solid 1px black;
-            color: white;
+            .y-item {
+                display: flex;
+                position: relative;
+                padding-right: 15px;
+                .likeText {
+                    border: none;
+                }
+                &:hover {
+                    .likeText {
+                        border: solid 1px @borderColor;
+                    }
+                    .closeButton {
+                        display: inherit;
+                    }
+                }
+                .closeButton {
+                    position: absolute;
+                    display: none;
+                    top: 0;
+                    bottom: 0;
+                    right: 0;
+                    width: 14px;
+                    border-radius: 5px;
+                    text-align: center;
+                    cursor: pointer;
+                    &:hover {
+                        border: solid 1px black;
+                        background-color: #e77f7e;
+                        color: white;
+                    }
+                }
+            }
         }
     }
 </style>

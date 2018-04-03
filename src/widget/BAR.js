@@ -50,6 +50,7 @@ class BAR extends FuncObj {
         if (model instanceof Var) {
             model = model.value_;
         }
+        console.log(model);
         if (model === '') {
             handle(false);
             return;
