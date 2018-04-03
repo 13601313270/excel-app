@@ -8,14 +8,25 @@
                     <td></td>
                 </tr>
                 <tr v-for="(value,key) in codeOption.props">
-                    <td v-html="codeOption.props[key].title"></td>
-                    <td>
-                        <inner-dom v-if="innerOption.props[key]"
-                                   @change="emitChange"
-                                   v-model="innerOption.props[key]"
-                                   :dataType="getDataType(key)"
-                        ></inner-dom>
-                    </td>
+                    <template v-if="key==0">
+                        <td v-html="codeOption.props[key].title"></td>
+                        <td>
+                            <select v-model="innerOption.props[key]">
+                                <option v-for="item in $store.state.connections" v-html="item.name"
+                                        :value="item.id"></option>
+                            </select>
+                        </td>
+                    </template>
+                    <template v-else>
+                        <td v-html="codeOption.props[key].title"></td>
+                        <td>
+                            <inner-dom v-if="innerOption.props[key]"
+                                       @change="emitChange"
+                                       v-model="innerOption.props[key]"
+                                       :dataType="getDataType(key)"
+                            ></inner-dom>
+                        </td>
+                    </template>
                     <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
                 </tr>
             </template>
@@ -114,8 +125,13 @@
                         <td>数组</td>
                         <td>
                             <template v-for="(item,key) in innerOption.props">
-                                <inner-dom v-model="innerOption.props[key]" @change="emitChange"
-                                           :dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>
+                                <div style="position:relative;padding-right: 14px;">
+                                    <inner-dom v-model="innerOption.props[key]" @change="emitChange"
+                                               :dataType="dataType.match(/array\((.*)\)/)[1]"></inner-dom>
+                                    <div class="closeButton"
+                                         @click="innerOption.props.splice(key,1),emitChange()">X
+                                    </div>
+                                </div>
                                 <template v-if="key==innerOption.props.length-1">
                                     <button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>
                                 </template>
@@ -394,7 +410,7 @@ export default {
             else if (innerOption.type === 'var') {
                 code = innerOption.name;
             }
-            else if (innerOption.type === 'function') {
+            else if (['function', 'relationalModel'].includes(innerOption.type)) {
                 code += innerOption.name + '(';
                 let TempPropArr = [];
                 innerOption.props.forEach((item) => {
@@ -595,6 +611,23 @@ export default {
                     }
                 }
             }
+        }
+    }
+
+    .closeButton {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: 14px;
+        border: solid 1px black;
+        border-left: none;
+        text-align: center;
+        cursor: pointer;
+        &:hover {
+            background-color: #e77f7e;
+            border-left: solid 1px black;
+            color: white;
         }
     }
 </style>

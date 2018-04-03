@@ -278,6 +278,7 @@ export default {
             }
         }).then((data) => {
             this.connections = data;
+            this.$store.commit('setConnections', data);
         });
 
         // let fileContent = `$a1 = INPUT('number',9999)`;
