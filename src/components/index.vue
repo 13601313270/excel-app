@@ -209,18 +209,14 @@ export default {
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
         codeUpdate(code) {
-            console.log('==============');
-            console.log(code);
             this.insertCode = code;
             let updateVar = allVar.getVar(this.insertVarName);
             let widgePanel = this.varToDom.get(updateVar);
-            console.log(code);
             if (widgePanel !== undefined) {
                 widgePanel.innerHTML = '';
             }
             // allVar.getVar(this.insertVarName).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
-            console.log(insertObj[0]);
             allVar.setVar(this.insertVarName, insertObj[0]);
             let value_ = updateVar.value_;
             if (widgePanel !== undefined) {
@@ -293,6 +289,7 @@ export default {
         $a2 = RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1'])
         $a3 = BAR($a2)
         $a4 = $a3.select
+        $a5 = MIN($a1,1)
         `;
         // let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';

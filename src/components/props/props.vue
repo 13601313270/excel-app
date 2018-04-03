@@ -110,23 +110,6 @@
                             ></select-type>
                         </td>
                     </template>
-                    <template v-else-if="innerOption.type === 'var'">
-                        <td>
-                            <select-type
-                                :value="innerOption.type"
-                                @change="changeType"
-                                :dataType="dataType"
-                            ></select-type>
-                        </td>
-                        <td>
-                            <select :value="innerOption.name"
-                                    @change="setInnerOption({type:'var',name:$event.target.value})">
-                                <option v-for="item,key in allVar" :value="key">
-                                    【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
-                                </option>
-                            </select>
-                        </td>
-                    </template>
                     <template v-else-if="innerOption.type==='array'">
                         <td>数组</td>
                         <td>
@@ -140,6 +123,23 @@
                             <template v-if="innerOption.props.length==0">
                                 <button @click="addProp(dataType.match(/array\((.*)\)/)[1])">添加</button>
                             </template>
+                        </td>
+                    </template>
+                    <template v-else-if="innerOption.type === 'var'">
+                        <td>
+                            <select-type
+                                :value="innerOption.type"
+                                @change="changeType"
+                                :dataType="dataType"
+                            ></select-type>
+                        </td>
+                        <td>
+                            <select :value="innerOption.name"
+                                    @change="changeVar($event.target.value)">
+                                <option v-for="item,key in allVar" :value="key">
+                                    【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
+                                </option>
+                            </select>
                         </td>
                     </template>
                     <template v-else-if="innerOption.type==='dict'">
@@ -169,19 +169,45 @@
                         </td>
                     </template>
                     <template v-else-if="innerOption.type==='dictionaryGet'">
-                        <td>字典获取</td>
-                        <td>
-                            <inner-dom @change="changeDictObj"
-                                       v-model="innerOption.dictionary"
-                                       :dataType="''"
-                            ></inner-dom>
+                        <template v-if="innerOption.dictionary.type='var'">
+                            <td>
+                                <select-type
+                                    :value="innerOption.dictionary.type"
+                                    @change="changeType"
+                                    :dataType="dataType"
+                                ></select-type>
+                            </td>
+                            <td>
+                                <select :value="innerOption.dictionary.name"
+                                        @change="changeVar($event.target.value)">
+                                    <option v-for="item,key in allVar" :value="key">
+                                        【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <select @change="emitChange()" v-model="innerOption.key">
+                                    <option v-for="item,key in innerOption.keys" :value="key">
+                                        【{{key}}】--{{item}}
+                                    </option>
+                                </select>
+                            </td>
+                        </template>
+                        <template v-else>
+                            <td>字典获取</td>
+                            <td>
+                                <inner-dom @change="changeDictObj"
+                                           v-model="innerOption.dictionary"
+                                           :dataType="''"
+                                ></inner-dom>
 
-                            <select @change="emitChange()" v-model="innerOption.key">
-                                <option v-for="item,key in innerOption.keys" :value="key">
-                                    【{{key}}】------{{item}}
-                                </option>
-                            </select>
-                        </td>
+                                <select @change="emitChange()" v-model="innerOption.key">
+                                    <option v-for="item,key in innerOption.keys" :value="key">
+                                        【{{key}}】--{{item}}
+                                    </option>
+                                </select>
+                            </td>
+                        </template>
                     </template>
                 </tr>
             </template>
@@ -285,12 +311,12 @@ export default {
                     keys: obj.dictionary.value,
                     key: obj.key
                 };
-                console.log(returnOption);
             }
             else if (obj instanceof Var) {
                 returnOption = {
                     type: 'var',
-                    name: obj.name
+                    name: obj.name,
+                    value: obj.value
                 };
             }
             else {
@@ -299,8 +325,6 @@ export default {
                     name: obj.name,
                     props: []
                 };
-                console.trace(obj);
-                console.log(obj.props);
                 obj.props.forEach(item => {
                     returnOption.props.push(this.getOptionByObj(item))
                 });
@@ -492,18 +516,44 @@ export default {
             }
             this.emitChange();
         },
+        changeVar(val) {
+            let map = this.allVar[val].value;
+            if (!(map instanceof Array) && map instanceof Object) {
+                let item = {
+                    type: 'dictionaryGet',
+                    dictionary: this.getOptionByObj(this.allVar[val]),
+                    keys: map
+                };
+                for (let i in map) {
+                    item.key = i;
+                    break;
+                }
+                this.setInnerOption(item);
+            } else {
+                this.setInnerOption({
+                    type: 'var',
+                    name: val
+                });
+            }
+        },
         changeDictObj() {
             // ??目前只处理了dict是变量的情况，现实有更复杂的嵌套的情况
             if (this.innerOption.dictionary.type === 'var') {
                 let map = this.allVar[this.innerOption.dictionary.name].value;
-                this.innerOption.keys = map;
-                for (let i in map) {
-                    this.innerOption.key = i;
-                    break;
+                if (map instanceof Array) {
+
+                } else if (map instanceof Object) {
+                    this.innerOption.keys = map;
+                    for (let i in map) {
+                        this.innerOption.key = i;
+                        break;
+                    }
+                } else {
+                    this.innerOption = {type: 'var', name: this.innerOption.dictionary.name}
                 }
             }
             this.emitChange();
-        },
+        }
     }
 }
 </script>
