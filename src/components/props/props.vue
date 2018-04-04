@@ -77,17 +77,6 @@
                         </select>
                         <template v-else>
                             <div v-if="getDataType(key)==='relationalModel'">
-
-
-                                <relational-model-props
-                                    @change="emitChange"
-                                    v-model="innerOption.props[key]"
-                                    :dataType="getDataType(key)"
-                                    :is-root="false"
-                                ></relational-model-props>
-
-
-                                <div v-html="innerOption.props[key]"></div>
                                 <select :value="innerOption.props[key].name"
                                         @change="innerOption.props[key]={type:'var',name:$event.target.value},emitChange()">
                                     <option v-for="(item,key) in allVar" :value="key"
@@ -96,7 +85,7 @@
                                     </option>
                                 </select>
                                 <br/>
-                                <button>新建2</button>
+                                <button>新建</button>
                             </div>
                             <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
                                        :dataType="getDataType(key)"></inner-dom>
@@ -250,7 +239,6 @@ import __dictionary__ from '../../languageParser/dictionary';
 import dictionaryGet from '../../languageParser/dictionaryGet';
 import Var from '../../observer/Var';
 import selectType from './typeSelect.vue';
-import relationalModelProps from './relationalModelProps.vue'
 export default {
     name: 'inner-dom',
     props: {
@@ -262,7 +250,6 @@ export default {
     components: {
         'inner-dom': innerDom,
         'select-type': selectType,
-        'relational-model-props': relationalModelProps
     },
     computed: {},
     watch: {

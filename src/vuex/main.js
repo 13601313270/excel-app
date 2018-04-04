@@ -1,7 +1,8 @@
 export default {
     state: {
         varHighlight: {},
-        connections: []
+        connections: [],
+        editObjArr: []
     },
     mutations: {
         varHighlightSet(state, data) {

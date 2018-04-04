@@ -35,27 +35,25 @@
                 <datas-vue :connections="connections" @change="editVar"></datas-vue>
             </div>
         </div>
-        <div v-if="insertVarName!==''"
+        <div v-if="editObjArr.length > 0"
              style="position: fixed;z-index: 2;top:0%;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
             <div style="background-color: white;border-radius: 5px;padding: 5px;position: relative;">
-                <div>对象：{{insertVarName}}
-                    <div @click="insertVarName=''"
-                         style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
-                        X
+                <template v-for="item,key in editObjArr">
+                    <div>对象：{{item.name}}
+                        <div @click="editObjArr.splice(key,1)"
+                             style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
+                            X
+                        </div>
                     </div>
-                </div>
-                <template v-for="item,key in insertProps">
                     <relational-model-props
                         v-if="editDataType==='relationalModel'" @change="codeUpdate"
-                        ref="insertProps"
-                        v-model="insertProps[key]"
+                        v-model="editObjArr[key].obj"
                         :dataType="editDataType"
                         :is-root="true"
                         style="min-height: 250px;"></relational-model-props>
                     <props-com
                         v-else @change="codeUpdate"
-                        ref="insertProps"
-                        v-model="insertProps[key]"
+                        v-model="editObjArr[key].obj"
                         :dataType="editDataType"
                         :is-root="true"
                         style="min-height: 250px;"></props-com>
@@ -101,10 +99,9 @@ export default {
         return {
             currentView: dashboard(),
             dragDomFunc: undefined,
-            insertProps: [],
+            editObjArr: [],
             editDataType: '',
             insertCode: '',
-            insertVarName: '',
             connections: [],
             html: '',
             varToDom: new Map()
@@ -189,10 +186,12 @@ export default {
                 let item = allMatch[i];
                 if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
                     let code = this.getCodeByMatchItem(item);
-                    this.insertVarName = varName;
                     let insertObj = evalObjAndStr(1, code);
                     allVar.setVar(varName, insertObj[0]);
-                    this.insertProps[0] = insertObj[0];
+                    this.editObjArr.push({
+                        name: varName,
+                        obj: insertObj[0]
+                    });
                     this.editDataType = '';
                     this.insertCode = code;
 
@@ -213,14 +212,14 @@ export default {
         },
         codeUpdate(code) {
             this.insertCode = code;
-            let updateVar = allVar.getVar(this.insertVarName);
+            let updateVar = allVar.getVar(this.editObjArr[0].name);
             let widgePanel = this.varToDom.get(updateVar);
             if (widgePanel !== undefined) {
                 widgePanel.innerHTML = '';
             }
-            // allVar.getVar(this.insertVarName).value_.dom.remove();
+            // allVar.getVar(this.editObjArr[0].name).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
-            allVar.setVar(this.insertVarName, insertObj[0]);
+            allVar.setVar(this.editObjArr[0].name, insertObj[0]);
             let value_ = updateVar.value_;
             if (widgePanel !== undefined) {
                 if (value_ instanceof Obj) {
@@ -253,11 +252,10 @@ export default {
         },
         editVar(key) {
             let Var = allVar.getVar(key);
-            this.insertVarName = key;
-            this.insertProps[0] = Var.value_;
-            setTimeout(() => {
-                this.insertProps[1] = Var.value_;
-            },2000);
+            this.editObjArr.push({
+                name: key,
+                obj: Var.value_
+            });
             if (Var.value_ instanceof relationalModel) {
                 this.editDataType = 'relationalModel';
             } else {
