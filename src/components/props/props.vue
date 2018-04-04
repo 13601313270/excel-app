@@ -84,6 +84,7 @@
                                         {{key}}
                                     </option>
                                 </select>
+                                <!--<button @click="$store.commit('editObjArrPush', {name: key,obj:innerOption.props[key]});"></button>-->
                                 <br/>
                                 <button>新建</button>
                             </div>
@@ -254,11 +255,7 @@ export default {
     computed: {},
     watch: {
         value(val) {
-            // if (this.isRoot) {
-            //    this.innerOption = this.getOptionByObj(val);
-            // } else {
             this.innerOption = val;
-            // }
         }
     },
     data() {
@@ -297,6 +294,13 @@ export default {
         setInnerOption(val) {
             this.innerOption = val;
             this.emitChange();
+        },
+        getCodeOption(name) {
+            for (let i = 0; i < this.allMatch.length; i++) {
+                if (name.match(this.allMatch[i].match)) {
+                    return this.allMatch[i];
+                }
+            }
         },
         getOptionByObj(obj) {
             let returnOption = {};
@@ -342,12 +346,7 @@ export default {
                 obj.props.forEach(item => {
                     returnOption.props.push(this.getOptionByObj(item))
                 });
-                for (let i = 0; i < this.allMatch.length; i++) {
-                    if (returnOption.name.match(this.allMatch[i].match)) {
-                        this.codeOption = this.allMatch[i];
-                        returnOption.type = this.codeOption.type;
-                    }
-                }
+                this.codeOption = this.getCodeOption(returnOption.name);
             }
             return returnOption;
         },

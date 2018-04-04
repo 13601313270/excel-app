@@ -36,11 +36,11 @@
             </div>
         </div>
         <div v-if="$store.state.editObjArr.length > 0"
-             style="position: fixed;z-index: 2;top:0%;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
+             style="position: fixed;z-index: 2;top:0;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
             <div style="background-color: white;border-radius: 5px;padding: 5px;position: relative;">
                 <template v-for="item,key in $store.state.editObjArr">
                     <div>对象：{{item.name}}
-                        <div @click="$store.commit('editObjArrDelete',key)"
+                        <div @click="$store.commit('editObjArrPop')"
                              style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
                             X
                         </div>
@@ -216,14 +216,15 @@ export default {
         },
         codeUpdate(code) {
             this.insertCode = code;
-            let updateVar = allVar.getVar(this.$store.state.editObjArr[0].name);
+            let editVarName = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1].name;
+            let updateVar = allVar.getVar(editVarName);
             let widgePanel = this.varToDom.get(updateVar);
             if (widgePanel !== undefined) {
                 widgePanel.innerHTML = '';
             }
-            // allVar.getVar(this.$store.state.editObjArr[0].name).value_.dom.remove();
+            // allVar.getVar(editVarName).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
-            allVar.setVar(this.$store.state.editObjArr[0].name, insertObj[0]);
+            allVar.setVar(editVarName, insertObj[0]);
             let value_ = updateVar.value_;
             if (widgePanel !== undefined) {
                 if (value_ instanceof Obj) {

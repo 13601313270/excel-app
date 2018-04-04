@@ -43,7 +43,6 @@ class relationalModel extends Obj {
                     }
                 }
             }).then((data) => {
-                console.log(data);
                 this.groupColumn = [];
                 this.dataColumn = [];
                 this.dataValue = [];

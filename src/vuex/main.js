@@ -14,8 +14,8 @@ export default {
         editObjArrPush(state, item) {
             state.editObjArr.push(item);
         },
-        editObjArrDelete(state, key) {
-            state.editObjArr.splice(key, 1);
+        editObjArrPop(state, key) {
+            state.editObjArr.pop(key);
         }
     }
 };
