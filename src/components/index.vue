@@ -191,12 +191,8 @@ export default {
                     allVar.setVar(varName, insertObj[0]);
                     this.$store.commit('editObjArrPush', {
                         name: varName,
-                        obj: insertObj[0]
+                        obj: getOptionByObj(insertObj[0])
                     });
-                    // this.editObjArr.push({
-                    //     name: varName,
-                    //     obj: insertObj[0]
-                    // });
                     this.editDataType = '';
                     this.insertCode = code;
 
@@ -263,7 +259,7 @@ export default {
             let Var = allVar.getVar(key);
             this.$store.commit('editObjArrPush', {
                 name: key,
-                obj: Var.value_
+                obj: getOptionByObj(Var.value_)
             });
             if (Var.value_ instanceof relationalModel) {
                 this.editDataType = 'relationalModel';
@@ -275,8 +271,7 @@ export default {
         },
         hover(key, messageType) {
             this.$store.commit('varHighlightSet', {key, 'info': messageType});
-        },
-        getOptionByObj: getOptionByObj
+        }
     },
     mounted() {
         /**
@@ -294,14 +289,26 @@ export default {
             this.connections = data;
             this.$store.commit('setConnections', data);
         });
+        ajax({
+            type: 'POST',
+            url: 'http://www.tablehub.cn/action/mysql.html',
+            data: {
+                type: 'showCreateTable',
+                connection: 1,
+                table: 'excel'
+            }
+        }).then((data) => {
+            console.log(data);
+        });
 
         // let fileContent = `$a1 = INPUT('number',9999)`;
         // let fileContent = `$a1 = CHECK_BOX(TRUE)`;
         // $a2 = RELATIONAL_MODEL(1,'user',$a1,['count(id)','count(id)+1'])
         //
         // id email
+        // $a3 = BAR(RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1']))
         let fileContent = `$a1 = INPUT('string',"10")
-        $a3 = BAR(RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1']))
+        $a3 = BAR(RELATIONAL_MODEL(1,'excel','DATE_FORMAT(ctime,"%Y-%m-%d")',['count(id)']))
         $a4 = $a3.select
         $a5 = MIN($a1,1)
         `;

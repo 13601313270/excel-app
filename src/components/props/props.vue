@@ -146,8 +146,6 @@
                                 @change="changeType"
                                 :dataType="dataType"
                             ></select-type>
-                        </td>
-                        <td :style="tdStyle">
                             <select :value="innerOption.name"
                                     @change="changeVar($event.target.value)">
                                 <option v-for="item,key in allVar" :value="key">
@@ -252,6 +250,14 @@ export default {
     computed: {},
     watch: {
         value(val) {
+            console.log('==========');
+            console.log(val);
+            try {
+                console.log(val.props[0]);
+            } catch (e) {
+
+            }
+
             this.innerOption = val;
         }
     },
@@ -267,7 +273,12 @@ export default {
     },
     mounted() {
         this.allMatch = allMatch;
-        if (this.isRoot) {
+        this.innerOption = this.value;
+        if (this.innerOption.type && ['function', 'relationalModel'].includes(this.innerOption.type)) {
+            this.codeOption = this.getCodeOption(this.innerOption.name);
+        }
+        /**
+         if (this.isRoot) {
             this.innerOption = getOptionByObj(this.value);
             if (this.innerOption.type && ['function', 'relationalModel'].includes(this.innerOption.type)) {
                 this.codeOption = this.getCodeOption(this.innerOption.name);
@@ -275,6 +286,7 @@ export default {
         } else {
             this.innerOption = this.value;
         }
+         */
     },
     methods: {
         prompt(text, defaultVal) {
@@ -495,10 +507,8 @@ export default {
                 }
                 this.setInnerOption(item);
             } else {
-                this.setInnerOption({
-                    type: 'var',
-                    name: val
-                });
+                this.innerOption.name = val;
+                this.emitChange();
             }
         },
         changeDictObj() {
