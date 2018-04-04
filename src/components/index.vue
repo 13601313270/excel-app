@@ -53,7 +53,7 @@
                         style="min-height: 250px;"></relational-model-props>
                     <props-com
                         v-else @change="codeUpdate"
-                        v-model="$store.state.editObjArr[key].obj"
+                        :value="$store.state.editObjArr[key].obj"
                         :dataType="editDataType"
                         :is-root="true"
                         style="min-height: 250px;"></props-com>
@@ -92,6 +92,7 @@ import relationalModelProps from './props/relationalModelProps.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 import datasVue from '../components/datas.vue';
+import getOptionByObj from './props/getPropsOptionByObj';
 
 import ajax from '../api/ajax';
 export default {
@@ -215,8 +216,11 @@ export default {
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
         codeUpdate(code) {
+            console.log('---------');
+            console.log(code);
             this.insertCode = code;
             let editVarName = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1].name;
+            console.log(editVarName);
             let updateVar = allVar.getVar(editVarName);
             let widgePanel = this.varToDom.get(updateVar);
             if (widgePanel !== undefined) {
@@ -271,7 +275,8 @@ export default {
         },
         hover(key, messageType) {
             this.$store.commit('varHighlightSet', {key, 'info': messageType});
-        }
+        },
+        getOptionByObj: getOptionByObj
     },
     mounted() {
         /**

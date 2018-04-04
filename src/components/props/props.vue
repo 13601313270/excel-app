@@ -235,11 +235,8 @@ import allMatch from '../../languageParser/allMatch';
 import allVar from '../../observer/allVar';
 // import getStrByObj from '../getStrByObj';
 import relationalModel from '../../widget/relationalModel';
-import __array__ from '../../languageParser/array';
-import __dictionary__ from '../../languageParser/dictionary';
-import dictionaryGet from '../../languageParser/dictionaryGet';
-import Var from '../../observer/Var';
 import selectType from './typeSelect.vue';
+import getOptionByObj from './getPropsOptionByObj';
 export default {
     name: 'inner-dom',
     props: {
@@ -271,7 +268,10 @@ export default {
     mounted() {
         this.allMatch = allMatch;
         if (this.isRoot) {
-            this.innerOption = this.getOptionByObj(this.value);
+            this.innerOption = getOptionByObj(this.value);
+            if (this.innerOption.type && ['function', 'relationalModel'].includes(this.innerOption.type)) {
+                this.codeOption = this.getCodeOption(this.innerOption.name);
+            }
         } else {
             this.innerOption = this.value;
         }
@@ -301,54 +301,6 @@ export default {
                     return this.allMatch[i];
                 }
             }
-        },
-        getOptionByObj(obj) {
-            let returnOption = {};
-            if (['boolean', 'number', 'string'].includes(typeof obj)) {
-                returnOption = obj;
-            }
-            else if (obj instanceof __array__) {
-                returnOption = {
-                    type: 'array',
-                    props: []
-                };
-                obj.value_.forEach((item) => {
-                    returnOption.props.push(this.getOptionByObj(item));
-                });
-            }
-            else if (obj instanceof __dictionary__) {
-                returnOption = {
-                    type: 'dict',
-                    props: obj.map
-                };
-            }
-            else if (obj instanceof dictionaryGet) {
-                returnOption = {
-                    type: 'dictionaryGet',
-                    dictionary: this.getOptionByObj(obj.dictionary),
-                    keys: obj.dictionary.value,
-                    key: obj.key
-                };
-            }
-            else if (obj instanceof Var) {
-                returnOption = {
-                    type: 'var',
-                    name: obj.name,
-                    value: obj.value
-                };
-            }
-            else {
-                returnOption = {
-                    type: obj.type,
-                    name: obj.name,
-                    props: []
-                };
-                obj.props.forEach(item => {
-                    returnOption.props.push(this.getOptionByObj(item))
-                });
-                this.codeOption = this.getCodeOption(returnOption.name);
-            }
-            return returnOption;
         },
         getDefaultValueByType(type) {
             if (type === 'number') {
@@ -534,7 +486,7 @@ export default {
             if (!(map instanceof Array) && map instanceof Object) {
                 let item = {
                     type: 'dictionaryGet',
-                    dictionary: this.getOptionByObj(this.allVar[val]),
+                    dictionary: getOptionByObj(this.allVar[val]),
                     keys: map
                 };
                 for (let i in map) {
