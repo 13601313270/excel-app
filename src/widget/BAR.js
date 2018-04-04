@@ -70,24 +70,21 @@ class BAR extends FuncObj {
         option.series = [];
         if (data.length > 0) {
             data.forEach((item) => {
-                let dataItem = {
-                    type: 'bar', data: []
-                };
                 item.forEach((item2, key) => {
                     if (key < model.groupColumn.length) {
                         option.xAxis.data.push(item2);
                     } else {
-                        if (option.series[key - model.groupColumn.length] === undefined) {
-                            option.series[key - model.groupColumn.length] = {
+                        let thisOne = key - model.groupColumn.length;
+                        if (option.series[thisOne] === undefined) {
+                            option.series[thisOne] = {
                                 type: 'bar',
-                                name: model.dataColumn[key - model.groupColumn.length],
+                                name: model.dataColumn[thisOne],
                                 data: []
                             };
                         }
-                        option.series[key - model.groupColumn.length].data.push(item2);
+                        option.series[thisOne].data.push(item2);
                     }
                 });
-                option.series.push(dataItem);
             });
         }
         this.myChart.setOption(option, true);
