@@ -249,7 +249,7 @@ export default {
     },
     components: {
         'inner-dom': innerDom,
-        'select-type': selectType,
+        'select-type': selectType
     },
     computed: {},
     watch: {

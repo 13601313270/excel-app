@@ -10,6 +10,12 @@ export default {
         },
         setConnections(state, data) {
             state.connections = data;
+        },
+        editObjArrPush(state, item) {
+            state.editObjArr.push(item);
+        },
+        editObjArrDelete(state, key) {
+            state.editObjArr.splice(key, 1);
         }
     }
 };

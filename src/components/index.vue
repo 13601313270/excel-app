@@ -35,25 +35,25 @@
                 <datas-vue :connections="connections" @change="editVar"></datas-vue>
             </div>
         </div>
-        <div v-if="editObjArr.length > 0"
+        <div v-if="$store.state.editObjArr.length > 0"
              style="position: fixed;z-index: 2;top:0%;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
             <div style="background-color: white;border-radius: 5px;padding: 5px;position: relative;">
-                <template v-for="item,key in editObjArr">
+                <template v-for="item,key in $store.state.editObjArr">
                     <div>对象：{{item.name}}
-                        <div @click="editObjArr.splice(key,1)"
+                        <div @click="$store.commit('editObjArrDelete',key)"
                              style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
                             X
                         </div>
                     </div>
                     <relational-model-props
                         v-if="editDataType==='relationalModel'" @change="codeUpdate"
-                        v-model="editObjArr[key].obj"
+                        v-model="$store.state.editObjArr[key].obj"
                         :dataType="editDataType"
                         :is-root="true"
                         style="min-height: 250px;"></relational-model-props>
                     <props-com
                         v-else @change="codeUpdate"
-                        v-model="editObjArr[key].obj"
+                        v-model="$store.state.editObjArr[key].obj"
                         :dataType="editDataType"
                         :is-root="true"
                         style="min-height: 250px;"></props-com>
@@ -188,10 +188,14 @@ export default {
                     let code = this.getCodeByMatchItem(item);
                     let insertObj = evalObjAndStr(1, code);
                     allVar.setVar(varName, insertObj[0]);
-                    this.editObjArr.push({
+                    this.$store.commit('editObjArrPush', {
                         name: varName,
                         obj: insertObj[0]
                     });
+                    // this.editObjArr.push({
+                    //     name: varName,
+                    //     obj: insertObj[0]
+                    // });
                     this.editDataType = '';
                     this.insertCode = code;
 
@@ -212,14 +216,14 @@ export default {
         },
         codeUpdate(code) {
             this.insertCode = code;
-            let updateVar = allVar.getVar(this.editObjArr[0].name);
+            let updateVar = allVar.getVar(this.$store.state.editObjArr[0].name);
             let widgePanel = this.varToDom.get(updateVar);
             if (widgePanel !== undefined) {
                 widgePanel.innerHTML = '';
             }
-            // allVar.getVar(this.editObjArr[0].name).value_.dom.remove();
+            // allVar.getVar(this.$store.state.editObjArr[0].name).value_.dom.remove();
             let insertObj = evalObjAndStr(1, code);
-            allVar.setVar(this.editObjArr[0].name, insertObj[0]);
+            allVar.setVar(this.$store.state.editObjArr[0].name, insertObj[0]);
             let value_ = updateVar.value_;
             if (widgePanel !== undefined) {
                 if (value_ instanceof Obj) {
@@ -252,7 +256,7 @@ export default {
         },
         editVar(key) {
             let Var = allVar.getVar(key);
-            this.editObjArr.push({
+            this.$store.commit('editObjArrPush', {
                 name: key,
                 obj: Var.value_
             });
