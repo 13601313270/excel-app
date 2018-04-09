@@ -46,24 +46,25 @@
                         </div>
                     </div>
                     <relational-model-props
-                        v-if="editDataType==='relationalModel'" @change="codeUpdate"
+                        v-if="editDataType==='relationalModel'"
+                        @change="codeUpdate"
                         v-model="$store.state.editObjArr[key].obj"
                         :dataType="editDataType"
                         :is-root="true"
                         style="min-height: 250px;"></relational-model-props>
                     <props-com
-                        v-else @change="codeUpdate"
+                        v-else
+                        @change="codeUpdate"
                         :value="$store.state.editObjArr[key].obj"
                         :dataType="editDataType"
                         :is-root="true"
                         style="min-height: 250px;"></props-com>
-                </template>
-
-                <div>
+                    <div>
                     <textarea @change="codeUpdate($event.target.value)"
-                              :value="insertCode"
+                              :value="item.code"
                               style="height: 50px;width: 100%;box-sizing: border-box;"></textarea>
-                </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -102,7 +103,6 @@ export default {
             dragDomFunc: undefined,
             editObjArr: [],
             editDataType: '',
-            insertCode: '',
             connections: [],
             html: '',
             varToDom: new Map()
@@ -191,10 +191,10 @@ export default {
                     allVar.setVar(varName, insertObj[0]);
                     this.$store.commit('editObjArrPush', {
                         name: varName,
+                        code: getStrByObj(insertObj[0]),
                         obj: getOptionByObj(insertObj[0])
                     });
                     this.editDataType = '';
-                    this.insertCode = code;
 
                     let newVar = allVar.getVar(varName);
                     this.varToDom.set(newVar, dom);
@@ -212,11 +212,9 @@ export default {
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
         codeUpdate(code) {
-            console.log('---------');
-            console.log(code);
-            this.insertCode = code;
-            let editVarName = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1].name;
-            console.log(editVarName);
+            let updateObj = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1];
+            let editVarName = updateObj.name;
+            updateObj.code = code;
             let updateVar = allVar.getVar(editVarName);
             let widgePanel = this.varToDom.get(updateVar);
             if (widgePanel !== undefined) {
@@ -259,6 +257,7 @@ export default {
             let Var = allVar.getVar(key);
             this.$store.commit('editObjArrPush', {
                 name: key,
+                code: getStrByObj(Var.value_),
                 obj: getOptionByObj(Var.value_)
             });
             if (Var.value_ instanceof relationalModel) {
@@ -266,8 +265,6 @@ export default {
             } else {
                 this.editDataType = '';
             }
-
-            this.insertCode = getStrByObj(Var.value_);
         },
         hover(key, messageType) {
             this.$store.commit('varHighlightSet', {key, 'info': messageType});
@@ -308,7 +305,7 @@ export default {
         // id email
         // $a3 = BAR(RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1']))
         let fileContent = `$a1 = INPUT('string',"10")
-        $a3 = BAR(RELATIONAL_MODEL(1,'excel','DATE_FORMAT(ctime,"%Y-%m-%d")',['count(id)']))
+        $a3 = BAR(RELATIONAL_MODEL(1,'excel','DATE_FORMAT(ctime,"%Y-%m")',['count(id)','count(id)+4']))
         $a4 = $a3.select
         $a5 = MIN($a1,1)
         `;

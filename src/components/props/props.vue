@@ -84,7 +84,8 @@
                                         {{key}}
                                     </option>
                                 </select>
-                                <!--<button @click="$store.commit('editObjArrPush', {name: key,obj:innerOption.props[key]});"></button>-->
+                                <div v-html="innerOption.props[key]"></div>
+                                <button @click="$store.commit('editObjArrPush', {name: key,obj:innerOption.props[key]});"></button>
                                 <br/>
                                 <button>新建</button>
                             </div>
@@ -278,7 +279,7 @@ export default {
             this.codeOption = this.getCodeOption(this.innerOption.name);
         }
         /**
-         if (this.isRoot) {
+        if (this.isRoot) {
             this.innerOption = getOptionByObj(this.value);
             if (this.innerOption.type && ['function', 'relationalModel'].includes(this.innerOption.type)) {
                 this.codeOption = this.getCodeOption(this.innerOption.name);
@@ -286,7 +287,7 @@ export default {
         } else {
             this.innerOption = this.value;
         }
-         */
+        */
     },
     methods: {
         prompt(text, defaultVal) {

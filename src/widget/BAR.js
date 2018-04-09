@@ -25,6 +25,7 @@ class BAR extends FuncObj {
         this.name = 'BAR';
         this.dom = document.createElement('div');
         this.myChart = echarts.init(this.dom);
+        this.selectBar = -1;
         let xColumn = new Temp();
         let select = new Temp();
         let value = new Temp();
@@ -34,6 +35,7 @@ class BAR extends FuncObj {
             value: value
         });
         this.myChart.on('click', (params) => {
+            this.selectBar = params.name;
             xColumn.value = params.name;
             select.value = params.seriesName;
             value.value = parseFloat(params.data);
@@ -46,6 +48,7 @@ class BAR extends FuncObj {
     }
 
     render(handle) {
+        let self = this;
         let model = this.props[0];
         if (model instanceof Var) {
             model = model.value_;
@@ -78,7 +81,32 @@ class BAR extends FuncObj {
                         if (option.series[thisOne] === undefined) {
                             option.series[thisOne] = {
                                 type: 'bar',
+                                itemStyle: {
+                                    normal: {
+                                        color: function(params) {
+                                            let colorList = Array(data.length);
+                                            let allColor = [
+                                                '#c03736', '#304553', '#63a0a7', '#d28268', '#93c6af',
+                                                '#759e84', '#c9852f', '#bca29b', '#6e7074', '#55656f',
+                                                '#c4ccd3'
+                                            ];
+                                            let baseColor = allColor[params.seriesIndex % allColor.length];
+                                            colorList.fill(baseColor);
+                                            let index = option.xAxis.data.indexOf(self.selectBar);
+                                            if (index === -1) {
+                                                return baseColor;
+                                            }
+                                            colorList[index] = '#e2633b';
+                                            return colorList[params.dataIndex];
+                                        },
+                                        label: {
+                                            show: true,
+                                            position: 'top'
+                                        }
+                                    }
+                                },
                                 name: model.dataColumn[thisOne],
+                                selectedMode: 'single',
                                 data: []
                             };
                         }
@@ -88,7 +116,6 @@ class BAR extends FuncObj {
             });
         }
         this.myChart.setOption(option, true);
-
         setTimeout(() => {
             this.dom.style.width = '500px';
             this.dom.style.height = '300px';
