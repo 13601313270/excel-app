@@ -133,7 +133,7 @@ __allMatch__.push({
         {
             name: 'source:',
             title: '关系模型',
-            dataType: 'relationalModel'
+            dataType: 'var,relationalModel'
         }
     ]
 });

@@ -3,6 +3,16 @@
         <table>
             <tbody>
             <template v-if="dataType==='relationalModel' || innerOption.type === 'relationalModel'">
+                <tr>
+                    <td>对象</td>
+                    <td>
+                        <select-type
+                            :value="innerOption.name"
+                            @change="changeType"
+                            :dataType="dataType"
+                        ></select-type>
+                    </td>
+                </tr>
                 <tr v-for="(value,key) in codeOption.props">
                     <template v-if="key==0">
                         <td v-html="codeOption.props[key].title"></td>
@@ -50,6 +60,10 @@
 
 
                             <div v-if="getDataType(codeOption.props.length-1)[0]==='relationalModel'">
+                                <select>
+                                    <option :value="val">变量</option>
+                                    <option :value="val">数据</option>
+                                </select>
                                 <select :value="innerOption.props[key].name"
                                         @change="setInnerOption({type:'var',name:$event.target.value})">
                                     <option v-for="(item,key) in allVar" :value="key"
@@ -73,18 +87,26 @@
                             <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
                         </select>
                         <template v-else>
-                            <div v-if="getDataType(key)==='relationalModel'">
-                                <select :value="innerOption.props[key].name"
-                                        @change="innerOption.props[key]={type:'var',name:$event.target.value},emitChange()">
+                            <div v-if="getDataType(key).split(',').includes('relationalModel')">
+                                <div style="display: inline-block"
+                                    v-if="Object.values(allVar).some(item => {return item.value_ instanceof relationalModel})">
+                                    <select v-model="innerOption.props[key].type"
+                                            @change="innerOption.props[key].name=($event.target.value=='relationalModel'?'RELATIONAL_MODEL':''),emitChange()">
+                                        <option value="var">变量</option>
+                                        <option value="relationalModel">关系模型</option>
+                                    </select>
+                                </div>
+                                <button
+                                    v-if="innerOption.props[key].type === 'relationalModel'"
+                                    @click="editRelationalModel(innerOption.props[key])">编辑模型
+                                </button>
+                                <select v-else :value="innerOption.props[key].name"
+                                        @change="innerOption.props[key].name = $event.target.value,emitChange()">
                                     <option v-for="(item,key) in allVar" :value="key"
                                             v-if="item.value_ instanceof relationalModel">
                                         {{key}}
                                     </option>
                                 </select>
-                                <button
-                                    @click="sss(innerOption.props[key])"></button>
-                                <br/>
-                                <button>新建</button>
                             </div>
                             <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
                                        :dataType="getDataType(key)"></inner-dom>
@@ -285,10 +307,8 @@ export default {
             }
         },
         emitChange() {
-            console.log('-----change-----');
             this.$emit('input', this.innerOption);// 根目录不用，但是子元素修改完修改影响父层
             this.$emit('change');
-            // this.$emit('change', createCodeText(this.innerOption));
         },
         setInnerOption(val) {
             this.innerOption = val;
@@ -322,19 +342,21 @@ export default {
                 return '';
             }
         },
-        sss(childObj) {
+        editRelationalModel(childObj) {
             this.$store.commit('editObjArrPush', {
                 code: createCodeText(childObj),
                 parent: this,
                 change: (code) => {
                     let updateObj = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1];
                     console.log(updateObj);
+                    console.log(code);
                     if (updateObj.obj === childObj) {
-                        updateObj.code = code;
+                        updateObj.code = createCodeText(updateObj.obj);
                     }
                     this.emitChange();
                 },
-                obj: childObj
+                obj: childObj,
+                dataType: 'relationalModel'
             });
         },
         addProp(dataType) {

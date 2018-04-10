@@ -49,14 +49,14 @@
                     v-if="editDataType==='relationalModel'"
                     @change="item.change"
                     v-model="$store.state.editObjArr[key].obj"
-                    :dataType="editDataType"
+                    :dataType="item.dataType"
                     :is-root="true"
                     style="min-height: 250px;"></relational-model-props>
                 <props-com
                     v-else
                     @change="item.change"
                     :value="$store.state.editObjArr[key].obj"
-                    :dataType="editDataType"
+                    :dataType="item.dataType"
                     :is-root="true"
                     style="min-height: 250px;"></props-com>
                 <div>
@@ -193,7 +193,8 @@ export default {
                         name: varName,
                         code: getStrByObj(insertObj[0]),
                         change: this.codeUpdate,
-                        obj: getOptionByObj(insertObj[0])
+                        obj: getOptionByObj(insertObj[0]),
+                        dataType: ''
                     });
                     this.editDataType = '';
 
@@ -277,7 +278,8 @@ export default {
                 change: function() {
                     self.codeUpdate(pushEditObj);
                 },
-                obj: getOptionByObj(Var.value_)
+                obj: getOptionByObj(Var.value_),
+                dataType: ((Var.value_ instanceof relationalModel) ? 'relationalModel' : '')
             };
             this.$store.commit('editObjArrPush', pushEditObj);
             this.$store.watch((store) => {
@@ -323,7 +325,7 @@ export default {
 
         // let fileContent = `$a1 = INPUT('number',9999)`;
         // let fileContent = `$a1 = CHECK_BOX(TRUE)`;
-        // $a2 = RELATIONAL_MODEL(1,'user',$a1,['count(id)','count(id)+1'])
+        // $a2 = RELATIONAL_MODEL(1,'excel','DATE_FORMAT(ctime,"%Y-%m")',['count(id)','count(id)+4'])
         //
         // id email
         // $a3 = BAR(RELATIONAL_MODEL(1,'user','email',['count(id)','count(id)+1']))
