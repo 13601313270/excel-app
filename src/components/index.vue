@@ -36,35 +36,34 @@
             </div>
         </div>
         <div v-if="$store.state.editObjArr.length > 0"
-             style="position: fixed;z-index: 2;top:0;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
+             v-for="item,key in $store.state.editObjArr" :style="{zIndex:key+100}"
+             style="position: fixed;top:0;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
             <div style="background-color: white;border-radius: 5px;padding: 5px;position: relative;">
-                <template v-for="item,key in $store.state.editObjArr">
-                    <div>对象：{{item.name}}
-                        <div @click="$store.commit('editObjArrPop')"
-                             style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
-                            X
-                        </div>
+                <div>对象：{{item.name}}
+                    <div @click="$store.commit('editObjArrPop')"
+                         style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
+                        X
                     </div>
-                    <relational-model-props
-                        v-if="editDataType==='relationalModel'"
-                        @change="codeUpdate"
-                        v-model="$store.state.editObjArr[key].obj"
-                        :dataType="editDataType"
-                        :is-root="true"
-                        style="min-height: 250px;"></relational-model-props>
-                    <props-com
-                        v-else
-                        @change="codeUpdate"
-                        :value="$store.state.editObjArr[key].obj"
-                        :dataType="editDataType"
-                        :is-root="true"
-                        style="min-height: 250px;"></props-com>
-                    <div>
-                    <textarea @change="codeUpdate($event.target.value)"
+                </div>
+                <relational-model-props
+                    v-if="editDataType==='relationalModel'"
+                    @change="item.change"
+                    v-model="$store.state.editObjArr[key].obj"
+                    :dataType="editDataType"
+                    :is-root="true"
+                    style="min-height: 250px;"></relational-model-props>
+                <props-com
+                    v-else
+                    @change="item.change"
+                    :value="$store.state.editObjArr[key].obj"
+                    :dataType="editDataType"
+                    :is-root="true"
+                    style="min-height: 250px;"></props-com>
+                <div>
+                    <textarea @change="changeCode($store.state.editObjArr[key],$event.target.value)"
                               :value="item.code"
                               style="height: 50px;width: 100%;box-sizing: border-box;"></textarea>
-                    </div>
-                </template>
+                </div>
             </div>
         </div>
     </div>
@@ -94,6 +93,7 @@ import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 import datasVue from '../components/datas.vue';
 import getOptionByObj from './props/getPropsOptionByObj';
+import createCodeText from './props/createCodeText';
 
 import ajax from '../api/ajax';
 export default {
@@ -192,6 +192,7 @@ export default {
                     this.$store.commit('editObjArrPush', {
                         name: varName,
                         code: getStrByObj(insertObj[0]),
+                        change: this.codeUpdate,
                         obj: getOptionByObj(insertObj[0])
                     });
                     this.editDataType = '';
@@ -211,28 +212,29 @@ export default {
             this.varToDom.get(initVar).innerHTML = '';
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
-        codeUpdate(code) {
-            let updateObj = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1];
-            let editVarName = updateObj.name;
-            updateObj.code = code;
-            let updateVar = allVar.getVar(editVarName);
-            let widgePanel = this.varToDom.get(updateVar);
-            if (widgePanel !== undefined) {
-                widgePanel.innerHTML = '';
-            }
-            // allVar.getVar(editVarName).value_.dom.remove();
-            let insertObj = evalObjAndStr(1, code);
-            allVar.setVar(editVarName, insertObj[0]);
-            let value_ = updateVar.value_;
-            if (widgePanel !== undefined) {
-                if (value_ instanceof Obj) {
-                    if (value_.dom) {
-                        widgePanel.appendChild(value_.dom);
+        codeUpdate(editObj) {
+            let editVarName = editObj.name;
+            editObj.code = createCodeText(editObj.obj);
+            if (editVarName !== undefined) {
+                let updateVar = allVar.getVar(editVarName);
+                let widgePanel = this.varToDom.get(updateVar);
+                if (widgePanel !== undefined) {
+                    widgePanel.innerHTML = '';
+                }
+                // allVar.getVar(editVarName).value_.dom.remove();
+                let insertObj = evalObjAndStr(1, editObj.code);
+                allVar.setVar(editVarName, insertObj[0]);
+                let value_ = updateVar.value_;
+                if (widgePanel !== undefined) {
+                    if (value_ instanceof Obj) {
+                        if (value_.dom) {
+                            widgePanel.appendChild(value_.dom);
+                        } else {
+                            widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
+                        }
                     } else {
-                        widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
+                        widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值
                     }
-                } else {
-                    widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值
                 }
             }
         },
@@ -253,12 +255,33 @@ export default {
                 }
             });
         },
+        changeCode(obj, code) {
+            let newObj = getOptionByObj(evalObjAndStr(1, code)[0]);
+            console.log(newObj);
+            // MIN(1,MIN(2,4),1)
+            // 不能直接覆盖obj.obj，因为js是引用赋值
+            obj.obj.type = newObj.type;
+            obj.obj.props = newObj.props;
+            this.codeUpdate(obj);
+            if (obj.parent !== undefined) {
+                console.log(obj.parent.emitChange);
+                obj.parent.emitChange();
+            }
+        },
         editVar(key) {
             let Var = allVar.getVar(key);
-            this.$store.commit('editObjArrPush', {
+            let self = this;
+            let pushEditObj = {
                 name: key,
                 code: getStrByObj(Var.value_),
+                change: function() {
+                    self.codeUpdate(pushEditObj);
+                },
                 obj: getOptionByObj(Var.value_)
+            };
+            this.$store.commit('editObjArrPush', pushEditObj);
+            this.$store.watch((store) => {
+                console.log(store);
             });
             if (Var.value_ instanceof relationalModel) {
                 this.editDataType = 'relationalModel';

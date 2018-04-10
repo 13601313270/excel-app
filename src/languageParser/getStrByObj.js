@@ -6,7 +6,15 @@ import Var from '../observer/Var';
 function createCodeText(runObj) {
     let code = '';
     if (typeof runObj === 'string') {
-        code = '"' + runObj + '"';
+        let beginEndStr = '"';
+        if (runObj.includes('"')) {
+            if (!runObj.includes('\'')) {
+                beginEndStr = '\'';
+            } else {
+                runObj = runObj.replace(/"/g, '\\"');
+            }
+        }
+        code = beginEndStr + runObj + beginEndStr;
     } else if (typeof runObj === 'number') {
         code = runObj;
     } else if (typeof runObj === 'boolean') {

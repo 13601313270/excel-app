@@ -2,10 +2,7 @@
     <div class="prop">
         <table>
             <tbody>
-            <template v-if="dataType==='relationalModel'">
-                <tr>
-                    <td>!!!!!!嵌套</td>
-                </tr>
+            <template v-if="dataType==='relationalModel' || innerOption.type === 'relationalModel'">
                 <tr v-for="(value,key) in codeOption.props">
                     <template v-if="key==0">
                         <td v-html="codeOption.props[key].title"></td>
@@ -84,8 +81,8 @@
                                         {{key}}
                                     </option>
                                 </select>
-                                <div v-html="innerOption.props[key]"></div>
-                                <button @click="$store.commit('editObjArrPush', {name: key,obj:innerOption.props[key]});"></button>
+                                <button
+                                    @click="sss(innerOption.props[key])"></button>
                                 <br/>
                                 <button>新建</button>
                             </div>
@@ -236,6 +233,7 @@ import allVar from '../../observer/allVar';
 import relationalModel from '../../widget/relationalModel';
 import selectType from './typeSelect.vue';
 import getOptionByObj from './getPropsOptionByObj';
+import createCodeText from './createCodeText';
 export default {
     name: 'inner-dom',
     props: {
@@ -251,15 +249,8 @@ export default {
     computed: {},
     watch: {
         value(val) {
-            console.log('==========');
-            console.log(val);
-            try {
-                console.log(val.props[0]);
-            } catch (e) {
-
-            }
-
             this.innerOption = val;
+            this.initCodeOption();
         }
     },
     data() {
@@ -275,21 +266,14 @@ export default {
     mounted() {
         this.allMatch = allMatch;
         this.innerOption = this.value;
-        if (this.innerOption.type && ['function', 'relationalModel'].includes(this.innerOption.type)) {
-            this.codeOption = this.getCodeOption(this.innerOption.name);
-        }
-        /**
-        if (this.isRoot) {
-            this.innerOption = getOptionByObj(this.value);
+        this.initCodeOption();
+    },
+    methods: {
+        initCodeOption() {
             if (this.innerOption.type && ['function', 'relationalModel'].includes(this.innerOption.type)) {
                 this.codeOption = this.getCodeOption(this.innerOption.name);
             }
-        } else {
-            this.innerOption = this.value;
-        }
-        */
-    },
-    methods: {
+        },
         prompt(text, defaultVal) {
             return window.prompt(text, defaultVal);
         },
@@ -301,8 +285,10 @@ export default {
             }
         },
         emitChange() {
+            console.log('-----change-----');
             this.$emit('input', this.innerOption);// 根目录不用，但是子元素修改完修改影响父层
-            this.$emit('change', this.createCodeText(this.innerOption));
+            this.$emit('change');
+            // this.$emit('change', createCodeText(this.innerOption));
         },
         setInnerOption(val) {
             this.innerOption = val;
@@ -336,52 +322,20 @@ export default {
                 return '';
             }
         },
-        createCodeText(innerOption) {
-            let code = '';
-            if (typeof innerOption === 'string') {
-                code = '"' + innerOption + '"';
-            }
-            else if (typeof innerOption === 'number') {
-                code = innerOption.toString();
-            }
-            else if (typeof innerOption === 'boolean') {
-                code = innerOption ? 'TRUE' : 'FALSE';
-            }
-            else if (innerOption.type === 'array') {
-                code = '[';
-                let childArr = [];
-                innerOption.props.forEach((item) => {
-                    childArr.push(this.createCodeText(item));
-                });
-                code += childArr.join(',');
-                code += ']';
-            }
-            else if (innerOption.type === 'dict') {
-                let props = innerOption.props;
-                code = '{';
-                let childArr = [];
-                for (let i in props) {
-                    childArr.push(this.createCodeText(i) + ':' + this.createCodeText(props[i]));
-                }
-                code += childArr.join(',');
-                code += '}';
-            }
-            else if (innerOption.type === 'dictionaryGet') {
-                code = this.createCodeText(innerOption.dictionary) + '.' + innerOption.key;
-            }
-            else if (innerOption.type === 'var') {
-                code = innerOption.name;
-            }
-            else if (['function', 'relationalModel'].includes(innerOption.type)) {
-                code += innerOption.name + '(';
-                let TempPropArr = [];
-                innerOption.props.forEach((item) => {
-                    TempPropArr.push(this.createCodeText(item));
-                });
-                code += TempPropArr.join(',');
-                code += ')';
-            }
-            return code;
+        sss(childObj) {
+            this.$store.commit('editObjArrPush', {
+                code: createCodeText(childObj),
+                parent: this,
+                change: (code) => {
+                    let updateObj = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1];
+                    console.log(updateObj);
+                    if (updateObj.obj === childObj) {
+                        updateObj.code = code;
+                    }
+                    this.emitChange();
+                },
+                obj: childObj
+            });
         },
         addProp(dataType) {
             let dataTypeNew = dataType.split(',')[0];
