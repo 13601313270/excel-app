@@ -1,8 +1,9 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import index from '@/components/index'
+import Vue from 'vue';
+import Router from 'vue-router';
+import index from '@/components/index';
+import ui from '@/components/ui';
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
     routes: [
@@ -10,6 +11,10 @@ export default new Router({
             path: '/',
             name: 'HelloWorld',
             component: index
+        }, {
+            path: '/ui/',
+            name: 'UI',
+            component: ui
         }
     ]
-})
+});

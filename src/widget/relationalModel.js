@@ -100,16 +100,21 @@ __allMatch__.push({
             default: ''
         },
         {
-            name: 'x:',
+            name: 'x',
             title: 'X轴',
             dataType: 'string,var',
             default: ''
         },
         {
-            name: 'y:',
+            name: 'y',
             title: 'Y轴',
             dataType: 'array(string)',
             default: ''
+        },
+        {
+            name: 'where',
+            title: '条件',
+            dataType: 'array(string)'
         }
     ]
 });

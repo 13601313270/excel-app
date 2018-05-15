@@ -26,6 +26,7 @@
                     <template v-else>
                         <td v-html="codeOption.props[key].title"></td>
                         <td>
+                            <div v-html="getDataType(key)"></div>
                             <inner-dom v-if="innerOption.props[key]"
                                        @change="emitChange"
                                        v-model="innerOption.props[key]"
@@ -87,7 +88,7 @@
                             <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
                         </select>
                         <template v-else>
-                            <div v-if="getDataType(key).split(',').includes('relationalModel')">
+                            <div v-if="false && getDataType(key).split(',').includes('relationalModel')">
                                 <div style="display: inline-block"
                                     v-if="Object.values(allVar).some(item => {return item.value_ instanceof relationalModel})">
                                     <select v-model="innerOption.props[key].type"
