@@ -1,8 +1,20 @@
 <template>
-    <div style="width: 100%;height: 100%;">
-        <div style="display: flex;width: 100%;height: 100%;">
-            <div
-                style="width: 200px;border-right: solid 1px black;text-align: center;background-color: #333;color:#999">
+    <div style="width: 100%;height: 100%;min-width: 930px;display: flex;flex-direction: column;">
+        <header-nav style="background-color: #3c3f41;border-bottom: solid 1px #4f4f4f;"></header-nav>
+        <div style="display: flex;width: 100%;flex-grow: 1;">
+            <div class="left_tools">
+                <div class="active">控件</div>
+                <div>控件</div>
+                <div>控件</div>
+            </div>
+            <div class="left_tools_content">
+                <h2>容器</h2>
+                <div>2</div>
+                <div>3</div>
+                <div>4</div>
+                <div>TAB</div>
+                <div>折叠面板</div>
+
                 <h2>表单</h2>
                 <div draggable="true" @dragstart='drag("INPUT")'>输入框</div>
                 <div draggable="true" @dragstart='drag("INPUT_DATE")'>日期</div>
@@ -17,7 +29,7 @@
                 <div draggable="true" @dragstart='drag("MIN")'>最小值</div>
                 <div draggable="true" @dragstart='drag("IF")'>IF判断</div>
             </div>
-            <div style="flex-grow:1;display: flex;flex-direction: column;" id="content">
+            <div id="content">
                 <div style="flex-grow: 1;overflow:scroll;background-color: #f9f9f9;padding: 10px;">
                     <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
                 </div>
@@ -31,8 +43,13 @@
                     </div>
                 </div>
             </div>
-            <div style="width: 200px;background-color: #d0d0d0;">
+            <div class="right_tools_content">
                 <datas-vue :connections="connections" @change="editVar"></datas-vue>
+            </div>
+            <div class="right_tools">
+                <div class="active">数据</div>
+                <div>已添加</div>
+                <div>HTML</div>
             </div>
         </div>
         <div v-if="$store.state.editObjArr.length > 0"
@@ -70,6 +87,7 @@
 </template>
 
 <script>
+import headerNav from './head.vue';
 import evalObjAndStr from '../languageParser/evalObjAndStr';
 import allMatch from '../languageParser/allMatch';
 import '../languageParser/array';
@@ -112,7 +130,8 @@ export default {
         'all-vars': allPageVars,
         'props-com': propsCom,
         'datas-vue': datasVue,
-        'relational-model-props': relationalModelProps
+        'relational-model-props': relationalModelProps,
+        'header-nav': headerNav
     },
     computed: {
         saveHtml() {
@@ -367,7 +386,7 @@ export default {
         display: inline-block;
     }
 </style>
-<style scoped>
+<style scoped lang="less">
     h1, h2 {
         font-weight: normal;
     }
@@ -384,5 +403,82 @@ export default {
 
     a {
         color: #42b983;
+    }
+
+    .left_tools {
+        width: 24px;
+        flex-shrink: 0;
+        flex-grow: 0;
+        background-color: #3c3f41;
+        color: #d9d9d9;
+        border-right: solid 1px #4f4f4f;
+        > * {
+            word-wrap: break-word;
+            margin: 0 1px 2px 0;
+            padding: 14px 2px;
+            border-radius: 5px 0 0 5px;
+            text-align: center;
+            cursor: default;
+            line-height: 18px;
+            color: #b1b1b1;
+            &.active {
+                background: #333333;
+                margin-right: -1px;
+                color: white;
+            }
+            &:hover {
+                box-shadow: inset 2px 0 5px 0 #717171;
+            }
+        }
+    }
+
+    .left_tools_content {
+        width: 200px;
+        min-width: 100px;
+        overflow: auto;
+        border-right: solid 1px black;
+        text-align: center;
+        background-color: #333;
+        color: #999
+    }
+
+    .right_tools_content {
+        width: 200px;
+        min-width: 100px;
+        background-color: rgb(51, 51, 51);
+        color: #d9d9d9;
+    }
+
+    #content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .right_tools {
+        width: 24px;
+        flex-shrink: 0;
+        flex-grow: 0;
+        background-color: #3c3f41;
+        color: #d9d9d9;
+        border-left: solid 1px #4f4f4f;
+        > * {
+            word-wrap: break-word;
+            margin: 0 1px 2px 0;
+            padding: 14px 2px;
+            border-radius: 0 5px 5px 0;
+            text-align: center;
+            cursor: default;
+            line-height: 18px;
+            color: #b1b1b1;
+            &.active {
+                background: #333333;
+                margin-left: -1px;
+                color: white;
+            }
+            &:hover {
+                box-shadow: inset -2px 0px 5px 0px #717171;
+            }
+        }
     }
 </style>
