@@ -3,53 +3,36 @@
         <header-nav style="background-color: #3c3f41;border-bottom: solid 1px #4f4f4f;"></header-nav>
         <div style="display: flex;width: 100%;flex-grow: 1;">
             <div class="left_tools">
-                <div class="active">控件</div>
-                <div>控件</div>
-                <div>控件</div>
+                <div :class="{active:leftToolSelect=='widget'}" @click="leftToolSelect='widget'">控件</div>
+                <div :class="{active:leftToolSelect=='widget22'}" @click="leftToolSelect='widget22'">控件</div>
             </div>
             <div class="left_tools_content">
-                <h2>容器</h2>
-                <div>2</div>
-                <div>3</div>
-                <div>4</div>
-                <div>TAB</div>
-                <div>折叠面板</div>
-
-                <h2>表单</h2>
-                <div draggable="true" @dragstart='drag("INPUT")'>输入框</div>
-                <div draggable="true" @dragstart='drag("INPUT_DATE")'>日期</div>
-                <!--<div draggable="true" @dragstart='drag($event)'>下拉框</div>-->
-                <div draggable="true" @dragstart='drag("CHECK_BOX")'>开关器</div>
-                <div draggable="true" @dragstart='drag("TEXT")'>文本</div>
-
-                <h2>图表</h2>
-                <div draggable="true" @dragstart='drag("BAR")'>柱状图</div>
-
-                <h2>计算</h2>
-                <div draggable="true" @dragstart='drag("MIN")'>最小值</div>
-                <div draggable="true" @dragstart='drag("IF")'>IF判断</div>
+                <tools_widget v-if="leftToolSelect=='widget'" @drag='drag'></tools_widget>
+                <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
             </div>
             <div id="content">
-                <div style="flex-grow: 1;overflow:scroll;background-color: #f9f9f9;padding: 10px;">
+                <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;padding: 10px;">
                     <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
                 </div>
-                <div style="display: flex;">
-                    <div style="flex-grow: 1;padding: 3px 3px;overflow: scroll">
-                        <all-vars @change="editVar" @hover="hover"></all-vars>
-                    </div>
+            </div>
+            <div class="right_tools_content">
+                <datas-vue v-if="rightToolSelect=='data'" :connections="connections" @change="editVar"></datas-vue>
+                <div v-else-if="rightToolSelect=='data2'">
                     <div style="overflow: scroll;border: solid 1px black;">
                         <textarea :value="saveHtml"
                                   style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
                     </div>
                 </div>
-            </div>
-            <div class="right_tools_content">
-                <datas-vue :connections="connections" @change="editVar"></datas-vue>
+                <div v-show="rightToolSelect=='var'">
+                    <div style="flex-grow: 1;padding: 3px 3px;overflow: scroll">
+                        <all-vars @change="editVar" @hover="hover"></all-vars>
+                    </div>
+                </div>
             </div>
             <div class="right_tools">
-                <div class="active">数据</div>
-                <div>已添加</div>
-                <div>HTML</div>
+                <div :class="{active:rightToolSelect=='data'}" @click="rightToolSelect='data'">数据</div>
+                <div :class="{active:rightToolSelect=='data2'}" @click="rightToolSelect='data2'">数据</div>
+                <div :class="{active:rightToolSelect=='var'}" @click="rightToolSelect='var'">已添加对象</div>
             </div>
         </div>
         <div v-if="$store.state.editObjArr.length > 0"
@@ -68,14 +51,16 @@
                     v-model="$store.state.editObjArr[key].obj"
                     :dataType="item.dataType"
                     :is-root="true"
-                    style="min-height: 250px;"></relational-model-props>
+                    style="min-height: 250px;"
+                ></relational-model-props>
                 <props-com
                     v-else
                     @change="item.change"
                     :value="$store.state.editObjArr[key].obj"
                     :dataType="item.dataType"
                     :is-root="true"
-                    style="min-height: 250px;"></props-com>
+                    style="min-height: 250px;"
+                ></props-com>
                 <div>
                     <textarea @change="changeCode($store.state.editObjArr[key],$event.target.value)"
                               :value="item.code"
@@ -88,6 +73,7 @@
 
 <script>
 import headerNav from './head.vue';
+import toolsWidget from './tools/widget.vue';
 import evalObjAndStr from '../languageParser/evalObjAndStr';
 import allMatch from '../languageParser/allMatch';
 import '../languageParser/array';
@@ -109,7 +95,7 @@ import propsCom from './props/props.vue';
 import relationalModelProps from './props/relationalModelProps.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
-import datasVue from '../components/datas.vue';
+import datasVue from './tools/datas.vue';
 import getOptionByObj from './props/getPropsOptionByObj';
 import createCodeText from './props/createCodeText';
 
@@ -119,19 +105,14 @@ export default {
         return {
             currentView: dashboard(),
             dragDomFunc: undefined,
+            leftToolSelect: 'widget',
+            rightToolSelect: 'data',
             editObjArr: [],
             editDataType: '',
             connections: [],
             html: '',
             varToDom: new Map()
         }
-    },
-    components: {
-        'all-vars': allPageVars,
-        'props-com': propsCom,
-        'datas-vue': datasVue,
-        'relational-model-props': relationalModelProps,
-        'header-nav': headerNav
     },
     computed: {
         saveHtml() {
@@ -208,13 +189,13 @@ export default {
                     let code = this.getCodeByMatchItem(item);
                     let insertObj = evalObjAndStr(1, code);
                     allVar.setVar(varName, insertObj[0]);
-                    this.$store.commit('editObjArrPush', {
-                        name: varName,
-                        code: getStrByObj(insertObj[0]),
-                        change: this.codeUpdate,
-                        obj: getOptionByObj(insertObj[0]),
-                        dataType: ''
-                    });
+//                    this.$store.commit('editObjArrPush', {
+//                        name: varName,
+//                        code: getStrByObj(insertObj[0]),
+//                        change: this.codeUpdate,
+//                        obj: getOptionByObj(insertObj[0]),
+//                        dataType: ''
+//                    });
                     this.editDataType = '';
 
                     let newVar = allVar.getVar(varName);
@@ -233,6 +214,7 @@ export default {
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
         codeUpdate(editObj) {
+            console.log(editObj);
             let editVarName = editObj.name;
             editObj.code = createCodeText(editObj.obj);
             if (editVarName !== undefined) {
@@ -282,6 +264,7 @@ export default {
             // 不能直接覆盖obj.obj，因为js是引用赋值
             obj.obj.type = newObj.type;
             obj.obj.props = newObj.props;
+            console.log(1);
             this.codeUpdate(obj);
             if (obj.parent !== undefined) {
                 console.log(obj.parent.emitChange);
@@ -375,6 +358,14 @@ export default {
         });
         newDash.template = this.html;
         this.currentView = newDash;
+    },
+    components: {
+        'all-vars': allPageVars,
+        'props-com': propsCom,
+        'datas-vue': datasVue,
+        'relational-model-props': relationalModelProps,
+        'header-nav': headerNav,
+        'tools_widget': toolsWidget
     }
 }
 </script>

@@ -28,8 +28,8 @@
     </div>
 </template>
 <script>
-import AllVarClass from '../observer/allVar.js';
-import getStrByObj from '../languageParser/getStrByObj';
+import AllVarClass from '../../observer/allVar.js';
+import getStrByObj from '../../languageParser/getStrByObj';
 
 export default {
     props: ['connections'],
