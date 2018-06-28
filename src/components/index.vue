@@ -55,7 +55,7 @@
                 ></relational-model-props>
                 <props-com
                     v-else
-                    @change="item.change"
+                    @change="item.change(item)"
                     :value="$store.state.editObjArr[key].obj"
                     :dataType="item.dataType"
                     :is-root="true"
@@ -189,13 +189,13 @@ export default {
                     let code = this.getCodeByMatchItem(item);
                     let insertObj = evalObjAndStr(1, code);
                     allVar.setVar(varName, insertObj[0]);
-//                    this.$store.commit('editObjArrPush', {
-//                        name: varName,
-//                        code: getStrByObj(insertObj[0]),
-//                        change: this.codeUpdate,
-//                        obj: getOptionByObj(insertObj[0]),
-//                        dataType: ''
-//                    });
+                    this.$store.commit('editObjArrPush', {
+                        name: varName,
+                        code: getStrByObj(insertObj[0]),
+                        change: this.codeUpdate,
+                        obj: getOptionByObj(insertObj[0]),
+                        dataType: ''
+                    });
                     this.editDataType = '';
 
                     let newVar = allVar.getVar(varName);
@@ -213,8 +213,8 @@ export default {
             this.varToDom.get(initVar).innerHTML = '';
             this.varToDom.get(initVar).appendChild(initVar.value_.dom);
         },
+        // 通过变量对象，修改生成的code
         codeUpdate(editObj) {
-            console.log(editObj);
             let editVarName = editObj.name;
             editObj.code = createCodeText(editObj.obj);
             if (editVarName !== undefined) {
