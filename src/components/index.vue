@@ -74,7 +74,7 @@
 <script>
 import headerNav from './head.vue';
 import toolsWidget from './tools/widget.vue';
-import evalObjAndStr from '../languageParser/evalObjAndStr';
+import getEvalObj from '../languageParser/evalObjAndStr';
 import allMatch from '../languageParser/allMatch';
 import '../languageParser/array';
 import '../languageParser/dictionary';
@@ -179,7 +179,7 @@ export default {
                 if (typeof propsArr[j] === 'function') {
                     temp2.push(null);
                 } else {
-                    temp2.push(evalObjAndStr(1, propsArr[j])[0]);
+                    temp2.push(getEvalObj(1, propsArr[j])[0]);
                 }
             }
             for (let j = 0; j < propsArr.length; j++) {
@@ -206,7 +206,7 @@ export default {
                 let item = allMatch[i];
                 if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
                     let code = this.getCodeByMatchItem(item);
-                    let insertObj = evalObjAndStr(1, code);
+                    let insertObj = getEvalObj(1, code);
                     allVar.setVar(varName, insertObj[0]);
                     this.$store.commit('editObjArrPush', {
                         name: varName,
@@ -243,7 +243,7 @@ export default {
                     widgePanel.innerHTML = '';
                 }
                 // allVar.getVar(editVarName).value_.dom.remove();
-                let insertObj = evalObjAndStr(1, editObj.code);
+                let insertObj = getEvalObj(1, editObj.code);
                 allVar.setVar(editVarName, insertObj[0]);
                 let value_ = updateVar.value_;
                 if (widgePanel !== undefined) {
@@ -277,7 +277,7 @@ export default {
             });
         },
         changeCode(obj, code) {
-            let newObj = getOptionByObj(evalObjAndStr(1, code)[0]);
+            let newObj = getOptionByObj(getEvalObj(1, code)[0]);
             console.log(newObj);
             // MIN(1,MIN(2,4),1)
             // 不能直接覆盖obj.obj，因为js是引用赋值
@@ -369,7 +369,7 @@ export default {
     </div>
 </div>`;
 
-        evalObjAndStr(1, fileContent);
+        getEvalObj(1, fileContent);
         console.log(allVar);
         let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {

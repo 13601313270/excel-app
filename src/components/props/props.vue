@@ -90,7 +90,7 @@
                         <template v-else>
                             <div v-if="false && getDataType(key).split(',').includes('relationalModel')">
                                 <div style="display: inline-block"
-                                    v-if="Object.values(allVar).some(item => {return item.value_ instanceof relationalModel})">
+                                     v-if="Object.values(allVar).some(item => {return item.value_ instanceof relationalModel})">
                                     <select v-model="innerOption.props[key].type"
                                             @change="innerOption.props[key].name=($event.target.value=='relationalModel'?'RELATIONAL_MODEL':''),emitChange()">
                                         <option value="var">变量</option>
@@ -193,8 +193,8 @@
                                 <div>
                                     <div class="key">
                                         <button
-                                            @click="innerOption.props[prompt('请输入键名', 'a7')]='val',emitChange()">
-                                            添加
+                                            @click="innerOption.props[prompt('请输入键名', 'a7')]='val',emitChange()"
+                                        >添加
                                         </button>
                                     </div>
                                 </div>
@@ -241,6 +241,13 @@
                                 </select>
                             </td>
                         </template>
+                    </template>
+                    <template v-else-if="innerOption.type==='runObj'">
+                        <td :style="tdStyle">
+                            <span
+                                style="background-color: grey;color: white;border-radius: 3px;padding: 0 2px;cursor: default;">公式</span>
+                            <span v-html="createCodeText(innerOption)"></span>
+                        </td>
                     </template>
                 </tr>
             </template>
@@ -506,7 +513,8 @@ export default {
                 }
             }
             this.emitChange();
-        }
+        },
+        createCodeText: createCodeText
     }
 }
 </script>

@@ -3,6 +3,7 @@
  */
 import Var from '../../observer/Var';
 import __array__ from '../../languageParser/array';
+import __runObj__ from '../../languageParser/__runObj__';
 import __dictionary__ from '../../languageParser/dictionary';
 import dictionaryGet from '../../languageParser/dictionaryGet';
 function getOptionByObj(obj) {
@@ -39,6 +40,16 @@ function getOptionByObj(obj) {
             name: obj.name,
             value: obj.value
         };
+    }
+    else if (obj instanceof __runObj__) {
+        returnOption = {
+            type: 'runObj',
+            name: '',
+            props: []
+        };
+        obj.params.forEach(item => {
+            returnOption.props.push(getOptionByObj(item));
+        });
     }
     else {
         returnOption = {

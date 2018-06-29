@@ -54,6 +54,15 @@ function createCodeText(innerOption) {
         code += TempPropArr.join(',');
         code += ')';
     }
+    else if (innerOption.type === 'runObj') {
+        code = innerOption.props.map(item => {
+            if (['boolean', 'number', 'string'].includes(typeof item)) {
+                return item;
+            } else {
+                return createCodeText(item);
+            }
+        }).join('');
+    }
     return code;
 }
 export default createCodeText;
