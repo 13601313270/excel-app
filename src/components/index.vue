@@ -6,7 +6,7 @@
                 <div :class="{active:leftToolSelect=='widget'}" @click="leftToolSelect='widget'">控件</div>
                 <div :class="{active:leftToolSelect=='widget22'}" @click="leftToolSelect='widget22'">控件</div>
             </div>
-            <div class="left_tools_content">
+            <div class="left_tools_content" :style="{width:leftToolInfo[leftToolSelect].width+'px'}">
                 <tools_widget v-if="leftToolSelect=='widget'" @drag='drag'></tools_widget>
                 <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
             </div>
@@ -15,23 +15,23 @@
                     <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
                 </div>
             </div>
-            <div class="right_tools_content">
+            <div class="right_tools_content" :style="{width:rightToolInfo[rightToolSelect].width+'px'}">
                 <datas-vue v-if="rightToolSelect=='data'" :connections="connections" @change="editVar"></datas-vue>
-                <div v-else-if="rightToolSelect=='data2'">
-                    <div style="overflow: scroll;border: solid 1px black;">
+                <div v-else-if="rightToolSelect=='html'">
+                    <div style="overflow: auto;border: solid 1px black;">
                         <textarea :value="saveHtml"
                                   style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
                     </div>
                 </div>
                 <div v-show="rightToolSelect=='var'">
-                    <div style="flex-grow: 1;padding: 3px 3px;overflow: scroll">
+                    <div style="flex-grow: 1;padding: 3px 3px;overflow: auto">
                         <all-vars @change="editVar" @hover="hover"></all-vars>
                     </div>
                 </div>
             </div>
             <div class="right_tools">
                 <div :class="{active:rightToolSelect=='data'}" @click="rightToolSelect='data'">数据</div>
-                <div :class="{active:rightToolSelect=='data2'}" @click="rightToolSelect='data2'">数据</div>
+                <div :class="{active:rightToolSelect=='html'}" @click="rightToolSelect='html'">html</div>
                 <div :class="{active:rightToolSelect=='var'}" @click="rightToolSelect='var'">已添加对象</div>
             </div>
         </div>
@@ -106,7 +106,26 @@ export default {
             currentView: dashboard(),
             dragDomFunc: undefined,
             leftToolSelect: 'widget',
+            leftToolInfo: {
+                widget: {
+                    width: 200
+                },
+                widget22: {
+                    width: 300
+                }
+            },
             rightToolSelect: 'data',
+            rightToolInfo: {
+                data: {
+                    width: 200
+                },
+                html: {
+                    width: 400
+                },
+                'var': {
+                    width: 300
+                }
+            },
             editObjArr: [],
             editDataType: '',
             connections: [],
