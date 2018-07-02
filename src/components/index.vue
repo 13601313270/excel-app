@@ -12,7 +12,7 @@
             </div>
             <div id="content">
                 <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;padding: 10px;">
-                    <component :is="currentView" style="width: 100%;" @addData="addData" @init="dataInit"></component>
+                    <component :is="currentView" style="width: 100%;"></component>
                 </div>
             </div>
             <div class="right_tools_content" :style="{width:rightToolInfo[rightToolSelect].width+'px'}">
@@ -31,14 +31,13 @@
             </div>
             <div class="right_tools">
                 <div :class="{active:rightToolSelect=='data'}" @click="rightToolSelect='data'">数据</div>
-                <div :class="{active:rightToolSelect=='html'}" @click="rightToolSelect='html'">html</div>
+                <div :class="{active:rightToolSelect=='html'}" @click="rightToolSelect='html'">HTML</div>
                 <div :class="{active:rightToolSelect=='var'}" @click="rightToolSelect='var'">已添加对象</div>
             </div>
         </div>
-        <div v-if="$store.state.editObjArr.length > 0"
-             v-for="item,key in $store.state.editObjArr" :style="{zIndex:key+100}"
-             style="position: fixed;top:0;left:0;right:0;bottom:0;display: flex;justify-content:center;align-items:center;background-color: rgba(103, 103, 103, 0.59);">
-            <div style="background-color: white;border-radius: 5px;padding: 5px;position: relative;">
+        <div class="floatVal" v-if="$store.state.editObjArr.length > 0"
+             v-for="item,key in $store.state.editObjArr" :style="{zIndex:key+100}">
+            <div>
                 <div>对象：{{item.name}}
                     <div @click="$store.commit('editObjArrPop')"
                          style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
@@ -100,6 +99,7 @@ import getOptionByObj from './props/getPropsOptionByObj';
 import createCodeText from './props/createCodeText';
 
 import ajax from '../api/ajax';
+import widgetEvent from './widgetChange';
 export default {
     data() {
         return {
@@ -135,7 +135,7 @@ export default {
     },
     computed: {
         saveHtml() {
-            return this.html.replace(/ @change="addData" @init="dataInit" random-id="r(\d+)"/g, '');
+            return this.html.replace(/ random-id="r(\d+)"/g, '');
         }
     },
     methods: {
@@ -202,6 +202,7 @@ export default {
             return code;
         },
         addData(varName, id, dom) {
+            console.log(1111);
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
                 if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
@@ -219,8 +220,8 @@ export default {
 
                     let newVar = allVar.getVar(varName);
                     this.varToDom.set(newVar, dom);
-                    let reg = new RegExp('<widget @change="addData" @init="dataInit" random-id="' + id + '"[^>]*>', 'g');
-                    this.html = this.html.replace(reg, '<widget @change="addData" @init="dataInit" random-id="' + id + '" data="' + varName + '">');
+                    let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
+                    this.html = this.html.replace(reg, '<widget random-id="' + id + '" data="' + varName + '">');
                     this.varToDom.get(newVar).innerHTML = '';
                     this.varToDom.get(newVar).appendChild(newVar.value_.dom);
                 }
@@ -373,10 +374,14 @@ export default {
         console.log(allVar);
         let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {
-            return '<widget @change="addData" @init="dataInit" random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
+            return '<widget random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
         });
         newDash.template = this.html;
         this.currentView = newDash;
+
+        console.log(widgetEvent);
+        widgetEvent.on('change', this.addData);
+        widgetEvent.on('init', this.dataInit);
     },
     components: {
         'all-vars': allPageVars,
@@ -463,6 +468,24 @@ export default {
         flex-grow: 1;
         display: flex;
         flex-direction: column;
+    }
+
+    .floatVal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(103, 103, 103, 0.59);
+        > div {
+            background-color: white;
+            border-radius: 5px;
+            padding: 5px;
+            position: relative;
+        }
     }
 
     .right_tools {

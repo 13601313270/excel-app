@@ -7,6 +7,7 @@
     </div>
 </template>
 <script>
+import widgetEvent from './widgetChange';
 export default {
     props: ['data', 'randomId'],
     data() {
@@ -16,6 +17,7 @@ export default {
     },
     mounted() {
         if (this.data !== undefined) {
+            widgetEvent.emit('init', this.data, this.randomId, this.$refs.content);
             this.$emit('init', this.data, this.randomId, this.$refs.content);
         }
     },
@@ -35,6 +37,7 @@ export default {
             varName = '$' + varName.replace(/^\$/, '');
             this.data_ = varName;
             if (varName !== null) {
+                widgetEvent.emit('change', varName, this.randomId, this.$refs.content);
                 this.$emit('change', varName, this.randomId, this.$refs.content);
             }
         }

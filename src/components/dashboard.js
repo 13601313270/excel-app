@@ -10,14 +10,6 @@ export default function() {
         components: {
             widget
         },
-        methods: {
-            addData(varName, id, dom) {
-                this.$emit('addData', varName, id, dom);
-            },
-            dataInit(varName, id, dom) {
-                this.$emit('init', varName, id, dom);
-            }
-        },
         mounted() {
         },
         template: `<div>

@@ -245,7 +245,7 @@
                     <template v-else-if="innerOption.type==='runObj'">
                         <td :style="tdStyle">
                             <span
-                                style="background-color: grey;color: white;border-radius: 3px;padding: 0 2px;cursor: default;">公式</span>
+                                style="background-color: #82b678;color: white;border-radius: 3px;padding: 0 2px;cursor: default;">公式</span>
                             <span v-html="createCodeText(innerOption)"></span>
                         </td>
                     </template>

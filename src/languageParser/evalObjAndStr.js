@@ -7,7 +7,6 @@ import Obj from '../observer/obj';
 import __allMatch__ from './allMatch';
 import __runObj__ from './__runObj__';
 import functionCall from './functionCall';
-import createCodeText from './getStrByObj';
 function getEvalObj(tableNum, str) {
     // 解释器梭子
     let forwordStrNum = 0;
