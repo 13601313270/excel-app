@@ -12,7 +12,8 @@
             </div>
             <div id="content">
                 <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;padding: 10px;">
-                    <component :is="currentView" style="width: 100%;"></component>
+                    <word></word>
+                    <!--<component :is="currentView" style="width: 100%;"></component>-->
                 </div>
             </div>
             <div class="right_tools_content" :style="{width:rightToolInfo[rightToolSelect].width+'px'}">
@@ -100,6 +101,8 @@ import createCodeText from './props/createCodeText';
 
 import ajax from '../api/ajax';
 import widgetEvent from './widgetChange';
+
+import word from './dashboard/word.vue';
 export default {
     data() {
         return {
@@ -146,25 +149,25 @@ export default {
                 let item2 = item;
                 let dataType = item2.dataType;
                 // let isArr = false;
-                if (dataType instanceof Array) {
+                if(dataType instanceof Array) {
                     // isArr = true;
                     dataType = dataType[0];
                 }
                 let pushProp = '';
-                if (item2.enum) {
+                if(item2.enum) {
                     for (let j in item2.enum) {
                         pushProp = '"' + j + '"';
                         break;
                     }
-                } else if (typeof dataType === 'function') {
+                } else if(typeof dataType === 'function') {
                     pushProp = dataType;
-                } else if (dataType.split(',').includes('number')) {
+                } else if(dataType.split(',').includes('number')) {
                     pushProp = 1;
-                } else if (dataType.split(',').includes('string')) {
+                } else if(dataType.split(',').includes('string')) {
                     pushProp = '""';
-                } else if (dataType.split(',').includes('bool')) {
+                } else if(dataType.split(',').includes('bool')) {
                     pushProp = 'TRUE';
-                } else if (dataType.match(/array\((.*)\)/)) {
+                } else if(dataType.match(/array\((.*)\)/)) {
                     pushProp = '[]';
                 } else {
                     pushProp = '""';
@@ -176,23 +179,23 @@ export default {
             });
             let temp2 = [];
             for (let j = 0; j < propsArr.length; j++) {
-                if (typeof propsArr[j] === 'function') {
+                if(typeof propsArr[j] === 'function') {
                     temp2.push(null);
                 } else {
                     temp2.push(getEvalObj(1, propsArr[j])[0]);
                 }
             }
             for (let j = 0; j < propsArr.length; j++) {
-                if (typeof propsArr[j] === 'function') {
+                if(typeof propsArr[j] === 'function') {
                     propsArr[j] = propsArr[j](temp2);
                     console.log(propsArr[j]);
-                    if (propsArr[j].split(',').includes('number')) {
+                    if(propsArr[j].split(',').includes('number')) {
                         propsArr[j] = 1;
-                    } else if (propsArr[j].split(',').includes('string')) {
+                    } else if(propsArr[j].split(',').includes('string')) {
                         propsArr[j] = '""';
-                    } else if (propsArr[j].split(',').includes('bool')) {
+                    } else if(propsArr[j].split(',').includes('bool')) {
                         propsArr[j] = 'TRUE';
-                    } else if (propsArr[j].split(',').includes('array')) {
+                    } else if(propsArr[j].split(',').includes('array')) {
                         propsArr[j] = '[]';
                     }
                 }
@@ -202,10 +205,9 @@ export default {
             return code;
         },
         addData(varName, id, dom) {
-            console.log(1111);
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
-                if (item.func !== undefined && this.dragDomFunc.match(item.match)) {
+                if(item.func !== undefined && this.dragDomFunc.match(item.match)) {
                     let code = this.getCodeByMatchItem(item);
                     let insertObj = getEvalObj(1, code);
                     allVar.setVar(varName, insertObj[0]);
@@ -237,19 +239,19 @@ export default {
         codeUpdate(editObj) {
             let editVarName = editObj.name;
             editObj.code = createCodeText(editObj.obj);
-            if (editVarName !== undefined) {
+            if(editVarName !== undefined) {
                 let updateVar = allVar.getVar(editVarName);
                 let widgePanel = this.varToDom.get(updateVar);
-                if (widgePanel !== undefined) {
+                if(widgePanel !== undefined) {
                     widgePanel.innerHTML = '';
                 }
                 // allVar.getVar(editVarName).value_.dom.remove();
                 let insertObj = getEvalObj(1, editObj.code);
                 allVar.setVar(editVarName, insertObj[0]);
                 let value_ = updateVar.value_;
-                if (widgePanel !== undefined) {
-                    if (value_ instanceof Obj) {
-                        if (value_.dom) {
+                if(widgePanel !== undefined) {
+                    if(value_ instanceof Obj) {
+                        if(value_.dom) {
                             widgePanel.appendChild(value_.dom);
                         } else {
                             widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
@@ -286,7 +288,7 @@ export default {
             obj.obj.props = newObj.props;
             console.log(1);
             this.codeUpdate(obj);
-            if (obj.parent !== undefined) {
+            if(obj.parent !== undefined) {
                 console.log(obj.parent.emitChange);
                 obj.parent.emitChange();
             }
@@ -307,7 +309,7 @@ export default {
             this.$store.watch((store) => {
                 console.log(store);
             });
-            if (Var.value_ instanceof relationalModel) {
+            if(Var.value_ instanceof relationalModel) {
                 this.editDataType = 'relationalModel';
             } else {
                 this.editDataType = '';
@@ -318,11 +320,6 @@ export default {
         }
     },
     mounted() {
-        /**
-         * showTables
-         * showCreateTable
-         * run
-         * */
         ajax({
             type: 'POST',
             url: 'http://www.tablehub.cn/action/mysql.html',
@@ -389,7 +386,8 @@ export default {
         'datas-vue': datasVue,
         'relational-model-props': relationalModelProps,
         'header-nav': headerNav,
-        'tools_widget': toolsWidget
+        'tools_widget': toolsWidget,
+        'word': word
     }
 }
 </script>
@@ -454,7 +452,8 @@ export default {
         border-right: solid 1px black;
         text-align: center;
         background-color: #333;
-        color: #999
+        color: #999;
+        flex-shrink: 0;
     }
 
     .right_tools_content {
@@ -462,6 +461,7 @@ export default {
         min-width: 100px;
         background-color: rgb(51, 51, 51);
         color: #d9d9d9;
+        flex-shrink: 0;
     }
 
     #content {
