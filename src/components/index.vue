@@ -12,13 +12,14 @@
                 <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
             </div>
             <div id="content">
-                <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;padding: 10px;">
+                <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;height:100%;">
                     <div v-if="documentType===''">
-                        <div @click="documentType='word'">word</div>
-                        <div @click="documentType='excel'">excel</div>
-                        <div>ppt</div>
+                        <div @click="documentType='word'">文稿</div>
+                        <div @click="documentType='excel'">表格</div>
+                        <div>黑板</div>
                     </div>
                     <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
+                    <excel v-else-if="documentType==='excel'" :tableObj="tableObj" :dragDomFunc="dragDomFunc"></excel>
                     <!--<component :is="currentView" style="width: 100%;"></component>-->
                 </div>
             </div>
@@ -109,6 +110,7 @@ import ajax from '../api/ajax';
 import widgetEvent from './widgetChange';
 
 import word from './dashboard/word.vue';
+import excel from './dashboard/excel.vue';
 export default {
     data() {
         return {
@@ -140,7 +142,13 @@ export default {
             editDataType: '',
             connections: [],
             html: '',
-            varToDom: new Map()
+            varToDom: new Map(),
+            tableObj: {
+                lie: [1, 2, 3, 4],
+                hang: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                alltableObj: [],
+                tdList: [[1, 2]]
+            }
         }
     },
     computed: {
@@ -217,9 +225,16 @@ export default {
             return code;
         },
         addData(varName, id, dom) {
+            let dragDomFunc = this.dragDomFunc;
+            if(dragDomFunc === null) {
+                dragDomFunc = allMatch.find(item => {
+                    return item.func;
+                }).name;
+                dragDomFunc = 'INPUT';
+            }
             for (let i = 0; i < allMatch.length; i++) {
                 let item = allMatch[i];
-                if(item.func !== undefined && this.dragDomFunc.match(item.match)) {
+                if(item.func !== undefined && dragDomFunc.match(item.match)) {
                     let code = this.getCodeByMatchItem(item);
                     let insertObj = getEvalObj(1, code);
                     allVar.setVar(varName, insertObj[0]);
@@ -401,7 +416,8 @@ export default {
         'relational-model-props': relationalModelProps,
         'header-nav': headerNav,
         'tools_widget': toolsWidget,
-        'word': word
+        'word': word,
+        'excel': excel
     }
 }
 </script>

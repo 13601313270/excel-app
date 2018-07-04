@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="padding: 10px;">
         <template v-for="(item,index) in data">
             <div
                 v-show="dragDomFunc && (dragIndexPosition===index||dragIndexPosition===index-1)"
