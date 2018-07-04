@@ -1,5 +1,6 @@
 <template>
-    <div style="width: 100%;height: 100%;min-width: 930px;display: flex;flex-direction: column;">
+    <div style="width: 100%;height: 100%;min-width: 930px;display: flex;flex-direction: column;"
+         @dragend="cancelDragDomFunc">
         <header-nav style="background-color: #3c3f41;border-bottom: solid 1px #4f4f4f;"></header-nav>
         <div style="display: flex;width: 100%;flex-grow: 1;">
             <div class="left_tools">
@@ -12,7 +13,7 @@
             </div>
             <div id="content">
                 <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;padding: 10px;">
-                    <word></word>
+                    <word :dragDomFunc="dragDomFunc"></word>
                     <!--<component :is="currentView" style="width: 100%;"></component>-->
                 </div>
             </div>
@@ -107,7 +108,7 @@ export default {
     data() {
         return {
             currentView: dashboard(),
-            dragDomFunc: undefined,
+            dragDomFunc: null,
             leftToolSelect: 'widget',
             leftToolInfo: {
                 widget: {
@@ -142,6 +143,11 @@ export default {
         }
     },
     methods: {
+        cancelDragDomFunc() {
+            this.$nextTick(() => {
+                this.dragDomFunc = null;
+            });
+        },
         getCodeByMatchItem(item) {
             let code = item.name + '(';
             let propsArr = [];
@@ -220,6 +226,7 @@ export default {
                     });
                     this.editDataType = '';
 
+                    console.log(varName, id, dom);
                     let newVar = allVar.getVar(varName);
                     this.varToDom.set(newVar, dom);
                     let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
@@ -230,6 +237,7 @@ export default {
             }
         },
         dataInit(varName, id, dom) {
+            console.log('---dataInit---');
             let initVar = allVar.getVar(varName);
             this.varToDom.set(initVar, dom);
             this.varToDom.get(initVar).innerHTML = '';
@@ -391,14 +399,6 @@ export default {
     }
 }
 </script>
-<style>
-    widget {
-        border: solid 1px black;
-        min-width: 20px;
-        min-height: 20px;
-        display: inline-block;
-    }
-</style>
 <style scoped lang="less">
     h1, h2 {
         font-weight: normal;

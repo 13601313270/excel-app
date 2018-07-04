@@ -16,7 +16,7 @@ export default {
         };
     },
     mounted() {
-        if (this.data !== undefined) {
+        if(this.data !== undefined) {
             widgetEvent.emit('init', this.data, this.randomId, this.$refs.content);
             this.$emit('init', this.data, this.randomId, this.$refs.content);
         }
@@ -24,7 +24,7 @@ export default {
     methods: {
         getHighlightState(type) {
             // return this.$store.state.varHighlight.key;
-            if (this.$store.state.varHighlight.key === type) {
+            if(this.$store.state.varHighlight.key === type) {
                 return this.$store.state.varHighlight.info;
             }
             return 'none';
@@ -36,7 +36,7 @@ export default {
             let varName = window.prompt('请输入名称', 'a7');
             varName = '$' + varName.replace(/^\$/, '');
             this.data_ = varName;
-            if (varName !== null) {
+            if(varName !== null) {
                 widgetEvent.emit('change', varName, this.randomId, this.$refs.content);
                 this.$emit('change', varName, this.randomId, this.$refs.content);
             }
