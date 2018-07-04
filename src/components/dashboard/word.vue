@@ -1,10 +1,11 @@
 <template>
     <div>
         <template v-for="(item,index) in data">
-            <div v-show="dragDomFunc"
-                 class="addHangSplit"
-                 @drop="addData(index)"
-                 @dragover="$event.preventDefault()"
+            <div
+                v-show="dragDomFunc && (dragIndexPosition===index||dragIndexPosition===index-1)"
+                class="addHangSplit"
+                @drop="addData(index)"
+                @dragover="$event.preventDefault()"
             ></div>
             <div v-if="item.type==='text'">
                 <p
@@ -15,13 +16,16 @@
                     @blur="item.value = $event.target.innerHTML.toString()"
                     @keyup="onkeyup"
                     @keydown="onkeydown"
-                    v-html="item.value"></p>
+                    @dragover="dragWidgetOver(index)"
+                    v-html="item.value"
+                ></p>
             </div>
             <div
                 v-else-if="item.type==='widget'"
                 :ref="'widgetContent'+item.randomId"
             >
                 <widget
+                    contenteditable="false"
                     :data="item.data"
                     :random-id="item.randomId"
                     :ref="item.randomId"
@@ -40,6 +44,7 @@ export default {
             editorIndex: -1,
             editorText: '',
             focusPosition: -1,
+            dragIndexPosition: -1,
             data: [{
                 type: 'text',
                 value: '正文'
@@ -47,9 +52,6 @@ export default {
         };
     },
     methods: {
-        changeText(val, text) {
-            val = text;
-        },
         focus(index) {
             this.editorIndex = index;
         },
@@ -76,7 +78,6 @@ export default {
                     }
                 }
             }
-            // ArrowUp,ArrowDown
         },
         onkeyup(event) {
             if(this.editorIndex === this.data.length - 1) {
@@ -136,6 +137,7 @@ export default {
                     }
                 }
             }
+            // document.execCommand("insertImage","false","https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png")
         },
         setCaretPositionEnd(ctrl, pos) {
             let Select = window.getSelection();
@@ -160,6 +162,9 @@ export default {
                 });
             }
             console.log(e);
+        },
+        dragWidgetOver(index) {
+            this.dragIndexPosition = index;
         }
     },
     components: {

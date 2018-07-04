@@ -13,7 +13,12 @@
             </div>
             <div id="content">
                 <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;padding: 10px;">
-                    <word :dragDomFunc="dragDomFunc"></word>
+                    <div v-if="documentType===''">
+                        <div @click="documentType='word'">word</div>
+                        <div @click="documentType='excel'">excel</div>
+                        <div>ppt</div>
+                    </div>
+                    <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
                     <!--<component :is="currentView" style="width: 100%;"></component>-->
                 </div>
             </div>
@@ -107,6 +112,7 @@ import word from './dashboard/word.vue';
 export default {
     data() {
         return {
+            documentType: '',
             currentView: dashboard(),
             dragDomFunc: null,
             leftToolSelect: 'widget',
