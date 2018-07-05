@@ -74,7 +74,7 @@ function getEvalObj(tableNum, str) {
                 return baseWord;
             }
             forword();
-            if (['+', '-', '*', '/', '>', '<', '<=', '>='].indexOf(word) > -1) {
+            if (['+', '-', '*', '/', '>', '<', '<=', '>=', '=='].indexOf(word) > -1) {
                 let innerStrArr = [];
                 if (typeof baseWord === 'string') {
                     innerStrArr.push('"' + baseWord + '"');
