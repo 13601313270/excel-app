@@ -445,19 +445,21 @@ export default {
                         this.innerOption.type = this.codeOption.type;
                         this.allMatch[i].props.forEach((item) => {
                             let dataType = item.dataType;
-                            if (dataType instanceof Array) {
+                            if(dataType instanceof Array) {
                                 dataType = dataType[0];
+                            } else if(dataType instanceof Function) {
+                                dataType = dataType(this.innerOption.props);
                             }
                             let firstType = dataType.split(',')[0];
-                            if (firstType.match(/array\((.*)\)/)) {
+                            if(firstType.match(/array\((.*)\)/)) {
                                 firstType = 'array';
                             }
-                            if (item.enum) {
+                            if(item.enum) {
                                 for (let j in item.enum) {
                                     this.innerOption.props.push(j);
                                     break;
                                 }
-                            } else if (typeof dataType === 'function') {
+                            } else if(typeof dataType === 'function') {
                                 this.innerOption.props.push(dataType);
                             } else {
                                 this.innerOption.props.push(this.getDefaultValueByType(firstType));

@@ -16,10 +16,11 @@
                     <div v-if="documentType===''">
                         <div @click="documentType='word'">文稿</div>
                         <div @click="documentType='excel'">表格</div>
-                        <div>黑板</div>
+                        <div @click="documentType='freePanel'">黑板</div>
                     </div>
                     <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
                     <excel v-else-if="documentType==='excel'" :tableObj="tableObj" :dragDomFunc="dragDomFunc"></excel>
+                    <free-panel v-else-if="documentType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                     <!--<component :is="currentView" style="width: 100%;"></component>-->
                 </div>
             </div>
@@ -63,7 +64,7 @@
                 <props-com
                     v-else
                     @change="item.change(item)"
-                    :value="$store.state.editObjArr[key].obj"
+                    v-model="$store.state.editObjArr[key].obj"
                     :dataType="item.dataType"
                     :is-root="true"
                     style="min-height: 250px;"
@@ -111,6 +112,7 @@ import widgetEvent from './widgetChange';
 
 import word from './dashboard/word.vue';
 import excel from './dashboard/excel.vue';
+import freePanel from './dashboard/freePanel.vue';
 export default {
     data() {
         return {
@@ -258,11 +260,12 @@ export default {
             }
         },
         dataInit(varName, id, dom) {
-            console.log('---dataInit---');
             let initVar = allVar.getVar(varName);
-            this.varToDom.set(initVar, dom);
-            this.varToDom.get(initVar).innerHTML = '';
-            this.varToDom.get(initVar).appendChild(initVar.value_.dom);
+            if(initVar) {
+                this.varToDom.set(initVar, dom);
+                this.varToDom.get(initVar).innerHTML = '';
+                this.varToDom.get(initVar).appendChild(initVar.value_.dom);
+            }
         },
         // 通过变量对象，修改生成的code
         codeUpdate(editObj) {
@@ -417,7 +420,8 @@ export default {
         'header-nav': headerNav,
         'tools_widget': toolsWidget,
         'word': word,
-        'excel': excel
+        'excel': excel,
+        'free-panel': freePanel
     }
 }
 </script>

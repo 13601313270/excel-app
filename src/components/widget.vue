@@ -50,7 +50,6 @@ export default {
     }
 
     .widget {
-        border: solid 1px black;
         min-width: 20px;
         min-height: 20px;
         display: inline-block;

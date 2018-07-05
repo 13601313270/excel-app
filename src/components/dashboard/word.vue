@@ -25,6 +25,7 @@
                 :ref="'widgetContent'+item.randomId"
             >
                 <widget
+                    class="widget"
                     contenteditable="false"
                     :data="item.data"
                     :random-id="item.randomId"
@@ -195,5 +196,9 @@ export default {
 
     .duanluo {
         /*border: solid 1px black;*/
+    }
+
+    .widget {
+        border: solid 1px black;
     }
 </style>
