@@ -41,9 +41,9 @@
                 </div>
             </div>
             <div class="right_tools">
+                <div :class="{active:rightToolSelect=='var'}" @click="rightToolSelect='var'">已添加对象</div>
                 <div :class="{active:rightToolSelect=='data'}" @click="rightToolSelect='data'">数据</div>
                 <div :class="{active:rightToolSelect=='html'}" @click="rightToolSelect='html'">HTML</div>
-                <div :class="{active:rightToolSelect=='var'}" @click="rightToolSelect='var'">已添加对象</div>
             </div>
         </div>
         <div class="floatVal" v-if="$store.state.editObjArr.length > 0"
@@ -131,7 +131,7 @@ export default {
                     width: 300
                 }
             },
-            rightToolSelect: 'data',
+            rightToolSelect: 'var',
             rightToolInfo: {
                 data: {
                     width: 200

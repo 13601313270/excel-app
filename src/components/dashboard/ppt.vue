@@ -7,13 +7,14 @@
         </div>
         <div
             style="position:absolute;top:20px;left:0;height: 100%;overflow: auto;width: 100%;z-index: 1;display: flex;">
-            <div>
+            <div style="overflow: auto;">
                 <div
                     v-for="(item,index) in data"
                     @click="selectPage=index"
                     class="page"
                     :class="{active:selectPage==index}">
                 </div>
+                <div class="page" style="height:30px;" @click="data.push([])">+</div>
             </div>
             <div :class="{'full-screen':isFullScreen}">
                 <div
