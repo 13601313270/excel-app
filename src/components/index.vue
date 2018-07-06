@@ -17,10 +17,12 @@
                         <div @click="documentType='word'">文稿</div>
                         <div @click="documentType='excel'">表格</div>
                         <div @click="documentType='freePanel'">黑板</div>
+                        <div @click="documentType='ppt'">演示文稿</div>
                     </div>
                     <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
                     <excel v-else-if="documentType==='excel'" :tableObj="tableObj" :dragDomFunc="dragDomFunc"></excel>
                     <free-panel v-else-if="documentType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
+                    <ppt v-else-if="documentType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
                     <!--<component :is="currentView" style="width: 100%;"></component>-->
                 </div>
             </div>
@@ -113,6 +115,7 @@ import widgetEvent from './widgetChange';
 import word from './dashboard/word.vue';
 import excel from './dashboard/excel.vue';
 import freePanel from './dashboard/freePanel.vue';
+import ppt from './dashboard/ppt.vue';
 export default {
     data() {
         return {
@@ -385,6 +388,7 @@ export default {
         $a4 = $a3.select
         $a5 = MIN($a1,1)
         `;
+        fileContent = '';
         // let fileContent = `$a1 = BAR(1,'user','state',['count(33)','count(email)'])`;
         // fileContent = '';
         this.html = `<div>
@@ -421,7 +425,8 @@ export default {
         'tools_widget': toolsWidget,
         'word': word,
         'excel': excel,
-        'free-panel': freePanel
+        'free-panel': freePanel,
+        'ppt': ppt
     }
 }
 </script>
