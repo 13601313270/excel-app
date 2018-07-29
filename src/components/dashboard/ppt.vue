@@ -63,7 +63,7 @@ export default {
             selectPage: 0,
             data: [[], [], []],
             isFullScreen: false,
-            setIntervalObj: null,
+            setIntervalObj: null
         };
     },
     mounted() {

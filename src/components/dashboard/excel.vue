@@ -45,8 +45,8 @@
                 <tr v-for="i in tableObj.hang" :hang="i">
                     <td v-for="j in tableObj.lie"
                         @click.stop="selectTd_temp(i,j)"
-                        @dblclick.stop.self="dbselectTd_temp(i,j,$event)"
-                        :key="i+','+j"
+                        @dblclick.stop="dbselectTd_temp(i,j,$event)"
+                        :key="(i)+','+(j)"
                         :hang="i"
                         :lie="j"
                         :class="setSelectClass(i,j)"
@@ -69,6 +69,22 @@
 <script>
 import widget from '../widget.vue';
 import widgetEvent from '../widgetChange';
+import ajax from '../../api/ajax';
+function getCellTemp(str) {
+    try {
+        str = str.match(/([A-Z]*)\$?(\d+)/);
+        let tdStr = str[1];
+        let trNum = parseInt(str[2]);
+        let tdNum = 0;
+        for (let i = 0; i < tdStr.length; i++) {
+            tdNum += (tdStr[i].charCodeAt() - 64) * Math.pow(26, tdStr.length - i - 1);
+        }
+        return [trNum, tdNum];
+    } catch (e) {
+        return null;
+    }
+}
+
 function getCellTemp2(trNum, tdNum) {
     let result = '';
     do {
@@ -83,13 +99,17 @@ function getCellTemp2(trNum, tdNum) {
     return result + trNum;
 }
 export default {
-    props: ['dragDomFunc', 'tableObj'],
+    props: ['dragDomFunc'],
     data() {
         return {
+            tableObj: {
+                lie: 5,
+                hang: 5,
+                alltableObj: [],
+                tdList: [[1, 2]]
+            },
             theadLeft: 0,
             rowTop: 0,
-            alltableObj: this.tableObj.alltableObj,
-            tdList: this.tableObj.tdList,
             isSelectDoms: false,
             beginSelect: [],
             // 用于记录最后一次触发的坐标
@@ -104,6 +124,49 @@ export default {
             data: []
         };
     },
+    mounted() {
+        let self = this;
+        ajax({
+            type: 'POST',
+            url: 'http://www.tablehub.cn/action/table.html',
+            data: {
+                'function': 'tableInfo',
+                fileId: 36,
+                temp: 1
+            }
+        }).then((data) => {
+            console.log(data.data[0].tableValue);
+            for (let key in data.data[0].tableValue) {
+                let randomId = 'r' + parseInt(Math.random() * 1000000);
+                let varName = '$' + key;
+                let pos = getCellTemp(key);
+                if(pos[1] >= self.tableObj.lie) {
+                    self.tableObj.lie = pos[1];
+                }
+                if(pos[0] >= self.tableObj.hang) {
+                    self.tableObj.hang = pos[0];
+                }
+                let code = data.data[0].tableValue[key].value.toString();// 'INPUT("number",999)';
+                if(code.indexOf('=') === 0) {
+                    code = code.substr(1);
+                } else {
+                    code = 'TEXT("' + code + '")';
+                }
+                this.data.push({
+                    type: 'widget',
+                    data: varName,
+                    randomId: randomId,
+                    code: code
+                });
+                this.$nextTick(() => {
+                    this.data.forEach(item => {
+                        widgetEvent.emit('insertByCode', item.data, item.randomId, this.$refs[item.data][0].$refs.content, item.code);
+                    });
+                });
+            }
+            console.log(data.data[0]);
+        });
+    },
     methods: {
         hasWidget(hang, lie) {
             return this.data.find(item => {
@@ -112,21 +175,24 @@ export default {
         },
         selectTd_temp() {
         },
-        dbselectTd_temp(hang, lie, e) {
+        dbselectTd_temp(hang, lie) {
             let randomId = 'r' + parseInt(Math.random() * 1000000);
             let varName = '$' + getCellTemp2(hang, lie);
-            this.data.push({
-                type: 'widget',
-                data: varName,
-                randomId: randomId
-            });
-            if(varName !== null) {
-                this.$nextTick(() => {
-                    console.log(this.$refs[varName][0].$refs.content);
-                    widgetEvent.emit('change', varName, randomId, this.$refs[varName][0].$refs.content);
+            if(this.data.find(item => { return item.data === varName; })) {
+                widgetEvent.emit('editVar', varName);
+            } else {
+                this.data.push({
+                    type: 'widget',
+                    data: varName,
+                    randomId: randomId
                 });
+                if(varName !== null) {
+                    this.$nextTick(() => {
+                        console.log(this.$refs[varName][0].$refs.content);
+                        widgetEvent.emit('change', varName, randomId, this.$refs[varName][0].$refs.content);
+                    });
+                }
             }
-            console.log(hang, lie);
         },
         setSelectClass() {
         },
@@ -163,6 +229,14 @@ export default {
         },
         mouseup_temp() {
             this.isSelectDoms = false;
+        },
+        scroll(event) {
+            this.theadLeft = event.target.scrollLeft;
+            this.rowTop = event.target.scrollTop;
+//            this.tableObj.events_.emit('scroll', {
+//                x: this.theadLeft,
+//                y: this.rowTop,
+//            });
         },
         getCellTemp2: getCellTemp2
     },

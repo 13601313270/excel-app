@@ -20,7 +20,7 @@
                         <div @click="documentType='ppt'">演示文稿</div>
                     </div>
                     <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
-                    <excel v-else-if="documentType==='excel'" :tableObj="tableObj" :dragDomFunc="dragDomFunc"></excel>
+                    <excel v-else-if="documentType==='excel'" :dragDomFunc="dragDomFunc"></excel>
                     <free-panel v-else-if="documentType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                     <ppt v-else-if="documentType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
                     <!--<component :is="currentView" style="width: 100%;"></component>-->
@@ -147,13 +147,7 @@ export default {
             editDataType: '',
             connections: [],
             html: '',
-            varToDom: new Map(),
-            tableObj: {
-                lie: [1, 2, 3, 4],
-                hang: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                alltableObj: [],
-                tdList: [[1, 2]]
-            }
+            varToDom: new Map()
         }
     },
     computed: {
@@ -241,26 +235,21 @@ export default {
                 let item = allMatch[i];
                 if(item.func !== undefined && dragDomFunc.match(item.match)) {
                     let code = this.getCodeByMatchItem(item);
-                    let insertObj = getEvalObj(1, code);
-                    allVar.setVar(varName, insertObj[0]);
-                    this.$store.commit('editObjArrPush', {
-                        name: varName,
-                        code: getStrByObj(insertObj[0]),
-                        change: this.codeUpdate,
-                        obj: getOptionByObj(insertObj[0]),
-                        dataType: ''
-                    });
-                    this.editDataType = '';
-
-                    console.log(varName, id, dom);
-                    let newVar = allVar.getVar(varName);
-                    this.varToDom.set(newVar, dom);
-                    let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
-                    this.html = this.html.replace(reg, '<widget random-id="' + id + '" data="' + varName + '">');
-                    this.varToDom.get(newVar).innerHTML = '';
-                    this.varToDom.get(newVar).appendChild(newVar.value_.dom);
+                    this.addData_(varName, id, dom, code);
+                    this.editVar(varName);
                 }
             }
+        },
+        addData_(varName, id, dom, code) {
+            let insertObj = getEvalObj(1, code);
+            allVar.setVar(varName, insertObj[0]);
+            this.editDataType = '';
+            let newVar = allVar.getVar(varName);
+            this.varToDom.set(newVar, dom);
+            let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
+            this.html = this.html.replace(reg, '<widget random-id="' + id + '" data="' + varName + '">');
+            this.varToDom.get(newVar).innerHTML = '';
+            this.varToDom.get(newVar).appendChild(newVar.value_.dom);
         },
         dataInit(varName, id, dom) {
             let initVar = allVar.getVar(varName);
@@ -414,7 +403,9 @@ export default {
 
         console.log(widgetEvent);
         widgetEvent.on('change', this.addData);
+        widgetEvent.on('insertByCode', this.addData_);
         widgetEvent.on('init', this.dataInit);
+        widgetEvent.on('editVar', this.editVar);
     },
     components: {
         'all-vars': allPageVars,
@@ -493,12 +484,14 @@ export default {
         background-color: rgb(51, 51, 51);
         color: #d9d9d9;
         flex-shrink: 0;
+        overflow: auto;
     }
 
     #content {
         flex-grow: 1;
         display: flex;
         flex-direction: column;
+        overflow: scroll;
     }
 
     .floatVal {

@@ -119,3 +119,15 @@ export default function(config) {
         }
     });
 }
+/*
+ajax({
+    type: 'POST',
+    url: 'http://www.tablehub.cn/action/mysql.html',
+    data: {
+        type: 'getConnections'
+    }
+}).then((data) => {
+    this.connections = data;
+    this.$store.commit('setConnections', data);
+});
+*/
