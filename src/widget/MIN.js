@@ -34,5 +34,6 @@ __allMatch__.push({
         name: 'value',
         title: '比较项',
         dataType: ['number,var,function']
-    }]
+    }],
+    returnType: 'number'
 });

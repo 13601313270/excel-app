@@ -4,15 +4,14 @@
 import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
 import funcLanguageParser from '../languageParser/functionCall';
-import createCodeText from '../languageParser/getStrByObj';
 import ajax from '../api/ajax';
+import FuncObj from './FuncObj';
 
-class relationalModel extends Obj {
-    constructor() {
-        super();
+class relationalModel extends FuncObj {
+    constructor(source, table, x, y, where) {
+        super(...Array.from(arguments));
         this.props = Array.from(arguments);
         this.name = 'RELATIONAL_MODEL';
-        this.type = 'relationalModel';
         this.groupColumn = [];
         this.dataColumn = [];
         this.dataValue = [];
@@ -25,6 +24,7 @@ class relationalModel extends Obj {
 
     render(handle) {
         handle(new Promise((resolve, reject) => {
+            console.log(this.props);
             let source = this.props[0] instanceof Obj ? this.props[0].value : this.props[0];
             let table = this.props[1] instanceof Obj ? this.props[1].value : this.props[1];
             let x = this.props[2] instanceof Obj ? this.props[2].value : this.props[2];
@@ -45,11 +45,11 @@ class relationalModel extends Obj {
                 this.groupColumn = [];
                 this.dataColumn = [];
                 this.dataValue = [];
-                if (data === false) {
+                if(data === false) {
                     resolve();
                 } else {
                     let x = this.props[2];
-                    if (x instanceof Obj) {
+                    if(x instanceof Obj) {
                         x = x.value;
                     }
                     let y = this.props[3].value;
@@ -67,34 +67,23 @@ class relationalModel extends Obj {
             });
         }));
     }
-
-    getCodeByObj() {
-        let code = 'RELATIONAL_MODEL(';
-        let TempPropArr = [];
-        this.props.forEach((item) => {
-            TempPropArr.push(createCodeText(item));
-        });
-        code += TempPropArr.join(',');
-        code += ')';
-        return code;
-    }
 }
 __allMatch__.push({
     match: /^RELATIONAL_MODEL/,
-    type: 'relationalModel',
+    type: 'function',
     name: 'RELATIONAL_MODEL',
     title: '关系模型',
     func: relationalModel,
     value: funcLanguageParser,
     props: [
         {
-            name: 'source:',
-            title: '关系模型',
+            name: 'source',
+            title: '关系模型.js',
             dataType: 'number',
             default: ''
         },
         {
-            name: 'table:',
+            name: 'table',
             title: '表',
             dataType: 'string',
             default: ''
@@ -116,6 +105,7 @@ __allMatch__.push({
             title: '条件',
             dataType: 'array(string)'
         }
-    ]
+    ],
+    returnType: 'relationalModel'
 });
 export default relationalModel;

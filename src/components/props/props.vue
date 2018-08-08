@@ -2,42 +2,7 @@
     <div class="prop">
         <table>
             <tbody>
-            <template v-if="dataType==='relationalModel' || innerOption.type === 'relationalModel'">
-                <tr>
-                    <td>对象</td>
-                    <td>
-                        <select-type
-                            :value="innerOption.name"
-                            @change="changeType"
-                            :dataType="dataType"
-                        ></select-type>
-                    </td>
-                </tr>
-                <tr v-for="(value,key) in codeOption.props">
-                    <template v-if="key==0">
-                        <td v-html="codeOption.props[key].title"></td>
-                        <td>
-                            <select v-model="innerOption.props[key]">
-                                <option v-for="item in $store.state.connections" v-html="item.name"
-                                        :value="item.id"></option>
-                            </select>
-                        </td>
-                    </template>
-                    <template v-else>
-                        <td v-html="codeOption.props[key].title"></td>
-                        <td>
-                            <div v-html="getDataType(key)"></div>
-                            <inner-dom v-if="innerOption.props[key]"
-                                       @change="emitChange"
-                                       v-model="innerOption.props[key]"
-                                       :dataType="getDataType(key)"
-                            ></inner-dom>
-                        </td>
-                    </template>
-                    <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
-                </tr>
-            </template>
-            <template v-else-if="innerOption.type === 'function'">
+            <template v-if="innerOption.type === 'function'">
                 <tr>
                     <td>函数{{innerOption.name}}</td>
                     <td>
@@ -46,75 +11,46 @@
                             @change="changeType"
                             :dataType="dataType"
                         ></select-type>
+                        <div v-if="!isRoot && singlePanelName.includes(innerOption.name)">
+                            <button
+                                @click="editRelationalModel(innerOption)">编辑模型
+                            </button>
+                        </div>
                     </td>
                 </tr>
-                <tr v-for="(value,key) in innerOption.props">
-                    <td v-html="key>=codeOption.props.length?codeOption.props[codeOption.props.length-1].title:codeOption.props[key].title"></td>
-                    <td>
-                        <template
-                            v-if="key>=codeOption.props.length-1 && getDataType(codeOption.props.length-1) instanceof Array">
-                            <select v-if="codeOption.props[codeOption.props.length-1].enum">
-                                <option v-for="title,val in codeOption.props[codeOption.props.length-1].enum"
-                                        :value="val">{{title}}
-                                </option>
-                            </select>
-
-
-                            <div v-if="getDataType(codeOption.props.length-1)[0]==='relationalModel'">
-                                <select>
-                                    <option :value="val">变量</option>
-                                    <option :value="val">数据</option>
-                                </select>
-                                <select :value="innerOption.props[key].name"
-                                        @change="setInnerOption({type:'var',name:$event.target.value})">
-                                    <option v-for="(item,key) in allVar" :value="key"
-                                            v-if="item.value_ instanceof relationalModel">
-                                        {{key}}
+                <template v-if="!(!isRoot && singlePanelName.includes(innerOption.name))">
+                    <tr v-for="(value,key) in innerOption.props">
+                        <td v-html="key>=codeOption.props.length?codeOption.props[codeOption.props.length-1].title:codeOption.props[key].title"></td>
+                        <td>
+                            <!--类似MIN的不限量参数-->
+                            <template
+                                v-if="key>=codeOption.props.length-1 && getDataType(codeOption.props.length-1) instanceof Array">
+                                <select v-if="codeOption.props[codeOption.props.length-1].enum">
+                                    <option v-for="title,val in codeOption.props[codeOption.props.length-1].enum"
+                                            :value="val">{{title}}
                                     </option>
                                 </select>
-                                <br/>
-                                <button>新建</button>
-                            </div>
-                            <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
-                                       :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
+                                <inner-dom @change="emitChange" v-model="innerOption.props[key]"
+                                           :dataType="getDataType(codeOption.props.length-1)[0]"></inner-dom>
 
 
-                            <template v-if="key==innerOption.props.length-1">
-                                <button @click="addProp(getDataType(codeOption.props.length-1)[0])">添加</button>
+                                <template v-if="key==innerOption.props.length-1">
+                                    <button @click="addProp(getDataType(codeOption.props.length-1)[0])">添加</button>
+                                </template>
                             </template>
-                        </template>
-                        <select v-else-if="codeOption.props[key].enum" v-model="innerOption.props[key]"
-                                @change="changeProp">
-                            <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
-                        </select>
-                        <template v-else>
-                            <div v-if="false && getDataType(key).split(',').includes('relationalModel')">
-                                <div style="display: inline-block"
-                                     v-if="Object.values(allVar).some(item => {return item.value_ instanceof relationalModel})">
-                                    <select v-model="innerOption.props[key].type"
-                                            @change="innerOption.props[key].name=($event.target.value=='relationalModel'?'RELATIONAL_MODEL':''),emitChange()">
-                                        <option value="var">变量</option>
-                                        <option value="relationalModel">关系模型</option>
-                                    </select>
-                                </div>
-                                <button
-                                    v-if="innerOption.props[key].type === 'relationalModel'"
-                                    @click="editRelationalModel(innerOption.props[key])">编辑模型
-                                </button>
-                                <select v-else :value="innerOption.props[key].name"
-                                        @change="innerOption.props[key].name = $event.target.value,emitChange()">
-                                    <option v-for="(item,key) in allVar" :value="key"
-                                            v-if="item.value_ instanceof relationalModel">
-                                        {{key}}
-                                    </option>
-                                </select>
-                            </div>
-                            <inner-dom v-else @change="emitChange" v-model="innerOption.props[key]"
-                                       :dataType="getDataType(key)"></inner-dom>
-                        </template>
-                    </td>
-                    <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
-                </tr>
+                            <!--枚举形式-->
+                            <select v-else-if="codeOption.props[key].enum" v-model="innerOption.props[key]"
+                                    @change="changeProp">
+                                <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
+                            </select>
+                            <template v-else>
+                                <inner-dom @change="emitChange" v-model="innerOption.props[key]"
+                                           :dataType="getDataType(key)"></inner-dom>
+                            </template>
+                        </td>
+                        <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
+                    </tr>
+                </template>
             </template>
             <template v-else>
                 <tr>
@@ -260,7 +196,6 @@ import innerDom from './props.vue';
 import allMatch from '../../languageParser/allMatch';
 import allVar from '../../observer/allVar';
 // import getStrByObj from '../getStrByObj';
-import relationalModel from '../../widget/relationalModel';
 import selectType from './typeSelect.vue';
 import getOptionByObj from './getPropsOptionByObj';
 import createCodeText from './createCodeText';
@@ -290,7 +225,7 @@ export default {
             codeOption: {},
             allMatch: {},
             allVar: allVar.getAllData(),
-            relationalModel: relationalModel
+            singlePanelName: ['RELATIONAL_MODEL']
         };
     },
     mounted() {
@@ -299,8 +234,12 @@ export default {
         this.initCodeOption();
     },
     methods: {
+        console(val) {
+            console.log(val);
+            console.log(this.getDefaultOption(val));
+        },
         initCodeOption() {
-            if (this.innerOption.type && ['function', 'relationalModel'].includes(this.innerOption.type)) {
+            if(this.innerOption.type && ['function'].includes(this.innerOption.type)) {
                 this.codeOption = this.getCodeOption(this.innerOption.name);
             }
         },
@@ -308,7 +247,7 @@ export default {
             return window.prompt(text, defaultVal);
         },
         getDataType(key) {
-            if (typeof this.codeOption.props[key].dataType === 'function') {
+            if(typeof this.codeOption.props[key].dataType === 'function') {
                 return this.codeOption.props[key].dataType(this.innerOption.props);
             } else {
                 return this.codeOption.props[key].dataType;
@@ -324,24 +263,24 @@ export default {
         },
         getCodeOption(name) {
             for (let i = 0; i < this.allMatch.length; i++) {
-                if (name.match(this.allMatch[i].match)) {
+                if(name.match(this.allMatch[i].match)) {
                     return this.allMatch[i];
                 }
             }
         },
         getDefaultValueByType(type) {
-            if (type === 'number') {
+            if(type === 'number') {
                 return 0;
-            } else if (type === 'string') {
+            } else if(type === 'string') {
                 return '';
-            } else if (type === 'bool') {
+            } else if(type === 'bool') {
                 return true;
-            } else if (type === 'dict') {
+            } else if(type === 'dict') {
                 return {
                     type: 'dict',
                     props: {}
                 };
-            } else if (type === 'array') {
+            } else if(type === 'array') {
                 return {
                     type: 'array',
                     props: []
@@ -358,24 +297,24 @@ export default {
                     let updateObj = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1];
                     console.log(updateObj);
                     console.log(code);
-                    if (updateObj.obj === childObj) {
+                    if(updateObj.obj === childObj) {
                         updateObj.code = createCodeText(updateObj.obj);
                     }
                     this.emitChange();
                 },
                 obj: childObj,
-                dataType: 'relationalModel'
+                dataType: 'function'
             });
         },
         addProp(dataType) {
             let dataTypeNew = dataType.split(',')[0];
-            if (dataTypeNew === 'number') {
+            if(dataTypeNew === 'number') {
                 this.innerOption.props.push(1);
-            } else if (dataTypeNew === 'string') {
+            } else if(dataTypeNew === 'string') {
                 this.innerOption.props.push('');
-            } else if (dataTypeNew === 'bool') {
+            } else if(dataTypeNew === 'bool') {
                 this.innerOption.props.push(true);
-            } else if (dataTypeNew === 'array') {
+            } else if(dataTypeNew === 'array') {
                 this.innerOption.props.push([]);
             } else {
                 this.innerOption.props.push('');
@@ -385,30 +324,30 @@ export default {
         changeProp() {
             // dataType参数类型，支持函数返回值，这就意味着，当修改某一个类型的时候，可能会影响其他的类型，所以重新计算对应类型的默认值
             for (let i = 0; i < this.allMatch.length; i++) {
-                if (this.innerOption.name.match(this.allMatch[i].match)) {
+                if(this.innerOption.name.match(this.allMatch[i].match)) {
                     this.codeOption = this.allMatch[i];
                     this.codeOption.props.forEach((item, key) => {
-                        if (typeof item.dataType === 'function') {
+                        if(typeof item.dataType === 'function') {
                             // this.innerOption.props并不是原始的Obj格式
                             let dataType = item.dataType(this.innerOption.props);
                             let replace = false;
-                            if (['number', 'string', 'boolean'].includes(typeof this.innerOption.props[key])) {
-                                if (!dataType.split(',').includes(typeof this.innerOption.props[key])) {
+                            if(['number', 'string', 'boolean'].includes(typeof this.innerOption.props[key])) {
+                                if(!dataType.split(',').includes(typeof this.innerOption.props[key])) {
                                     replace = true;
                                 }
-                            } else if (this.innerOption.props[key] instanceof Array) {
-                                if (!dataType.split(',').includes('bool')) {
+                            } else if(this.innerOption.props[key] instanceof Array) {
+                                if(!dataType.split(',').includes('bool')) {
                                     replace = true;
                                 }
                             }
-                            if (replace) {
-                                if (dataType.split(',').includes('number')) {
+                            if(replace) {
+                                if(dataType.split(',').includes('number')) {
                                     this.innerOption.props[key] = 1;
-                                } else if (dataType.split(',').includes('string')) {
+                                } else if(dataType.split(',').includes('string')) {
                                     this.innerOption.props[key] = '';
-                                } else if (dataType.split(',').includes('bool')) {
+                                } else if(dataType.split(',').includes('bool')) {
                                     this.innerOption.props[key] = true;
-                                } else if (dataType.split(',').includes('array')) {
+                                } else if(dataType.split(',').includes('array')) {
                                     this.innerOption.props[key] = [];
                                 }
                             }
@@ -418,71 +357,81 @@ export default {
                 }
             }
         },
-        changeType(name) {
+        getDefaultOption(name) {
             // codeOption.props
-            if (name === 'var') {
-                this.innerOption = 1;
+            let returnVal;
+            if(name === 'var') {
+                returnVal = 1;
                 // 需要增加保证i不等于自己的逻辑
                 for (let i in this.allVar) {
-                    this.innerOption = {
+                    returnVal = {
                         type: 'var',
                         name: i
                     };
                     break;
                 }
-            } else if (['TRUE', 'FALSE'].includes(name)) {
-                this.innerOption = name === 'TRUE';
-            } else if (['number', 'string', 'dict', 'array'].includes(name)) {
-                this.innerOption = this.getDefaultValueByType(name);
+            } else if(['TRUE', 'FALSE'].includes(name)) {
+                returnVal = (name === 'TRUE');
+            } else if(['number', 'string', 'dict', 'array'].includes(name)) {
+                returnVal = this.getDefaultValueByType(name);
             } else {
-                this.innerOption = {
+                returnVal = {
                     name: name,
                     props: []
                 };
-                for (let i = 0; i < this.allMatch.length; i++) {
-                    if (this.innerOption.name.match(this.allMatch[i].match)) {
-                        this.codeOption = this.allMatch[i];
-                        this.innerOption.type = this.codeOption.type;
-                        this.allMatch[i].props.forEach((item) => {
-                            let dataType = item.dataType;
-                            if(dataType instanceof Array) {
-                                dataType = dataType[0];
-                            } else if(dataType instanceof Function) {
-                                dataType = dataType(this.innerOption.props);
+                this.allMatch.filter(item => {
+                    return name.match(item.match);
+                }).forEach(item => {
+                    // this.codeOption = item;
+                    returnVal.type = item.type;
+                    item.props.forEach((item) => {
+                        let dataType = item.dataType;
+                        if(dataType instanceof Array) {
+                            dataType = dataType[0];
+                        } else if(dataType instanceof Function) {
+                            dataType = dataType(returnVal.props);
+                        }
+                        let firstType = dataType.split(',')[0];
+                        if(firstType.match(/array\((.*)\)/)) {
+                            firstType = 'array';
+                        }
+                        if(item.enum) {
+                            for (let j in item.enum) {
+                                returnVal.props.push(j);
+                                break;
                             }
-                            let firstType = dataType.split(',')[0];
-                            if(firstType.match(/array\((.*)\)/)) {
-                                firstType = 'array';
-                            }
-                            if(item.enum) {
-                                for (let j in item.enum) {
-                                    this.innerOption.props.push(j);
-                                    break;
-                                }
-                            } else if(typeof dataType === 'function') {
-                                this.innerOption.props.push(dataType);
-                            } else {
-                                this.innerOption.props.push(this.getDefaultValueByType(firstType));
-                            }
-                        });
-                    }
-                }
-                for (let i = 0; i < this.innerOption.props.length; i++) {
-                    if (typeof this.innerOption.props[i] === 'function') {
-                        this.innerOption.props[i] = this.innerOption.props[i](this.innerOption.props);
-                        let first = this.innerOption.props[i].split(',')[0];
-                        if (first.match(/array\((.*)\)/)) {
+                        } else if(typeof dataType === 'function') {
+                            returnVal.props.push(dataType);
+                        } else {
+                            returnVal.props.push(this.getDefaultValueByType(firstType));
+                        }
+                    });
+                });
+                for (let i = 0; i < returnVal.props.length; i++) {
+                    if(typeof returnVal.props[i] === 'function') {
+                        returnVal.props[i] = returnVal.props[i](returnVal.props);
+                        let first = returnVal.props[i].split(',')[0];
+                        if(first.match(/array\((.*)\)/)) {
                             first = 'array';
                         }
-                        this.innerOption.props[i] = this.getDefaultValueByType(first);
+                        returnVal.props[i] = this.getDefaultValueByType(first);
                     }
                 }
             }
+            return returnVal;
+        },
+        changeType(name) {
+            this.allMatch.filter(item => {
+                return name.match(item.match);
+            }).forEach(item => {
+                this.codeOption = item;
+            });
+            this.innerOption = this.getDefaultOption(name);
             this.emitChange();
         },
         changeVar(val) {
             let map = this.allVar[val].value;
-            if (!(map instanceof Array) && map instanceof Object) {
+            if(!(map instanceof Array) && map instanceof Object) {
                 let item = {
                     type: 'dictionaryGet',
                     dictionary: getOptionByObj(this.allVar[val]),
@@ -500,11 +449,11 @@ export default {
         },
         changeDictObj() {
             // ??目前只处理了dict是变量的情况，现实有更复杂的嵌套的情况
-            if (this.innerOption.dictionary.type === 'var') {
+            if(this.innerOption.dictionary.type === 'var') {
                 let map = this.allVar[this.innerOption.dictionary.name].value;
-                if (map instanceof Array) {
+                if(map instanceof Array) {
 
-                } else if (map instanceof Object) {
+                } else if(map instanceof Object) {
                     this.innerOption.keys = map;
                     for (let i in map) {
                         this.innerOption.key = i;

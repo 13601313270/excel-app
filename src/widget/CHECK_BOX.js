@@ -39,5 +39,6 @@ __allMatch__.push({
             dataType: 'bool',
             default: ''
         }
-    ]
+    ],
+    returnType: 'dom'
 });

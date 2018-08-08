@@ -41,5 +41,6 @@ __allMatch__.push({
         name: 'obj2',
         title: '假值运算',
         dataType: 'number,function,var'
-    }]
+    }],
+    returnType: 'number,var'
 });

@@ -20,7 +20,7 @@ class Temp extends Obj {
 }
 
 class BAR extends FuncObj {
-    constructor(source, table, x, y) {
+    constructor(source, table, x, y, where) {
         super(...Array.from(arguments));
         this.name = 'BAR';
         this.dom = document.createElement('div');
@@ -50,10 +50,10 @@ class BAR extends FuncObj {
     render(handle) {
         let self = this;
         let model = this.props[0];
-        if (model instanceof Var) {
+        if(model instanceof Var) {
             model = model.value_;
         }
-        if (model === '') {
+        if(model === '') {
             handle(false);
             return;
         }
@@ -71,14 +71,14 @@ class BAR extends FuncObj {
         };
         option.xAxis.data = [];
         option.series = [];
-        if (data.length > 0) {
+        if(data.length > 0) {
             data.forEach((item) => {
                 item.forEach((item2, key) => {
-                    if (key < model.groupColumn.length) {
+                    if(key < model.groupColumn.length) {
                         option.xAxis.data.push(item2);
                     } else {
                         let thisOne = key - model.groupColumn.length;
-                        if (option.series[thisOne] === undefined) {
+                        if(option.series[thisOne] === undefined) {
                             option.series[thisOne] = {
                                 type: 'bar',
                                 itemStyle: {
@@ -93,7 +93,7 @@ class BAR extends FuncObj {
                                             let baseColor = allColor[params.seriesIndex % allColor.length];
                                             colorList.fill(baseColor);
                                             let index = option.xAxis.data.indexOf(self.selectBar);
-                                            if (index === -1) {
+                                            if(index === -1) {
                                                 return baseColor;
                                             }
                                             colorList[index] = '#e2633b';
@@ -131,9 +131,10 @@ __allMatch__.push({
     func: BAR,
     props: [
         {
-            name: 'source:',
+            name: 'source',
             title: '关系模型',
             dataType: 'var,relationalModel'
         }
-    ]
+    ],
+    returnType: 'dom'
 });

@@ -1,5 +1,5 @@
 <template>
-    <div style="display: inline-block">
+    <div class="all">
         <div v-if="(dataType!=='' && dataType.split(',').length === 1)">
             <span
                 v-for="item in allMatch"
@@ -12,8 +12,7 @@
             :value="value"
             @change="changeType($event.target.value)">
             <option
-                v-for="item in allMatch"
-                v-if="item.name && (dataType===''||dataType.split(',').includes(item.type))"
+                v-for="item in showMatch"
                 :value="item.name">
                 {{item.title}}
             </option>
@@ -29,7 +28,28 @@ export default {
         value: {},
         dataType: ''
     },
-    computed: {},
+    computed: {
+        showMatch() {
+            return this.allMatch.filter((item) => {
+                if(item.name) {
+                    if(this.dataType === '') {
+                        return true;
+                    } else {
+                        if(item.type === 'function') {
+                            let mustType = item.returnType.split(',');
+                            return this.dataType.split(',').some(item2 => {
+                                return mustType.includes(item2);
+                            });
+                        } else {
+                            return this.dataType.split(',').includes(item.type);
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            });
+        }
+    },
     data() {
         return {
             allMatch: allMatch
@@ -44,3 +64,8 @@ export default {
     }
 }
 </script>
+<style scoped lang="less">
+    .all{
+        display: inline-block
+    }
+</style>

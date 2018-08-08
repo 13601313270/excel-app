@@ -39,5 +39,6 @@ __allMatch__.push({
             dataType: 'string',
             default: ''
         }
-    ]
+    ],
+    returnType: 'dom'
 });

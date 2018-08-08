@@ -53,5 +53,6 @@ __allMatch__.push({
             },
             default: ''
         }
-    ]
+    ],
+    returnType: 'dom'
 });

@@ -32,5 +32,6 @@ __allMatch__.push({
             title: '文字值',
             dataType: 'string,number,bool,function,var'
         }
-    ]
+    ],
+    returnType: 'dom'
 });

@@ -4,15 +4,20 @@
         <header-nav style="background-color: #3c3f41;border-bottom: solid 1px #4f4f4f;"></header-nav>
         <div style="display: flex;width: 100%;flex-grow: 1;">
             <div class="left_tools">
-                <div :class="{active:leftToolSelect=='widget'}" @click="leftToolSelect='widget'">控件</div>
-                <div :class="{active:leftToolSelect=='widget22'}" @click="leftToolSelect='widget22'">控件</div>
+                <div :class="{active:leftToolSelect=='widget'}"
+                     @click="leftToolSelect=(leftToolSelect==='widget'?'':'widget')">控件
+                </div>
+                <div :class="{active:leftToolSelect=='widget22'}"
+                     @click="leftToolSelect=(leftToolSelect==='widget22'?'':'widget22')">控件
+                </div>
             </div>
-            <div class="left_tools_content" :style="{width:leftToolInfo[leftToolSelect].width+'px'}">
+            <div class="left_tools_content" v-if="leftToolSelect!==''"
+                 :style="{width:leftToolInfo[leftToolSelect]?leftToolInfo[leftToolSelect].width+'px':''}">
                 <tools_widget v-if="leftToolSelect=='widget'" @drag='drag'></tools_widget>
                 <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
             </div>
             <div id="content">
-                <div style="flex-grow: 1;overflow:auto;background-color: #f9f9f9;height:100%;">
+                <div>
                     <div v-if="documentType===''">
                         <div @click="documentType='word'">文稿</div>
                         <div @click="documentType='excel'">表格</div>
@@ -26,7 +31,11 @@
                     <!--<component :is="currentView" style="width: 100%;"></component>-->
                 </div>
             </div>
-            <div class="right_tools_content" :style="{width:rightToolInfo[rightToolSelect].width+'px'}">
+            <div
+                class="right_tools_content"
+                v-show="rightToolSelect!==''"
+                :style="{width:rightToolInfo[rightToolSelect]?rightToolInfo[rightToolSelect].width+'px':''}"
+            >
                 <datas-vue v-if="rightToolSelect=='data'" :connections="connections" @change="editVar"></datas-vue>
                 <div v-else-if="rightToolSelect=='html'">
                     <div style="overflow: auto;border: solid 1px black;">
@@ -41,9 +50,15 @@
                 </div>
             </div>
             <div class="right_tools">
-                <div :class="{active:rightToolSelect=='var'}" @click="rightToolSelect='var'">已添加对象</div>
-                <div :class="{active:rightToolSelect=='data'}" @click="rightToolSelect='data'">数据</div>
-                <div :class="{active:rightToolSelect=='html'}" @click="rightToolSelect='html'">HTML</div>
+                <div :class="{active:rightToolSelect=='var'}"
+                     @click="rightToolSelect=(rightToolSelect==='var'?'':'var')">已添加对象
+                </div>
+                <div :class="{active:rightToolSelect=='data'}"
+                     @click="rightToolSelect=(rightToolSelect==='data'?'':'data')">数据
+                </div>
+                <div :class="{active:rightToolSelect=='html'}"
+                     @click="rightToolSelect=(rightToolSelect==='html'?'':'')">HTML
+                </div>
             </div>
         </div>
         <div class="floatVal" v-if="$store.state.editObjArr.length > 0"
@@ -55,16 +70,7 @@
                         X
                     </div>
                 </div>
-                <relational-model-props
-                    v-if="editDataType==='relationalModel'"
-                    @change="item.change"
-                    v-model="$store.state.editObjArr[key].obj"
-                    :dataType="item.dataType"
-                    :is-root="true"
-                    style="min-height: 250px;"
-                ></relational-model-props>
                 <props-com
-                    v-else
                     @change="item.change(item)"
                     v-model="$store.state.editObjArr[key].obj"
                     :dataType="item.dataType"
@@ -351,6 +357,7 @@ export default {
                 type: 'getConnections'
             }
         }).then((data) => {
+            console.log(data);
             this.connections = data;
             this.$store.commit('setConnections', data);
         });
@@ -492,6 +499,13 @@ export default {
         display: flex;
         flex-direction: column;
         overflow: scroll;
+        > div {
+            flex-grow: 1;
+            position: relative;
+            overflow: auto;
+            background-color: #f9f9f9;
+            height: 100%;
+        }
     }
 
     .floatVal {

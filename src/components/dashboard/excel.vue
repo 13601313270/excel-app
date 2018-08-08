@@ -1,68 +1,73 @@
 <template>
-    <div style="position: relative;height: 100%;overflow: auto;width: 100%;">
-        <div class="tableThead">
-            <table class="table" :style="{marginLeft:theadLeft*-1+'px'}">
-                <thead>
-                <tr>
-                    <th v-for="i in tableObj.lie" class="lieNum"
-                        :lienum="getCellTemp2(0, i).match(/([A-Z]*)(\d+)/)[1]">
-                        {{getCellTemp2(0, i).match(/([A-Z]*)(\d+)/)[1]}}
-                        <!--<absolute-move @mousemove="Xmousemove" @mouseup="Xmouseup" move="x"></absolute-move>-->
-                    </th>
-                </tr>
-                </thead>
-            </table>
+    <div>
+        <div class="excel_content">
+            <div class="tableThead">
+                <table class="table" :style="{marginLeft:theadLeft*-1+'px'}">
+                    <thead>
+                    <tr>
+                        <th v-for="i in tableObj.lie" class="lieNum"
+                            :lienum="getCellTemp2(0, i).match(/([A-Z]*)(\d+)/)[1]">
+                            {{getCellTemp2(0, i).match(/([A-Z]*)(\d+)/)[1]}}
+                            <!--<absolute-move @mousemove="Xmousemove" @mouseup="Xmouseup" move="x"></absolute-move>-->
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="tableRow">
+                <table class="table" :style="{marginTop:rowTop*-1+'px'}">
+                    <tbody>
+                    <tr v-for="i in tableObj.hang">
+                        <td class="idNum" :hang="i" style="width: 80px;">{{i}}
+                            <!--<absolute-move @mousemove="Ymousemove" @mouseup="Ymouseup" move="y"></absolute-move>-->
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tableBody" @scroll="scroll($event)">
+                <!--<div class="allCharts" ref="allCharts">-->
+                <!--<absolute-move-->
+                <!--:key="key"-->
+                <!--:move="edit?'both':'none'"-->
+                <!--@mouseup="moveCharts"-->
+                <!--v-for="item,key in this.alltableObj"-->
+                <!--:left="item.left"-->
+                <!--:top="item.top"></absolute-move>-->
+                <!--</div>-->
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th v-for="i in tableObj.lie" class="lienum"
+                            :lienum="getCellTemp2(0, i).match(/([A-Z]*)(\d+)/)[1]"></th>
+                    </tr>
+                    </thead>
+                    <tbody ref="tableBody">
+                    <tr v-for="i in tableObj.hang" :hang="i">
+                        <td v-for="j in tableObj.lie"
+                            @click.stop="selectTd_temp(i,j)"
+                            @dblclick.stop="dbselectTd_temp(i,j,$event)"
+                            :key="(i)+','+(j)"
+                            :hang="i"
+                            :lie="j"
+                            :class="setSelectClass(i,j)"
+                            @mousedown="mousedown_temp(i,j)"
+                            @mouseover="mouseenter_temp(i,j)"
+                            @mouseup="mouseup_temp"
+                        >
+                            <widget
+                                v-if="hasWidget(i,j)"
+                                :data="hasWidget(i,j).data"
+                                :random-id="hasWidget(i,j).randomId"
+                                :ref="'$' + getCellTemp2(i, j)"></widget>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="tableRow">
-            <table class="table" :style="{marginTop:rowTop*-1+'px'}">
-                <tbody>
-                <tr v-for="i in tableObj.hang">
-                    <td class="idNum" :hang="i" style="width: 80px;">{{i}}
-                        <!--<absolute-move @mousemove="Ymousemove" @mouseup="Ymouseup" move="y"></absolute-move>-->
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="tableBody" @scroll="scroll($event)">
-            <!--<div class="allCharts" ref="allCharts">-->
-            <!--<absolute-move-->
-            <!--:key="key"-->
-            <!--:move="edit?'both':'none'"-->
-            <!--@mouseup="moveCharts"-->
-            <!--v-for="item,key in this.alltableObj"-->
-            <!--:left="item.left"-->
-            <!--:top="item.top"></absolute-move>-->
-            <!--</div>-->
-            <table class="table">
-                <thead>
-                <tr>
-                    <th v-for="i in tableObj.lie" class="lienum"
-                        :lienum="getCellTemp2(0, i).match(/([A-Z]*)(\d+)/)[1]"></th>
-                </tr>
-                </thead>
-                <tbody ref="tableBody">
-                <tr v-for="i in tableObj.hang" :hang="i">
-                    <td v-for="j in tableObj.lie"
-                        @click.stop="selectTd_temp(i,j)"
-                        @dblclick.stop="dbselectTd_temp(i,j,$event)"
-                        :key="(i)+','+(j)"
-                        :hang="i"
-                        :lie="j"
-                        :class="setSelectClass(i,j)"
-                        @mousedown="mousedown_temp(i,j)"
-                        @mouseover="mouseenter_temp(i,j)"
-                        @mouseup="mouseup_temp"
-                    >
-                        <widget
-                            v-if="hasWidget(i,j)"
-                            :data="hasWidget(i,j).data"
-                            :random-id="hasWidget(i,j).randomId"
-                            :ref="'$' + getCellTemp2(i, j)"></widget>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <div>
+            工作表1
         </div>
     </div>
 </template>
@@ -233,10 +238,12 @@ export default {
         scroll(event) {
             this.theadLeft = event.target.scrollLeft;
             this.rowTop = event.target.scrollTop;
-//            this.tableObj.events_.emit('scroll', {
-//                x: this.theadLeft,
-//                y: this.rowTop,
-//            });
+            /*
+             this.tableObj.events_.emit('scroll', {
+             x: this.theadLeft,
+             y: this.rowTop,
+             });
+             */
         },
         getCellTemp2: getCellTemp2
     },
@@ -246,6 +253,13 @@ export default {
 }
 </script>
 <style scoped lang="less">
+    .excel_content {
+        position: relative;
+        height: 100%;
+        overflow: auto;
+        width: 100%;
+    }
+
     .floatSingleValueWrite {
         height: 1px;
         width: 1px;
