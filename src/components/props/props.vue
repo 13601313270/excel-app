@@ -11,7 +11,7 @@
                             @change="changeType"
                             :dataType="dataType"
                         ></select-type>
-                        <div v-if="!isRoot && singlePanelName.includes(innerOption.name)">
+                        <div style="float: right;" v-if="!isRoot && singlePanelName.includes(innerOption.name)">
                             <button
                                 @click="editRelationalModel(innerOption)">编辑模型
                             </button>
@@ -303,7 +303,7 @@ export default {
                     this.emitChange();
                 },
                 obj: childObj,
-                dataType: 'function'
+                dataType: this.codeOption.returnType
             });
         },
         addProp(dataType) {
