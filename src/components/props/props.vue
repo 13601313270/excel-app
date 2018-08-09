@@ -44,8 +44,21 @@
                                 <option v-for="title,val in codeOption.props[key].enum" :value="val">{{title}}</option>
                             </select>
                             <template v-else>
-                                <inner-dom @change="emitChange" v-model="innerOption.props[key]"
-                                           :dataType="getDataType(key)"></inner-dom>
+                                <replace
+                                    :type="innerOption.name+'_'+codeOption.props[key].name"
+                                    @change="emitChange"
+                                    v-model="innerOption.props[key]"
+                                    :dataType="getDataType(key)"
+                                >
+                                    <inner-dom
+                                        slot="default"
+                                        @change="emitChange"
+                                        v-model="innerOption.props[key]"
+                                        :dataType="getDataType(key)"
+                                    ></inner-dom>
+                                </replace>
+                                <!--<div v-html="innerOption.name"></div>-->
+                                <!--<div v-html="codeOption.props[key].name"></div>-->
                             </template>
                         </td>
                         <!--<td v-html="JSON.stringify(codeOption.props[key])"></td>-->
@@ -199,6 +212,7 @@ import allVar from '../../observer/allVar';
 import selectType from './typeSelect.vue';
 import getOptionByObj from './getPropsOptionByObj';
 import createCodeText from './createCodeText';
+import replace from './replace.vue';
 export default {
     name: 'inner-dom',
     props: {
@@ -209,7 +223,8 @@ export default {
     },
     components: {
         'inner-dom': innerDom,
-        'select-type': selectType
+        'select-type': selectType,
+        'replace': replace
     },
     computed: {},
     watch: {
@@ -219,13 +234,14 @@ export default {
         }
     },
     data() {
+        // 'RELATIONAL_MODEL'
         return {
             name: '',
             innerOption: {},
             codeOption: {},
             allMatch: {},
             allVar: allVar.getAllData(),
-            singlePanelName: ['RELATIONAL_MODEL']
+            singlePanelName: []
         };
     },
     mounted() {
@@ -234,10 +250,6 @@ export default {
         this.initCodeOption();
     },
     methods: {
-        console(val) {
-            console.log(val);
-            console.log(this.getDefaultOption(val));
-        },
         initCodeOption() {
             if(this.innerOption.type && ['function'].includes(this.innerOption.type)) {
                 this.codeOption = this.getCodeOption(this.innerOption.name);

@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import Vuex from 'vuex'
-import vuexConfig from './vuex/main';
+import vuexConfig from './vuex/index';
 
 Vue.use(Vuex);
 Vue.config.productionTip = false;

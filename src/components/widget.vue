@@ -8,6 +8,7 @@
 </template>
 <script>
 import widgetEvent from './widgetChange';
+import { mapGetters } from 'vuex';
 export default {
     props: ['data', 'randomId'],
     data() {
@@ -24,8 +25,8 @@ export default {
     methods: {
         getHighlightState(type) {
             // return this.$store.state.varHighlight.key;
-            if(this.$store.state.varHighlight.key === type) {
-                return this.$store.state.varHighlight.info;
+            if(this.varHighlight.key === type) {
+                return this.varHighlight.info;
             }
             return 'none';
         },
@@ -41,6 +42,9 @@ export default {
                 this.$emit('change', varName, this.randomId, this.$refs.content);
             }
         }
+    },
+    computed: {
+        ...mapGetters('main', ['varHighlight'])
     }
 }
 </script>

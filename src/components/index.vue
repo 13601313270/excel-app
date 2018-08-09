@@ -61,24 +61,24 @@
                 </div>
             </div>
         </div>
-        <div class="floatVal" v-if="$store.state.editObjArr.length > 0"
-             v-for="item,key in $store.state.editObjArr" :style="{zIndex:key+100}">
+        <div class="floatVal" v-if="editObjArr.length > 0"
+             v-for="item,key in editObjArr" :style="{zIndex:key+100}">
             <div>
                 <div>对象：{{item.name}}
-                    <div @click="$store.commit('editObjArrPop')"
+                    <div @click="editObjArrPop"
                          style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
                         X
                     </div>
                 </div>
                 <props-com
                     @change="item.change(item)"
-                    v-model="$store.state.editObjArr[key].obj"
+                    v-model="editObjArr[key].obj"
                     :dataType="item.dataType"
                     :is-root="true"
                     style="min-height: 250px;"
                 ></props-com>
                 <div>
-                    <textarea @change="changeCode($store.state.editObjArr[key],$event.target.value)"
+                    <textarea @change="changeCode(editObjArr[key],$event.target.value)"
                               :value="item.code"
                               style="height: 50px;width: 100%;box-sizing: border-box;"></textarea>
                 </div>
@@ -108,7 +108,6 @@ import allVar from '../observer/allVar';
 import dashboard from './dashboard';
 import allPageVars from './allVars.vue';
 import propsCom from './props/props.vue';
-import relationalModelProps from './props/relationalModelProps.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 import datasVue from './tools/datas.vue';
@@ -122,6 +121,9 @@ import word from './dashboard/word.vue';
 import excel from './dashboard/excel.vue';
 import freePanel from './dashboard/freePanel.vue';
 import ppt from './dashboard/ppt.vue';
+
+import { mapActions, mapGetters } from 'vuex';
+
 export default {
     data() {
         return {
@@ -149,7 +151,6 @@ export default {
                     width: 300
                 }
             },
-            editObjArr: [],
             editDataType: '',
             connections: [],
             html: '',
@@ -157,11 +158,13 @@ export default {
         }
     },
     computed: {
+        ...mapGetters('main', ['editObjArr']),
         saveHtml() {
             return this.html.replace(/ random-id="r(\d+)"/g, '');
         }
     },
     methods: {
+        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop']),
         cancelDragDomFunc() {
             this.$nextTick(() => {
                 this.dragDomFunc = null;
@@ -335,10 +338,7 @@ export default {
                 obj: getOptionByObj(Var.value_),
                 dataType: ((Var.value_ instanceof relationalModel) ? 'relationalModel' : '')
             };
-            this.$store.commit('editObjArrPush', pushEditObj);
-            this.$store.watch((store) => {
-                console.log(store);
-            });
+            this.editObjArrPush(pushEditObj);
             if(Var.value_ instanceof relationalModel) {
                 this.editDataType = 'relationalModel';
             } else {
@@ -346,7 +346,7 @@ export default {
             }
         },
         hover(key, messageType) {
-            this.$store.commit('varHighlightSet', {key, 'info': messageType});
+            this.varHighlightSet({key, 'info': messageType});
         }
     },
     mounted() {
@@ -359,7 +359,7 @@ export default {
         }).then((data) => {
             console.log(data);
             this.connections = data;
-            this.$store.commit('setConnections', data);
+            this.setConnections(data);
         });
         ajax({
             type: 'POST',
@@ -418,7 +418,6 @@ export default {
         'all-vars': allPageVars,
         'props-com': propsCom,
         'datas-vue': datasVue,
-        'relational-model-props': relationalModelProps,
         'header-nav': headerNav,
         'tools_widget': toolsWidget,
         'word': word,
@@ -523,6 +522,7 @@ export default {
             border-radius: 5px;
             padding: 5px;
             position: relative;
+            overflow: hidden;
         }
     }
 
