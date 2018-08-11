@@ -263,7 +263,7 @@ export default {
         createRunObjItem: createRunObjItem,
         createCodeSingle(item) {
             let code = createRunObjItem(item);
-            if(item.type==="function" || code.length > 10) {
+            if(item.type === 'function' || code.length > 10) {
                 return item;
             } else {
                 return code;
