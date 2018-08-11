@@ -1,12 +1,23 @@
 /**
  * Created by ptmind on 2018/4/10.
  */
+function createRunObjItem(item) {
+    if(['boolean', 'number', 'string'].includes(typeof item)) {
+        return item;
+    } else {
+        if(item.type === 'runObj') {
+            return '(' + createCodeText(item) + ')';
+        } else {
+            return createCodeText(item);
+        }
+    }
+}
 function createCodeText(innerOption) {
     let code = '';
-    if (typeof innerOption === 'string') {
+    if(typeof innerOption === 'string') {
         let beginEndStr = '"';
-        if (innerOption.includes('"')) {
-            if (!innerOption.includes('\'')) {
+        if(innerOption.includes('"')) {
+            if(!innerOption.includes('\'')) {
                 beginEndStr = '\'';
             } else {
                 innerOption = innerOption.replace(/"/g, '\\"');
@@ -14,13 +25,13 @@ function createCodeText(innerOption) {
         }
         code = beginEndStr + innerOption + beginEndStr;
     }
-    else if (typeof innerOption === 'number') {
+    else if(typeof innerOption === 'number') {
         code = innerOption.toString();
     }
-    else if (typeof innerOption === 'boolean') {
+    else if(typeof innerOption === 'boolean') {
         code = innerOption ? 'TRUE' : 'FALSE';
     }
-    else if (innerOption.type === 'array') {
+    else if(innerOption.type === 'array') {
         code = '[';
         let childArr = [];
         innerOption.props.forEach((item) => {
@@ -29,7 +40,7 @@ function createCodeText(innerOption) {
         code += childArr.join(',');
         code += ']';
     }
-    else if (innerOption.type === 'dict') {
+    else if(innerOption.type === 'dict') {
         let props = innerOption.props;
         code = '{';
         let childArr = [];
@@ -39,13 +50,13 @@ function createCodeText(innerOption) {
         code += childArr.join(',');
         code += '}';
     }
-    else if (innerOption.type === 'dictionaryGet') {
+    else if(innerOption.type === 'dictionaryGet') {
         code = createCodeText(innerOption.dictionary) + '.' + innerOption.key;
     }
-    else if (innerOption.type === 'var') {
+    else if(innerOption.type === 'var') {
         code = innerOption.name;
     }
-    else if (['function', 'relationalModel'].includes(innerOption.type)) {
+    else if(['function', 'relationalModel'].includes(innerOption.type)) {
         code += innerOption.name + '(';
         let TempPropArr = [];
         innerOption.props.forEach((item) => {
@@ -54,15 +65,12 @@ function createCodeText(innerOption) {
         code += TempPropArr.join(',');
         code += ')';
     }
-    else if (innerOption.type === 'runObj') {
+    else if(innerOption.type === 'runObj') {
         code = innerOption.props.map(item => {
-            if (['boolean', 'number', 'string'].includes(typeof item)) {
-                return item;
-            } else {
-                return createCodeText(item);
-            }
+            return createRunObjItem(item);
         }).join('');
     }
     return code;
 }
+// export const createRunObjItem;
 export default createCodeText;

@@ -23,12 +23,13 @@
                         <div @click="documentType='excel'">表格</div>
                         <div @click="documentType='freePanel'">黑板</div>
                         <div @click="documentType='ppt'">演示文稿</div>
+                        <div @click="documentType='test'">测试</div>
                     </div>
                     <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
                     <excel v-else-if="documentType==='excel'" :dragDomFunc="dragDomFunc"></excel>
                     <free-panel v-else-if="documentType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                     <ppt v-else-if="documentType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
-                    <!--<component :is="currentView" style="width: 100%;"></component>-->
+                    <component v-else-if="documentType==='test'" :is="currentView" style="width: 100%;"></component>
                 </div>
             </div>
             <div
@@ -313,6 +314,8 @@ export default {
             });
         },
         changeCode(obj, code) {
+            console.log(code);
+            console.log(getEvalObj(1, code)[0]);
             let newObj = getOptionByObj(getEvalObj(1, code)[0]);
             console.log(newObj);
             // MIN(1,MIN(2,4),1)

@@ -162,7 +162,6 @@ export default {
                     widgetEvent.emit('change', varName, randomId, this.$refs[randomId][0].$refs.content);
                 });
             }
-            console.log(e);
         },
         dragWidgetOver(index) {
             this.dragIndexPosition = index;

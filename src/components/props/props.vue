@@ -192,10 +192,12 @@
                         </template>
                     </template>
                     <template v-else-if="innerOption.type==='runObj'">
-                        <td :style="tdStyle">
-                            <span
-                                style="background-color: #82b678;color: white;border-radius: 3px;padding: 0 2px;cursor: default;">公式</span>
+                        <td class="runObj" :style="tdStyle">
+                            <span class="gongshi">公式</span>
                             <span v-html="createCodeText(innerOption)"></span>
+                            <template v-for="item in innerOption.props">
+                                <span v-html="createCodeSingle(item)"></span>
+                            </template>
                         </td>
                     </template>
                 </tr>
@@ -250,6 +252,17 @@ export default {
         this.initCodeOption();
     },
     methods: {
+        createCodeSingle(item) {
+            if(['boolean', 'number', 'string'].includes(typeof item)) {
+                return item;
+            } else {
+                if(item.type === 'runObj') {
+                    return '(' + createCodeText(item) + ')';
+                } else {
+                    return createCodeText(item);
+                }
+            }
+        },
         initCodeOption() {
             if(this.innerOption.type && ['function'].includes(this.innerOption.type)) {
                 this.codeOption = this.getCodeOption(this.innerOption.name);
@@ -518,6 +531,15 @@ export default {
                         border-radius: 0 10px;
                     }
                 }
+            }
+        }
+        .runObj {
+            .gongshi {
+                background-color: #82b678;
+                color: white;
+                border-radius: 3px;
+                padding: 0 2px;
+                cursor: default;
             }
         }
     }

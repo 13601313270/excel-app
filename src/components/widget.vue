@@ -57,6 +57,7 @@ export default {
         min-width: 20px;
         min-height: 20px;
         display: inline-block;
+        border: solid 1px black;
     }
 </style>
 <style>
