@@ -13,7 +13,7 @@
                         ></select-type>
                         <div style="float: right;" v-if="!isRoot && singlePanelName.includes(innerOption.name)">
                             <button
-                                @click="editRelationalModel(innerOption)">编辑模型
+                                @click="editRelationalModel(innerOption,codeOption.returnType)">编辑模型
                             </button>
                         </div>
                     </td>
@@ -194,9 +194,15 @@
                     <template v-else-if="innerOption.type==='runObj'">
                         <td class="runObj" :style="tdStyle">
                             <span class="gongshi">公式</span>
-                            <span v-html="createCodeText(innerOption)"></span>
-                            <template v-for="item in innerOption.props">
-                                <span v-html="createCodeSingle(item)"></span>
+                            <template v-for="(item,key) in innerOption.props">
+                                <span v-if="['boolean', 'number', 'string'].includes(typeof createCodeSingle(item))"
+                                      v-html="createCodeSingle(item)"></span>
+                                <button
+                                    v-else
+                                    @click="editRelationalModel(innerOption.props[key],'')"
+                                >
+                                    {{createRunObjItem(item)}}
+                                </button>
                             </template>
                         </td>
                     </template>
@@ -213,8 +219,9 @@ import allVar from '../../observer/allVar';
 // import getStrByObj from '../getStrByObj';
 import selectType from './typeSelect.vue';
 import getOptionByObj from './getPropsOptionByObj';
-import createCodeText from './createCodeText';
+import { createCodeText, createRunObjItem } from './createCodeText';
 import replace from './replace.vue';
+import { mapActions } from 'vuex';
 export default {
     name: 'inner-dom',
     props: {
@@ -252,15 +259,14 @@ export default {
         this.initCodeOption();
     },
     methods: {
+        ...mapActions('main', ['editObjArrPush']),
+        createRunObjItem: createRunObjItem,
         createCodeSingle(item) {
-            if(['boolean', 'number', 'string'].includes(typeof item)) {
+            let code = createRunObjItem(item);
+            if(item.type==="function" || code.length > 10) {
                 return item;
             } else {
-                if(item.type === 'runObj') {
-                    return '(' + createCodeText(item) + ')';
-                } else {
-                    return createCodeText(item);
-                }
+                return code;
             }
         },
         initCodeOption() {
@@ -314,8 +320,8 @@ export default {
                 return '';
             }
         },
-        editRelationalModel(childObj) {
-            this.$store.commit('editObjArrPush', {
+        editRelationalModel(childObj, returnType) {
+            this.editObjArrPush({
                 code: createCodeText(childObj),
                 parent: this,
                 change: (code) => {
@@ -328,7 +334,7 @@ export default {
                     this.emitChange();
                 },
                 obj: childObj,
-                dataType: this.codeOption.returnType
+                dataType: returnType
             });
         },
         addProp(dataType) {

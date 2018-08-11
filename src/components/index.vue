@@ -113,7 +113,7 @@ import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 import datasVue from './tools/datas.vue';
 import getOptionByObj from './props/getPropsOptionByObj';
-import createCodeText from './props/createCodeText';
+import { createCodeText } from './props/createCodeText';
 
 import ajax from '../api/ajax';
 import widgetEvent from './widgetChange';

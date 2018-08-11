@@ -1,7 +1,7 @@
 /**
  * Created by ptmind on 2018/4/10.
  */
-function createRunObjItem(item) {
+export function createRunObjItem(item) {
     if(['boolean', 'number', 'string'].includes(typeof item)) {
         return item;
     } else {
@@ -12,7 +12,7 @@ function createRunObjItem(item) {
         }
     }
 }
-function createCodeText(innerOption) {
+export function createCodeText(innerOption) {
     let code = '';
     if(typeof innerOption === 'string') {
         let beginEndStr = '"';
@@ -72,5 +72,3 @@ function createCodeText(innerOption) {
     }
     return code;
 }
-// export const createRunObjItem;
-export default createCodeText;
