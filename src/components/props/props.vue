@@ -4,7 +4,8 @@
             <tbody>
             <template v-if="innerOption.type === 'function'">
                 <tr>
-                    <td>函数{{innerOption.name}}</td>
+                    <td>函数</td>
+                    <!--{{innerOption.name}}-->
                     <td>
                         <select-type
                             :value="innerOption.name"
@@ -221,7 +222,7 @@ import selectType from './typeSelect.vue';
 import getOptionByObj from './getPropsOptionByObj';
 import { createCodeText, createRunObjItem } from './createCodeText';
 import replace from './replace.vue';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 export default {
     name: 'inner-dom',
     props: {
@@ -235,7 +236,9 @@ export default {
         'select-type': selectType,
         'replace': replace
     },
-    computed: {},
+    computed: {
+        ...mapGetters('main', ['editObjArr'])
+    },
     watch: {
         value(val) {
             this.innerOption = val;
@@ -250,7 +253,7 @@ export default {
             codeOption: {},
             allMatch: {},
             allVar: allVar.getAllData(),
-            singlePanelName: []
+            singlePanelName: ['RELATIONAL_MODEL']
         };
     },
     mounted() {
@@ -285,6 +288,8 @@ export default {
             }
         },
         emitChange() {
+            console.log('-------------');
+            console.log(this.innerOption);
             this.$emit('input', this.innerOption);// 根目录不用，但是子元素修改完修改影响父层
             this.$emit('change');
         },
@@ -325,7 +330,7 @@ export default {
                 code: createCodeText(childObj),
                 parent: this,
                 change: (code) => {
-                    let updateObj = this.$store.state.editObjArr[this.$store.state.editObjArr.length - 1];
+                    let updateObj = this.editObjArr[this.editObjArr.length - 1];
                     console.log(updateObj);
                     console.log(code);
                     if(updateObj.obj === childObj) {

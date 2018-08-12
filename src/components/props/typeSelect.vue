@@ -1,7 +1,6 @@
 <template>
     <div class="all">
         <div v-if="(showMatch.length+((dataType===''||dataType.split(',').includes('var'))?1:0))===1">
-            !
             <span
                 v-for="item in allMatch"
                 v-if="item.type === dataType"
