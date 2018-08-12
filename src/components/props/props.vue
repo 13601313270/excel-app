@@ -260,6 +260,10 @@ export default {
         this.allMatch = allMatch;
         this.innerOption = this.value;
         this.initCodeOption();
+        if(this.innerOption.type === 'var') {
+            // 如果变量值是字典，则展开下一级选择
+            this.changeVar(this.innerOption.name);
+        }
     },
     methods: {
         ...mapActions('main', ['editObjArrPush']),
@@ -463,6 +467,10 @@ export default {
                 this.codeOption = item;
             });
             this.innerOption = this.getDefaultOption(name);
+            if(this.innerOption.type === 'var') {
+                // 如果变量值是字典，则展开下一级选择
+                this.changeVar(this.innerOption.name);
+            }
             this.emitChange();
         },
         changeVar(val) {
@@ -479,8 +487,11 @@ export default {
                 }
                 this.setInnerOption(item);
             } else {
-                this.innerOption.name = val;
-                this.emitChange();
+                let item = {
+                    type: 'var',
+                    name: val
+                };
+                this.setInnerOption(item);
             }
         },
         changeDictObj() {
