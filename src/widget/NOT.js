@@ -4,10 +4,10 @@
 import FuncObj from './FuncObj';
 import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
-class ISNUMBER extends FuncObj {
+class NOT extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
-        this.name = 'ISNUMBER';
+        this.name = 'NOT';
         this.val = value;
     }
 
@@ -16,19 +16,19 @@ class ISNUMBER extends FuncObj {
         if(result instanceof Obj) {
             result = result.value;
         }
-        return typeof result === 'number';
+        return !result;
     }
 }
 __allMatch__.push({
-    match: /^ISNUMBER$/,
-    title: '判断是否是数字',
+    match: /^NOT$/,
+    title: 'NOT',
     type: 'function',
-    name: 'ISNUMBER',
-    func: ISNUMBER,
+    name: 'NOT',
+    func: NOT,
     props: [{
         name: 'value',
-        title: '判断值',
-        dataType: ''
+        title: '比较项',
+        dataType: 'bool'
     }],
     returnType: 'bool'
 });

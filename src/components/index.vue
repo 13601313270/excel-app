@@ -116,6 +116,9 @@ import '../widget/ASIN';
 import '../widget/ACOS';
 import '../widget/ATAN';
 import '../widget/CHOOSE';
+import '../widget/AND';
+import '../widget/OR';
+import '../widget/NOT';
 import relationalModel from '../widget/relationalModel';
 
 import allVar from '../observer/allVar';
