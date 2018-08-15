@@ -4,7 +4,7 @@
         <table style="width: 100%;">
             <thead>
             <tr>
-                <td>对象</td>
+                <td style="min-width: 30px;">对象</td>
                 <td>公式</td>
                 <td>计算值</td>
                 <td>操作</td>
@@ -20,7 +20,7 @@
                 <td v-if="['string','number','boolean'].includes(typeof item)" v-html="item"></td>
                 <td v-else-if="item.value===undefined||item.value===null"></td>
                 <td v-else-if="item.value instanceof Array">数组</td>
-                <td v-else-if="item.value instanceof Object">对象</td>
+                <td v-else-if="item.value instanceof Object">对象:<br/>{{item.value}}</td>
                 <td v-else v-html="item.value.toString()"></td>
                 <td>
                     <button @click="change(key)">修改</button>
@@ -74,6 +74,8 @@ export default {
         border-collapse: collapse;
         td {
             border: solid 1px black;
+            word-break:break-all;
+            word-wrap:break-word;
         }
 
     }

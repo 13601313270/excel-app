@@ -99,10 +99,23 @@ import '../languageParser/dictionaryGet';
 import '../widget/CHECK_BOX';
 import '../widget/BAR';
 import '../widget/INPUT';
+import '../widget/TEXT';
 import '../widget/IF';
 import '../widget/INPUT_DATE';
 import '../widget/MIN';
-import '../widget/TEXT';
+import '../widget/MAX';
+import '../widget/SUM';
+import '../widget/AVERAGE';
+import '../widget/NOW';
+import '../widget/TODAY';
+import '../widget/ISNUMBER';
+import '../widget/SIN';
+import '../widget/COS';
+import '../widget/TAN';
+import '../widget/ASIN';
+import '../widget/ACOS';
+import '../widget/ATAN';
+import '../widget/CHOOSE';
 import relationalModel from '../widget/relationalModel';
 
 import allVar from '../observer/allVar';
@@ -149,7 +162,7 @@ export default {
                     width: 400
                 },
                 'var': {
-                    width: 300
+                    width: 400
                 }
             },
             editDataType: '',
