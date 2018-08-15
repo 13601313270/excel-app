@@ -119,6 +119,10 @@ import '../widget/CHOOSE';
 import '../widget/AND';
 import '../widget/OR';
 import '../widget/NOT';
+import '../widget/LEFT';
+import '../widget/RIGHT';
+import '../widget/MID';
+import '../widget/LEN';
 import relationalModel from '../widget/relationalModel';
 
 import allVar from '../observer/allVar';

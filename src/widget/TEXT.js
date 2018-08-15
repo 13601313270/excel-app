@@ -8,15 +8,14 @@ class TEXT extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
         this.name = 'TEXT';
-        this.dom = document.createElement('div');
-        this.data = value;
+        this.text = value;
     }
 
     get value() {
-        if (this.data instanceof Obj) {
-            return this.data.value;
+        if(this.text instanceof Obj) {
+            return this.text.value.toString();
         } else {
-            return this.data;
+            return this.text.toString();
         }
     }
 }
@@ -33,5 +32,5 @@ __allMatch__.push({
             dataType: 'string,number,bool,function,var'
         }
     ],
-    returnType: 'dom'
+    returnType: 'string'
 });
