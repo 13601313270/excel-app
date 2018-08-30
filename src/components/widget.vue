@@ -10,16 +10,17 @@
 import widgetEvent from './widgetChange';
 import { mapGetters } from 'vuex';
 export default {
-    props: ['data', 'randomId'],
+    props: ['data'],
     data() {
         return {
-            data_: this.data
+            data_: this.data,
+            key: this.$vnode.key
         };
     },
     mounted() {
         if(this.data !== undefined) {
-            widgetEvent.emit('init', this.data, this.randomId, this.$refs.content);
-            this.$emit('init', this.data, this.randomId, this.$refs.content);
+            widgetEvent.emit('init', this.data, this.key, this.$refs.content);
+            this.$emit('init', this.data, this.key, this.$refs.content);
         }
     },
     methods: {
@@ -38,8 +39,8 @@ export default {
             varName = '$' + varName.replace(/^\$/, '');
             this.data_ = varName;
             if(varName !== null) {
-                widgetEvent.emit('change', varName, this.randomId, this.$refs.content);
-                this.$emit('change', varName, this.randomId, this.$refs.content);
+                widgetEvent.emit('change', varName, this.key, this.$refs.content);
+                this.$emit('change', varName, this.key, this.$refs.content);
             }
         }
     },

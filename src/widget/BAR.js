@@ -129,12 +129,10 @@ __allMatch__.push({
     name: 'BAR',
     title: '柱状图',
     func: BAR,
-    props: [
-        {
-            name: 'source',
-            title: '关系模型',
-            dataType: 'var,relationalModel'
-        }
-    ],
+    props: [{
+        name: 'source',
+        title: '关系模型',
+        dataType: 'var,relationalModel'
+    }],
     returnType: 'dom'
 });

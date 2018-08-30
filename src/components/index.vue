@@ -23,12 +23,14 @@
                         <div @click="documentType='excel'">表格</div>
                         <div @click="documentType='freePanel'">黑板</div>
                         <div @click="documentType='ppt'">演示文稿</div>
+                        <div @click="documentType='useFile'">保存测试</div>
                         <div @click="documentType='test'">测试</div>
                     </div>
                     <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
                     <excel v-else-if="documentType==='excel'" :dragDomFunc="dragDomFunc"></excel>
                     <free-panel v-else-if="documentType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                     <ppt v-else-if="documentType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
+                    <use-file v-else-if="documentType==='useFile'" :fileData="fileData" @save="save"></use-file>
                     <component v-else-if="documentType==='test'" :is="currentView" style="width: 100%;"></component>
                 </div>
             </div>
@@ -142,6 +144,7 @@ import word from './dashboard/word.vue';
 import excel from './dashboard/excel.vue';
 import freePanel from './dashboard/freePanel.vue';
 import ppt from './dashboard/ppt.vue';
+import useFile from './dashboard/useFile.vue';
 
 import { mapActions, mapGetters } from 'vuex';
 
@@ -175,7 +178,12 @@ export default {
             editDataType: '',
             connections: [],
             html: '',
-            varToDom: new Map()
+            varToDom: new Map(),
+            widgetIdToVar: {},
+            // 保存的文件
+            fileData: {
+                widget: []
+            }
         }
     },
     computed: {
@@ -186,6 +194,10 @@ export default {
     },
     methods: {
         ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop']),
+        save() {
+            console.log('-------this.fileData-------');
+            console.log(this.fileData.widget);
+        },
         cancelDragDomFunc() {
             this.$nextTick(() => {
                 this.dragDomFunc = null;
@@ -254,6 +266,7 @@ export default {
             return code;
         },
         addData(varName, id, dom) {
+            console.log(varName, id, dom);
             let dragDomFunc = this.dragDomFunc;
             if(dragDomFunc === null) {
                 dragDomFunc = allMatch.find(item => {
@@ -261,13 +274,14 @@ export default {
                 }).name;
                 dragDomFunc = 'INPUT';
             }
-            for (let i = 0; i < allMatch.length; i++) {
-                let item = allMatch[i];
-                if(item.func !== undefined && dragDomFunc.match(item.match)) {
-                    let code = this.getCodeByMatchItem(item);
-                    this.addData_(varName, id, dom, code);
-                    this.editVar(varName);
-                }
+            let matchItem = allMatch.find(item => {
+                return item.func !== undefined && dragDomFunc.match(item.match);
+            });
+
+            if(matchItem !== undefined) {
+                let code = this.getCodeByMatchItem(matchItem);
+                this.addData_(varName, id, dom, code);
+                this.editVar(varName);
             }
         },
         addData_(varName, id, dom, code) {
@@ -275,7 +289,11 @@ export default {
             allVar.setVar(varName, insertObj[0]);
             this.editDataType = '';
             let newVar = allVar.getVar(varName);
+
+            // 用来设置变量映射dom
             this.varToDom.set(newVar, dom);
+            // 用来映射widgetId对应存放的变量
+            this.widgetIdToVar[id] = varName;
             let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
             this.html = this.html.replace(reg, '<widget random-id="' + id + '" data="' + varName + '">');
             this.varToDom.get(newVar).innerHTML = '';
@@ -446,7 +464,8 @@ export default {
         'word': word,
         'excel': excel,
         'free-panel': freePanel,
-        'ppt': ppt
+        'ppt': ppt,
+        'useFile': useFile
     }
 }
 </script>
