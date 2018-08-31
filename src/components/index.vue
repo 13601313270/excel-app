@@ -388,7 +388,6 @@ export default {
             this.save();
         },
         editVar(key) {
-            console.log('-----修改变量-----');
             let Var = allVar.getVar(key);
             let self = this;
             let pushEditObj = {
@@ -442,12 +441,10 @@ export default {
             file.var_data = JSON.parse(file.var_data);
             file.widget_id_to_var = JSON.parse(file.widget_id_to_var);
             // 先创建对象，保证所有对象都存在
-            /*
             Object.keys(file.var_data).forEach(item => {
                 let insertObj = getEvalObj(1, '""');
                 allVar.setVar(item, insertObj[0]);
             });
-            */
             // 先后重新赋值正确的对象
             Object.keys(file.var_data).forEach(item => {
                 let insertObj = getEvalObj(1, file.var_data[item]);
@@ -468,9 +465,12 @@ export default {
         save() {
             let allData = allVar.getAllData();
             let saveData = {};
+            console.log('++++++++++');
+            console.log(allData);
             for (let i in allData) {
                 saveData[i] = getStrByObj(allData[i].value_);
             }
+            console.log(JSON.stringify(saveData));
             ajax({
                 type: 'PUT',
                 url: 'http://www.tablehub.cn/app/file.html',

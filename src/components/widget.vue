@@ -24,9 +24,7 @@ export default {
             widgetEvent.emit('init', this.data, this.key, this.$refs.content);
             this.$emit('init', this.data, this.key, this.$refs.content);
         } else {
-            console.log('---------1----------');
             let key = widgetIdToVar[this.key];
-            console.log(key);
             this.data_ = key;
 
             widgetEvent.emit('init', this.data_, this.key, this.$refs.content);
