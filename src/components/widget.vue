@@ -11,6 +11,7 @@ import widgetEvent from './widgetChange';
 import widgetIdToVar from './widgetIdToVar';
 import { mapGetters } from 'vuex';
 export default {
+    name: 'widget',
     props: ['data'],
     data() {
         return {

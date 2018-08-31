@@ -11,7 +11,6 @@
     </div>
 </template>
 <script>
-import widget from '../widget.vue';
 export default {
     props: ['fileData'],
     created() {
@@ -29,9 +28,6 @@ export default {
             this.fileData.widget.splice(key, 1);
             this.$emit('save');
         }
-    },
-    components: {
-        widget
     }
 }
 </script>

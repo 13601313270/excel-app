@@ -2,7 +2,7 @@
     <div class="content" @dragend="cancelDragDomFunc">
         <header-nav></header-nav>
         <div v-if="appType===''" class="app_list">
-            <h1>软件列表</h1>
+            <h1>数据软件列表</h1>
             <div class="list">
                 <div @click="chooseApp('word')">
                     <div class="panel-heading">文稿</div>
@@ -167,6 +167,9 @@ import widgetIdToVar from './widgetIdToVar';
 
 import { mapActions, mapGetters } from 'vuex';
 
+import Vue from 'vue';
+import widget from './widget.vue';
+Vue.component(widget.name, widget);
 export default {
     data() {
         return {
