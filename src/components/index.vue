@@ -1,8 +1,24 @@
 <template>
-    <div style="width: 100%;height: 100%;min-width: 930px;display: flex;flex-direction: column;"
-         @dragend="cancelDragDomFunc">
-        <header-nav style="background-color: #3c3f41;border-bottom: solid 1px #4f4f4f;"></header-nav>
-        <div style="display: flex;width: 100%;flex-grow: 1;">
+    <div class="content" @dragend="cancelDragDomFunc">
+        <header-nav></header-nav>
+        <div v-if="appType===''" class="app_list">
+            <h1>软件列表</h1>
+            <div class="list">
+                <div @click="chooseApp('word')">
+                    <div class="panel-heading">文稿</div>
+                </div>
+                <div @click="chooseApp('excel')">
+                    <div class="panel-heading">表格</div>
+                </div>
+                <div @click="chooseApp('freePanel')">黑板</div>
+                <div @click="chooseApp('ppt')">演示文稿</div>
+                <div @click="chooseApp('test')">测试</div>
+                <div v-for="item in dashboardTemplate" @click="chooseApp(item.id)">
+                    <div class="panel-heading" v-html="item.title"></div>
+                </div>
+            </div>
+        </div>
+        <div v-else class="app_page">
             <div class="left_tools">
                 <div :class="{active:leftToolSelect=='widget'}"
                      @click="leftToolSelect=(leftToolSelect==='widget'?'':'widget')">控件
@@ -16,24 +32,14 @@
                 <tools_widget v-if="leftToolSelect=='widget'" @drag='drag'></tools_widget>
                 <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
             </div>
-            <div id="content">
-                <div>
-                    <div v-if="appType===''">
-                        <div @click="chooseApp('word')">文稿</div>
-                        <div @click="chooseApp('excel')">表格</div>
-                        <div @click="chooseApp('freePanel')">黑板</div>
-                        <div @click="chooseApp('ppt')">演示文稿</div>
-                        <div @click="chooseApp('test')">测试</div>
-                        <div v-for="item in dashboardTemplate" @click="chooseApp(item.id)" v-html="item.title"></div>
-                    </div>
-                    <template v-if="appType!=='' && !isChooseFile">
-                        <word v-if="appType==='word'" :dragDomFunc="dragDomFunc"></word>
-                        <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
-                        <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
-                        <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
-                        <use-file v-else-if="appType===1" :fileData="fileData.file_data" @save="save"></use-file>
-                        <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
-                    </template>
+            <div id="app_content">
+                <div v-if="appType!=='' && !isChooseFile">
+                    <word v-if="appType==='word'" :dragDomFunc="dragDomFunc"></word>
+                    <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
+                    <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
+                    <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
+                    <use-file v-else-if="appType===1" :fileData="fileData.file_data" @save="save"></use-file>
+                    <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
                 </div>
             </div>
             <div
@@ -452,7 +458,7 @@ export default {
             });
 
             // console.log('-----file.widget_id_to_var-----');
-            for(let i in file.widget_id_to_var) {
+            for (let i in file.widget_id_to_var) {
                 widgetIdToVar[i] = file.widget_id_to_var[i];
             }
 
@@ -583,64 +589,122 @@ export default {
         color: #42b983;
     }
 
-    .left_tools {
-        width: 24px;
-        flex-shrink: 0;
-        flex-grow: 0;
-        background-color: #3c3f41;
-        color: #d9d9d9;
-        border-right: solid 1px #4f4f4f;
-        > * {
-            word-wrap: break-word;
-            margin: 0 1px 2px 0;
-            padding: 14px 2px;
-            border-radius: 5px 0 0 5px;
-            text-align: center;
-            cursor: default;
-            line-height: 18px;
-            color: #b1b1b1;
-            &.active {
-                background: #333333;
-                margin-right: -1px;
-                color: white;
-            }
-            &:hover {
-                box-shadow: inset 2px 0 5px 0 #717171;
-            }
-        }
-    }
-
-    .left_tools_content {
-        width: 200px;
-        min-width: 100px;
-        overflow: auto;
-        border-right: solid 1px black;
-        text-align: center;
-        background-color: #333;
-        color: #999;
-        flex-shrink: 0;
-    }
-
-    .right_tools_content {
-        width: 200px;
-        min-width: 100px;
-        background-color: rgb(51, 51, 51);
-        color: #d9d9d9;
-        flex-shrink: 0;
-        overflow: auto;
-    }
-
-    #content {
-        flex-grow: 1;
+    .content {
+        width: 100%;
+        height: 100%;
+        min-width: 930px;
         display: flex;
         flex-direction: column;
-        overflow: scroll;
-        > div {
+        .app_list {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 15px;
+            .list > * {
+                flex-shrink: 0;
+                float: left;
+                width: 300px;
+                height: 220px;
+                margin: 0 10px 20px 10px;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+                -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+                box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+                .panel-heading {
+                    padding: 10px 15px;
+                    border-bottom: solid 1px #ddd;
+                    background-color: #f5f5f5;
+                }
+            }
+        }
+        .app_page {
+            display: flex;
+            width: 100%;
             flex-grow: 1;
-            position: relative;
-            overflow: auto;
-            background-color: #f9f9f9;
-            height: 100%;
+            .left_tools {
+                width: 24px;
+                flex-shrink: 0;
+                flex-grow: 0;
+                background-color: #3c3f41;
+                color: #d9d9d9;
+                border-right: solid 1px #4f4f4f;
+                > * {
+                    word-wrap: break-word;
+                    margin: 0 1px 2px 0;
+                    padding: 14px 2px;
+                    border-radius: 5px 0 0 5px;
+                    text-align: center;
+                    cursor: default;
+                    line-height: 18px;
+                    color: #b1b1b1;
+                    &.active {
+                        background: #333333;
+                        margin-right: -1px;
+                        color: white;
+                    }
+                    &:hover {
+                        box-shadow: inset 2px 0 5px 0 #717171;
+                    }
+                }
+            }
+            .left_tools_content {
+                width: 200px;
+                min-width: 100px;
+                overflow: auto;
+                border-right: solid 1px black;
+                text-align: center;
+                background-color: #333;
+                color: #999;
+                flex-shrink: 0;
+            }
+            #app_content {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: scroll;
+                > div {
+                    flex-grow: 1;
+                    position: relative;
+                    overflow: auto;
+                    background-color: #f9f9f9;
+                    height: 100%;
+                }
+            }
+            .right_tools_content {
+                width: 200px;
+                min-width: 100px;
+                background-color: rgb(51, 51, 51);
+                color: #d9d9d9;
+                flex-shrink: 0;
+                overflow: auto;
+            }
+            .right_tools {
+                width: 24px;
+                flex-shrink: 0;
+                flex-grow: 0;
+                background-color: #3c3f41;
+                color: #d9d9d9;
+                border-left: solid 1px #4f4f4f;
+                > * {
+                    word-wrap: break-word;
+                    margin: 0 1px 2px 0;
+                    padding: 14px 2px;
+                    border-radius: 0 5px 5px 0;
+                    text-align: center;
+                    cursor: default;
+                    line-height: 18px;
+                    color: #b1b1b1;
+                    &.active {
+                        background: #333333;
+                        margin-left: -1px;
+                        color: white;
+                    }
+                    &:hover {
+                        box-shadow: inset -2px 0px 5px 0px #717171;
+                    }
+                }
+            }
         }
     }
 
@@ -660,33 +724,6 @@ export default {
             padding: 5px;
             position: relative;
             overflow: hidden;
-        }
-    }
-
-    .right_tools {
-        width: 24px;
-        flex-shrink: 0;
-        flex-grow: 0;
-        background-color: #3c3f41;
-        color: #d9d9d9;
-        border-left: solid 1px #4f4f4f;
-        > * {
-            word-wrap: break-word;
-            margin: 0 1px 2px 0;
-            padding: 14px 2px;
-            border-radius: 0 5px 5px 0;
-            text-align: center;
-            cursor: default;
-            line-height: 18px;
-            color: #b1b1b1;
-            &.active {
-                background: #333333;
-                margin-left: -1px;
-                color: white;
-            }
-            &:hover {
-                box-shadow: inset -2px 0px 5px 0px #717171;
-            }
         }
     }
 

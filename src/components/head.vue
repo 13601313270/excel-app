@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="background-color: #3c3f41;border-bottom: solid 1px #4f4f4f;">
         头部
     </div>
 </template>

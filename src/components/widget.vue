@@ -9,7 +9,6 @@
 <script>
 import widgetEvent from './widgetChange';
 import widgetIdToVar from './widgetIdToVar';
-import allVar from '../observer/allVar';
 import { mapGetters } from 'vuex';
 export default {
     props: ['data'],
