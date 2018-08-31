@@ -3,14 +3,15 @@
         <div>文件保存</div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
-        <widget v-for="(item,key) in fileData.widget" :key="'w'+key" v-html="item"></widget>
+        <div v-for="(item,key) in fileData.widget">
+            <widget :key="item"></widget>
+            <div @click="deleteWidget(key)">delete</div>
+        </div>
         <div @click="add">click</div>
     </div>
 </template>
 <script>
 import widget from '../widget.vue';
-// import widgetEvent from '../widgetChange';
-// import ajax from '../../api/ajax';
 export default {
     props: ['fileData'],
     created() {
@@ -20,7 +21,12 @@ export default {
     },
     methods: {
         add() {
-            this.fileData.widget.push(Math.random());
+            let widgetKey = 'widget_' + parseInt(Math.random() * 100000);
+            this.fileData.widget.push(widgetKey);
+            this.$emit('save');
+        },
+        deleteWidget(key) {
+            this.fileData.widget.splice(key, 1);
             this.$emit('save');
         }
     },

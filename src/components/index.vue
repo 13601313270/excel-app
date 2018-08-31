@@ -31,7 +31,7 @@
                         <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
                         <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                         <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
-                        <use-file v-else-if="appType===1" :fileData="fileData.data" @save="save"></use-file>
+                        <use-file v-else-if="appType===1" :fileData="fileData.file_data" @save="save"></use-file>
                         <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
                     </template>
                 </div>
@@ -157,6 +157,7 @@ import excel from './dashboard/excel.vue';
 import freePanel from './dashboard/freePanel.vue';
 import ppt from './dashboard/ppt.vue';
 import useFile from './dashboard/useFile.vue';
+import widgetIdToVar from './widgetIdToVar';
 
 import { mapActions, mapGetters } from 'vuex';
 
@@ -197,7 +198,6 @@ export default {
             connections: [],
             html: '',
             varToDom: new Map(),
-            widgetIdToVar: {},
             // 是否弹出选择文件界面
             isChooseFile: false,
             // 选择的app类型
@@ -300,6 +300,7 @@ export default {
                 this.addData_(varName, id, dom, code);
                 this.editVar(varName);
             }
+            this.save();
         },
         addData_(varName, id, dom, code) {
             let insertObj = getEvalObj(1, code);
@@ -310,7 +311,7 @@ export default {
             // 用来设置变量映射dom
             this.varToDom.set(newVar, dom);
             // 用来映射widgetId对应存放的变量
-            this.widgetIdToVar[id] = varName;
+            widgetIdToVar[id] = varName;
             let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
             this.html = this.html.replace(reg, '<widget random-id="' + id + '" data="' + varName + '">');
             this.varToDom.get(newVar).innerHTML = '';
@@ -350,6 +351,7 @@ export default {
                     }
                 }
             }
+            this.save();
         },
         drag(func) {
             this.dragDomFunc = func;
@@ -383,8 +385,10 @@ export default {
                 console.log(obj.parent.emitChange);
                 obj.parent.emitChange();
             }
+            this.save();
         },
         editVar(key) {
+            console.log('-----修改变量-----');
             let Var = allVar.getVar(key);
             let self = this;
             let pushEditObj = {
@@ -434,28 +438,51 @@ export default {
             });
         },
         selectFile(file) {
-            if(file.data === '') {
-                file.data = {};
-            } else {
-                file.data = JSON.parse(file.data);
+            file.file_data = JSON.parse(file.file_data);
+            file.var_data = JSON.parse(file.var_data);
+            file.widget_id_to_var = JSON.parse(file.widget_id_to_var);
+            // 先创建对象，保证所有对象都存在
+            /*
+            Object.keys(file.var_data).forEach(item => {
+                let insertObj = getEvalObj(1, '""');
+                allVar.setVar(item, insertObj[0]);
+            });
+            */
+            // 先后重新赋值正确的对象
+            Object.keys(file.var_data).forEach(item => {
+                let insertObj = getEvalObj(1, file.var_data[item]);
+                allVar.setVar(item, insertObj[0]);
+            });
+
+            // console.log('-----file.widget_id_to_var-----');
+            for(let i in file.widget_id_to_var) {
+                widgetIdToVar[i] = file.widget_id_to_var[i];
             }
+
+            // let insertObj = getEvalObj(1, code);
+            // allVar.setVar(varName, insertObj[0]);
+            console.log(file.var_data);
             this.fileData = file;
             this.isChooseFile = false;
         },
         save() {
+            let allData = allVar.getAllData();
+            let saveData = {};
+            for (let i in allData) {
+                saveData[i] = getStrByObj(allData[i].value_);
+            }
             ajax({
                 type: 'PUT',
                 url: 'http://www.tablehub.cn/app/file.html',
                 data: {
                     id: this.fileData.id,
-                    data: JSON.stringify(this.fileData.data)
+                    file_data: JSON.stringify(this.fileData.file_data),
+                    widgetIdToVar: JSON.stringify(widgetIdToVar),
+                    allVar: JSON.stringify(saveData)
                 }
             }).then((data) => {
                 console.log(data);
             });
-            console.log('-------this.fileData-------');
-            console.log(this.fileData);
-            // http://www.tablehub.cn/app/file.html
         }
     },
     mounted() {

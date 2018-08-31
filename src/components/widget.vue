@@ -8,6 +8,8 @@
 </template>
 <script>
 import widgetEvent from './widgetChange';
+import widgetIdToVar from './widgetIdToVar';
+import allVar from '../observer/allVar';
 import { mapGetters } from 'vuex';
 export default {
     props: ['data'],
@@ -21,6 +23,14 @@ export default {
         if(this.data !== undefined) {
             widgetEvent.emit('init', this.data, this.key, this.$refs.content);
             this.$emit('init', this.data, this.key, this.$refs.content);
+        } else {
+            console.log('---------1----------');
+            let key = widgetIdToVar[this.key];
+            console.log(key);
+            this.data_ = key;
+
+            widgetEvent.emit('init', this.data_, this.key, this.$refs.content);
+            this.$emit('init', this.data_, this.key, this.$refs.content);
         }
     },
     methods: {
