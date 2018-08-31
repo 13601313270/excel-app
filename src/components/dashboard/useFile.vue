@@ -3,7 +3,7 @@
         <div>文件保存</div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
-        <widget v-for="(item,key) in fileData.widget" :key="'w'+key"></widget>
+        <widget v-for="(item,key) in fileData.widget" :key="'w'+key" v-html="item"></widget>
         <div @click="add">click</div>
     </div>
 </template>
@@ -14,12 +14,13 @@ import widget from '../widget.vue';
 export default {
     props: ['fileData'],
     created() {
-        console.log('-----this.fileData-----');
-        console.log(this.fileData);
+        if(this.fileData.widget === undefined) {
+            this.$set(this.fileData, 'widget', []);
+        }
     },
     methods: {
         add() {
-            this.fileData.widget.push(1);
+            this.fileData.widget.push(Math.random());
             this.$emit('save');
         }
     },

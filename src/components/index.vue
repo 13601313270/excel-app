@@ -18,20 +18,22 @@
             </div>
             <div id="content">
                 <div>
-                    <div v-if="documentType===''">
-                        <div @click="documentType='word'">文稿</div>
-                        <div @click="documentType='excel'">表格</div>
-                        <div @click="documentType='freePanel'">黑板</div>
-                        <div @click="documentType='ppt'">演示文稿</div>
-                        <div @click="documentType='useFile'">保存测试</div>
-                        <div @click="documentType='test'">测试</div>
+                    <div v-if="appType===''">
+                        <div @click="chooseApp('word')">文稿</div>
+                        <div @click="chooseApp('excel')">表格</div>
+                        <div @click="chooseApp('freePanel')">黑板</div>
+                        <div @click="chooseApp('ppt')">演示文稿</div>
+                        <div @click="chooseApp('test')">测试</div>
+                        <div v-for="item in dashboardTemplate" @click="chooseApp(item.id)" v-html="item.title"></div>
                     </div>
-                    <word v-else-if="documentType==='word'" :dragDomFunc="dragDomFunc"></word>
-                    <excel v-else-if="documentType==='excel'" :dragDomFunc="dragDomFunc"></excel>
-                    <free-panel v-else-if="documentType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
-                    <ppt v-else-if="documentType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
-                    <use-file v-else-if="documentType==='useFile'" :fileData="fileData" @save="save"></use-file>
-                    <component v-else-if="documentType==='test'" :is="currentView" style="width: 100%;"></component>
+                    <template v-if="appType!=='' && !isChooseFile">
+                        <word v-if="appType==='word'" :dragDomFunc="dragDomFunc"></word>
+                        <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
+                        <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
+                        <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
+                        <use-file v-else-if="appType===1" :fileData="fileData.data" @save="save"></use-file>
+                        <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
+                    </template>
                 </div>
             </div>
             <div
@@ -84,6 +86,16 @@
                     <textarea @change="changeCode(editObjArr[key],$event.target.value)"
                               :value="item.code"
                               style="height: 50px;width: 100%;box-sizing: border-box;"></textarea>
+                </div>
+            </div>
+        </div>
+        <!--文件选择-->
+        <div v-if="isChooseFile" class="chooseFile" @click="isChooseFile=false,appType=''">
+            <div class="body" @click.stop="">
+                <div v-for="item in fileList" @click="selectFile(item)">
+                    <div class="panel-heading" v-html="item.title"></div>
+                </div>
+                <div @click="createFile" style="background-color: #dce4e4;text-align: center;padding-top: 50px;">新建
                 </div>
             </div>
         </div>
@@ -151,7 +163,13 @@ import { mapActions, mapGetters } from 'vuex';
 export default {
     data() {
         return {
-            documentType: '',
+            dashboardTemplate: [
+                {
+                    id: 1,
+                    name: 'useFile',
+                    title: '保存测试'
+                }
+            ],
             currentView: dashboard(),
             dragDomFunc: null,
             leftToolSelect: 'widget',
@@ -180,10 +198,13 @@ export default {
             html: '',
             varToDom: new Map(),
             widgetIdToVar: {},
+            // 是否弹出选择文件界面
+            isChooseFile: false,
+            // 选择的app类型
+            appType: '',
+            fileList: [],
             // 保存的文件
-            fileData: {
-                widget: []
-            }
+            fileData: {}
         }
     },
     computed: {
@@ -194,10 +215,6 @@ export default {
     },
     methods: {
         ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop']),
-        save() {
-            console.log('-------this.fileData-------');
-            console.log(this.fileData.widget);
-        },
         cancelDragDomFunc() {
             this.$nextTick(() => {
                 this.dragDomFunc = null;
@@ -388,6 +405,57 @@ export default {
         },
         hover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
+        },
+        chooseApp(appType) {
+            ajax({
+                type: 'GET',
+                url: 'http://www.tablehub.cn/app/file.html',
+                data: {
+                    appType: appType
+                }
+            }).then((data) => {
+                this.isChooseFile = true;
+                this.fileList = data;
+                this.appType = appType;
+                console.log(data);
+            });
+        },
+        createFile() {
+            let fileName = window.prompt('请输入文件名', '未命名文件');
+            ajax({
+                type: 'POST',
+                url: 'http://www.tablehub.cn/app/file.html',
+                data: {
+                    appType: this.appType,
+                    title: fileName
+                }
+            }).then((data) => {
+                console.log(data);
+            });
+        },
+        selectFile(file) {
+            if(file.data === '') {
+                file.data = {};
+            } else {
+                file.data = JSON.parse(file.data);
+            }
+            this.fileData = file;
+            this.isChooseFile = false;
+        },
+        save() {
+            ajax({
+                type: 'PUT',
+                url: 'http://www.tablehub.cn/app/file.html',
+                data: {
+                    id: this.fileData.id,
+                    data: JSON.stringify(this.fileData.data)
+                }
+            }).then((data) => {
+                console.log(data);
+            });
+            console.log('-------this.fileData-------');
+            console.log(this.fileData);
+            // http://www.tablehub.cn/app/file.html
         }
     },
     mounted() {
@@ -591,6 +659,39 @@ export default {
             }
             &:hover {
                 box-shadow: inset -2px 0px 5px 0px #717171;
+            }
+        }
+    }
+
+    .chooseFile {
+        width: 100%;
+        height: 100%;
+        background-color: #0000002e;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .body {
+            width: 500px;
+            height: 300px;
+            padding: 20px;
+            background-color: white;
+            > * {
+                float: left;
+                width: 200px;
+                height: 130px;
+                margin: 0 5px 20px 5px;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+                -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+                box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+                .panel-heading {
+                    padding: 10px 15px;
+                    border-bottom: solid 1px #ddd;
+                    background-color: #f5f5f5;
+                }
             }
         }
     }

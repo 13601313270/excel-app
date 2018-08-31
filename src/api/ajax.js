@@ -86,9 +86,9 @@ export default function(config) {
             head.insertBefore(script, head.firstChild);
         } else {
             let xhr = new XMLHttpRequest();
-            // if (config.type !== 'POST') {
-            //     config.url += ((config.url.indexOf('?') === -1 ? '?' : '&') + jsonToQuery(config.data));
-            // }
+            if (config.type === 'GET') {
+                config.url += ((config.url.indexOf('?') === -1 ? '?' : '&') + jsonToQuery(config.data));
+            }
             // if (config['Content-Type'] === undefined) {
             //     config['Content-Type'] = 'application/json;charset=UTF-8';
             // }
@@ -109,7 +109,7 @@ export default function(config) {
             xhr.onerror = function(e) {
                 reject(e);
             };
-            if (config.type === 'POST') {
+            if(['POST', 'PUT'].includes(config.type)) {
                 // xhr.send(JSON.stringify(config.data));
                 // console.log(jsonToQuery(config.data));
                 xhr.send(jsonToQuery(config.data));
