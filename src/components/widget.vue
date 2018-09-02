@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="widget" :class="{warning:getHighlightState(data_)=='info',candrop:this.key,light:dragDomFunc}"
+        <div class="widget" :class="{warning:getHighlightState(data_)=='info'}"
              ref="content"
              @dragover="allowDrop($event)"
              @drop="ondrop($event)"></div>
@@ -69,12 +69,6 @@ export default {
         min-width: 20px;
         min-height: 20px;
         display: inline-block;
-        &.candrop {
-            border: solid 1px black;
-            &.light {
-                border: solid 1px red;
-            }
-        }
     }
 </style>
 <style>

@@ -5,7 +5,7 @@
         <!--<widget saveId="sf"></widget>-->
         <widget data="$bbb"></widget>
         <div v-for="(item,key) in fileData.widget">
-            <widget :key="item"></widget>
+            <widget :key="item" class="widget" :class="{light:dragDomFunc}"></widget>
             <div @click="deleteWidget(key)">delete</div>
         </div>
         <div @click="add">click</div>
@@ -13,7 +13,7 @@
 </template>
 <script>
 export default {
-    props: ['fileData'],
+    props: ['fileData', 'dragDomFunc'],
     created() {
         if(this.fileData.widget === undefined) {
             this.$set(this.fileData, 'widget', []);
@@ -38,4 +38,10 @@ export default {
 }
 </script>
 <style scoped lang="less">
+    .widget {
+        border: solid 1px black;
+        &.light {
+            border: solid 1px red;
+        }
+    }
 </style>
