@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="widget" :class="{warning:getHighlightState(data_)=='info'}"
+        <div class="widget" :class="{warning:getHighlightState(data_)=='info',candrop:this.key,light:dragDomFunc}"
              ref="content"
              @dragover="allowDrop($event)"
              @drop="ondrop($event)"></div>
@@ -43,17 +43,20 @@ export default {
             e.preventDefault();
         },
         ondrop(e) {
-            let varName = window.prompt('请输入名称', 'a7');
-            varName = '$' + varName.replace(/^\$/, '');
-            this.data_ = varName;
-            if(varName !== null) {
-                widgetEvent.emit('change', varName, this.key, this.$refs.content);
-                this.$emit('change', varName, this.key, this.$refs.content);
+            // 如果没有设置key，则不允许拖拽widget，用来定义不可修改组件。反过来说，所有添加了key的widget可以拖拽组件
+            if(this.key !== undefined) {
+                let varName = window.prompt('请输入名称', 'a7');
+                if(varName !== null) {
+                    varName = '$' + varName.replace(/^\$/, '');
+                    this.data_ = varName;
+                    widgetEvent.emit('change', varName, this.key, this.$refs.content);
+                    this.$emit('change', varName, this.key, this.$refs.content);
+                }
             }
         }
     },
     computed: {
-        ...mapGetters('main', ['varHighlight'])
+        ...mapGetters('main', ['varHighlight', 'dragDomFunc'])
     }
 }
 </script>
@@ -66,7 +69,12 @@ export default {
         min-width: 20px;
         min-height: 20px;
         display: inline-block;
-        border: solid 1px black;
+        &.candrop {
+            border: solid 1px black;
+            &.light {
+                border: solid 1px red;
+            }
+        }
     }
 </style>
 <style>

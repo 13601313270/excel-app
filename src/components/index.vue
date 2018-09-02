@@ -38,7 +38,9 @@
                     <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
                     <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                     <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
-                    <use-file v-else-if="appType===1" :fileData="fileData.file_data" @save="save"></use-file>
+                    <use-file v-else-if="appType===1" :dragDomFunc="dragDomFunc" :fileData="fileData.file_data"
+                              @save="save"
+                              @eval="eval"></use-file>
                     <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
                 </div>
             </div>
@@ -181,7 +183,6 @@ export default {
                 }
             ],
             currentView: dashboard(),
-            dragDomFunc: null,
             leftToolSelect: 'widget',
             leftToolInfo: {
                 widget: {
@@ -217,16 +218,16 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('main', ['editObjArr']),
+        ...mapGetters('main', ['editObjArr', 'dragDomFunc']),
         saveHtml() {
             return this.html.replace(/ random-id="r(\d+)"/g, '');
         }
     },
     methods: {
-        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop']),
+        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc']),
         cancelDragDomFunc() {
             this.$nextTick(() => {
-                this.dragDomFunc = null;
+                this.setDragDomFunc(null);
             });
         },
         getCodeByMatchItem(item) {
@@ -363,7 +364,7 @@ export default {
             this.save();
         },
         drag(func) {
-            this.dragDomFunc = func;
+            this.setDragDomFunc(func);
         },
         allowDrop(e) {
             e.preventDefault();
@@ -395,6 +396,10 @@ export default {
                 obj.parent.emitChange();
             }
             this.save();
+        },
+        eval(evalContent) {
+            console.log(evalContent);
+            getEvalObj(1, evalContent);
         },
         editVar(key) {
             let Var = allVar.getVar(key);

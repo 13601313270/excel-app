@@ -3,7 +3,8 @@ export default {
     state: {
         varHighlight: {},
         connections: [],
-        editObjArr: []
+        editObjArr: [],
+        dragDomFunc: null
     },
     mutations: {
         varHighlightSet(state, data) {
@@ -17,6 +18,9 @@ export default {
         },
         editObjArrPop(state, key) {
             state.editObjArr.pop(key);
+        },
+        setDragDomFunc(state, data) {
+            state.dragDomFunc = data;
         }
     },
     actions: {
@@ -31,11 +35,15 @@ export default {
         },
         editObjArrPop({commit}, data) {
             return commit('editObjArrPop', data);
+        },
+        setDragDomFunc({commit}, data) {
+            return commit('setDragDomFunc', data);
         }
     },
     getters: {
         connections: state => state.connections,
         varHighlight: state => state.varHighlight,
-        editObjArr: state => state.editObjArr
+        editObjArr: state => state.editObjArr,
+        dragDomFunc: state => state.dragDomFunc
     }
 };
