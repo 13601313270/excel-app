@@ -1,0 +1,63 @@
+// =======================
+// 带界限的封闭区域
+@ui_panel_padding: 10px 15px;
+@ui_panel_borderColor: #ddd;
+.ui_panel {
+  background-color: #fff;
+  border: 1px solid @ui_panel_borderColor;
+  border-radius: 4px;
+  box-sizing: border-box;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+  padding: @ui_panel_padding;
+}
+//带厚度的
+.ui_panel_weight{
+  .ui_panel;
+  border: none;
+  .shaow(1,100);
+  .weight();
+}
+// =======================
+// 可以被点击
+@ui_min_click_width: 28px;
+@ui_min_click_height: 28px;
+.ui_can_be_click {
+  cursor: pointer;
+  user-select:none;
+  min-width: @ui_min_click_width;
+  min-height: @ui_min_click_height;
+  &:hover{
+    .shaow(1,100);
+    .weight();
+  }
+}
+
+// =======================
+// 阴影
+@lightHeight: 200;// 光源离屏幕距离
+@lightAngle: pi()/5;// 光源照射角度
+/*获取光源阴影*/
+.shaow(@zIndex,@width) {
+  @blur: @zIndex*0.8;
+  @spread: ((@lightHeight*@width/(@lightHeight - @zIndex) - @width)/2);
+  box-shadow+: 0 unit(tan(@lightAngle)*@zIndex, px) unit(@blur, px) unit(@spread, px) rgba(0, 0, 0, 0.40);
+}
+
+/*增加厚度*/
+.weight() {
+  box-shadow+: 0 1px 0 0 #333, inset 0 1px 1px -1px rgba(255, 255, 255, 0.6);
+}
+
+/*凹进去*/
+.ao(@deep) {
+  box-shadow+: inset 0 unit(tan(@lightAngle)*@deep, px) unit(@deep*0.5, px) 0 rgba(0, 0, 0, 0.56),
+  0 1px 2px 0 white,
+  inset 0 unit(@deep*2*-1, px) 8px -1px rgba(255, 255, 255, 0.45);
+}
+
+// 单行文字
+.ui_single_text {
+  font-size: 13px;
+  line-height: 15px;
+}

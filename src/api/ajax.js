@@ -109,7 +109,7 @@ export default function(config) {
             xhr.onerror = function(e) {
                 reject(e);
             };
-            if(['POST', 'PUT'].includes(config.type)) {
+            if(['POST', 'PUT', 'DELETE'].includes(config.type)) {
                 // xhr.send(JSON.stringify(config.data));
                 // console.log(jsonToQuery(config.data));
                 xhr.send(jsonToQuery(config.data));

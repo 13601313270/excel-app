@@ -100,9 +100,14 @@
         <!--文件选择-->
         <div v-if="isChooseFile" class="chooseFile" @click="isChooseFile=false,appType=''">
             <div class="body" @click.stop="">
-                <div v-for="item in fileList" @click="selectFile(item)">
-                    <div class="panel-heading" v-html="item.title"></div>
-                </div>
+                <ui_window
+                    v-for="item in fileList"
+                    :key="item.id"
+                    @click="selectFile(item)"
+                    :title="item.title"
+                    @close="closeFileChoose(item.id)"
+                >
+                </ui_window>
                 <div @click="createFile" style="background-color: #dce4e4;text-align: center;padding-top: 50px;">新建
                 </div>
             </div>
@@ -167,6 +172,8 @@ import ppt from './dashboard/ppt.vue';
 import useFile from './dashboard/useFile.vue';
 import widgetIdToVar from './widgetIdToVar';
 
+import uiWindow from './ui/window.vue';
+
 import { mapActions, mapGetters } from 'vuex';
 
 import Vue from 'vue';
@@ -214,7 +221,8 @@ export default {
             appType: '',
             fileList: [],
             // 保存的文件
-            fileData: {}
+            fileData: {},
+            chooseAppId: null
         }
     },
     computed: {
@@ -438,7 +446,9 @@ export default {
             });
         },
         createFile() {
+            console.log(window);
             let fileName = window.prompt('请输入文件名', '未命名文件');
+            console.log(2);
             ajax({
                 type: 'POST',
                 url: 'http://www.tablehub.cn/app/file.html',
@@ -475,6 +485,20 @@ export default {
             console.log(file.var_data);
             this.fileData = file;
             this.isChooseFile = false;
+        },
+        closeFileChoose(id) {
+            console.log('closeFileChoose');
+            console.log(id);
+            ajax({
+                type: 'DELETE',
+                url: 'http://www.tablehub.cn/app/file.html',
+                data: {
+                    id: id
+                }
+            }).then((data) => {
+                this.chooseApp(this.appType);
+                console.log(data);
+            });
         },
         save() {
             let allData = allVar.getAllData();
@@ -574,7 +598,8 @@ export default {
         'excel': excel,
         'free-panel': freePanel,
         'ppt': ppt,
-        'useFile': useFile
+        'useFile': useFile,
+        'ui_window': uiWindow
     }
 }
 </script>
@@ -753,17 +778,6 @@ export default {
                 width: 200px;
                 height: 130px;
                 margin: 0 5px 20px 5px;
-                background-color: #fff;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                box-sizing: border-box;
-                -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-                box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-                .panel-heading {
-                    padding: 10px 15px;
-                    border-bottom: solid 1px #ddd;
-                    background-color: #f5f5f5;
-                }
             }
         }
     }
