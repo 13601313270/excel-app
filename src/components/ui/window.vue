@@ -6,6 +6,9 @@
                 <ui_button size="mini" @click="closeWindow">X</ui_button>
             </div>
         </div>
+        <div class="body">
+            <slot></slot>
+        </div>
     </div>
 </template>
 <script>
@@ -20,9 +23,6 @@ export default {
             this.$emit('close');
         }
     },
-    created() {
-        console.log(this);
-    },
     components: {
         ui_button: button
     }
@@ -32,11 +32,15 @@ export default {
     @import "basic";
 
     .window_content {
-        .ui_panel_weight;
+        .ui_panel;
         padding: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
         .panel-heading {
             .ui_panel;
             border: none;
+            flex-shrink: 0;
             border-radius: 0;
             border-bottom: solid 1px @ui_panel_borderColor;
             background-color: #f5f5f5;
@@ -52,6 +56,14 @@ export default {
                     .ui_can_be_click;
                 }
             }
+        }
+        .body {
+            .ui_panel;
+            flex-grow: 1;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: scroll;
         }
     }
 </style>

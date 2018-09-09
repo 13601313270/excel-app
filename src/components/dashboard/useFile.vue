@@ -19,7 +19,7 @@ export default {
             this.$set(this.fileData, 'widget', []);
         }
         this.$emit('eval', `$a111 = INPUT('string',"10")
-        $a311 = BAR(RELATIONAL_MODEL(1,'excel','DATE_FORMAT(ctime,"%Y-%m")',['count(id)','count(id)+4']))
+        $a3 = BAR(RELATIONAL_MODEL(1,'excel','DATE_FORMAT(ctime,"%Y-%m")',['count(id)','count(id)+4']))
         $a411 = $a3.select
         $bbb = INPUT('number',100)
         $a511 = MIN($a1,1)`);

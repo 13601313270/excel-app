@@ -98,19 +98,23 @@
             </div>
         </div>
         <!--文件选择-->
-        <div v-if="isChooseFile" class="chooseFile" @click="isChooseFile=false,appType=''">
-            <div class="body" @click.stop="">
-                <ui_window
-                    v-for="item in fileList"
-                    :key="item.id"
-                    @click="selectFile(item)"
-                    :title="item.title"
-                    @close="closeFileChoose(item.id)"
-                >
-                </ui_window>
-                <div @click="createFile" style="background-color: #dce4e4;text-align: center;padding-top: 50px;">新建
+        <div v-if="isChooseFile" class="chooseFile">
+            <ui_window class="body" @close="closeChooseFile">
+                <template v-for="item in fileList">
+                    <ui_window
+                        class="file_item"
+                        :key="item.id"
+                        @click.native="selectFile(item)"
+                        :title="item.title"
+                        @close="deleteFile(item.id)"
+                    >
+                        asdfsda
+                    </ui_window>
+                </template>
+                <div @click="createFile" class="file_item"
+                     style="background-color: #dce4e4;text-align: center;padding-top: 50px;box-sizing: border-box;">新建
                 </div>
-            </div>
+            </ui_window>
         </div>
     </div>
 </template>
@@ -237,6 +241,10 @@ export default {
             this.$nextTick(() => {
                 this.setDragDomFunc(null);
             });
+        },
+        closeChooseFile() {
+            this.isChooseFile = false;
+            this.appType = '';
         },
         getCodeByMatchItem(item) {
             let code = item.name + '(';
@@ -446,9 +454,7 @@ export default {
             });
         },
         createFile() {
-            console.log(window);
             let fileName = window.prompt('请输入文件名', '未命名文件');
-            console.log(2);
             ajax({
                 type: 'POST',
                 url: 'http://www.tablehub.cn/app/file.html',
@@ -457,7 +463,7 @@ export default {
                     title: fileName
                 }
             }).then((data) => {
-                console.log(data);
+                this.chooseApp(this.appType);
             });
         },
         selectFile(file) {
@@ -486,9 +492,7 @@ export default {
             this.fileData = file;
             this.isChooseFile = false;
         },
-        closeFileChoose(id) {
-            console.log('closeFileChoose');
-            console.log(id);
+        deleteFile(id) {
             ajax({
                 type: 'DELETE',
                 url: 'http://www.tablehub.cn/app/file.html',
@@ -497,7 +501,6 @@ export default {
                 }
             }).then((data) => {
                 this.chooseApp(this.appType);
-                console.log(data);
             });
         },
         save() {
@@ -763,17 +766,17 @@ export default {
     .chooseFile {
         width: 100%;
         height: 100%;
-        background-color: #0000002e;
         position: absolute;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: rgba(0, 0, 0, 0.3);
         .body {
             width: 500px;
             height: 300px;
-            padding: 20px;
             background-color: white;
-            > * {
+            box-shadow: 1px 1px 400px -40px #5c5c5c;
+            .file_item {
                 float: left;
                 width: 200px;
                 height: 130px;
