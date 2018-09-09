@@ -3,7 +3,7 @@
         <div class="panel-heading">
             <div class="name" v-html="title"></div>
             <div class="tools">
-                <ui_button size="mini" @click="closeWindow">X</ui_button>
+                <ui_button size="mini" @click.native.stop="closeWindow">X</ui_button>
             </div>
         </div>
         <div class="body">
