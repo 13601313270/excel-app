@@ -1,6 +1,6 @@
 <template>
     <div class="content">
-        <header-nav></header-nav>
+        <div style="background-color: #3c3f41;border-bottom: solid 1px #4f4f4f;">tablehub</div>
         <div class="app_list">
             <h1>数据软件列表</h1>
             <div class="list">
@@ -133,18 +133,18 @@ export default {
             this.setConnections(data);
         });
         /*
-        ajax({
-            type: 'POST',
-            url: 'http://www.tablehub.cn/action/mysql.html',
-            data: {
-                type: 'showCreateTable',
-                connection: 1,
-                table: 'excel'
-            }
-        }).then((data) => {
-            console.log(data);
-        });
-        */
+         ajax({
+         type: 'POST',
+         url: 'http://www.tablehub.cn/action/mysql.html',
+         data: {
+         type: 'showCreateTable',
+         connection: 1,
+         table: 'excel'
+         }
+         }).then((data) => {
+         console.log(data);
+         });
+         */
     },
     components: {
         'header-nav': headerNav,

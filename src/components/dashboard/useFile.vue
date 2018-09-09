@@ -6,14 +6,14 @@
         <widget data="$bbb"></widget>
         <div v-for="(item,key) in fileData.widget">
             <widget :key="item" class="widget" :class="{light:dragDomFunc}"></widget>
-            <div @click="deleteWidget(key)">delete</div>
+            <div @click="deleteWidget(key)" v-if="isEditing">delete</div>
         </div>
-        <div @click="add">click</div>
+        <div @click="add" v-if="isEditing">click</div>
     </div>
 </template>
 <script>
 export default {
-    props: ['fileData', 'dragDomFunc'],
+    props: ['fileData', 'isEditing', 'dragDomFunc'],
     created() {
         if(this.fileData.widget === undefined) {
             this.$set(this.fileData, 'widget', []);

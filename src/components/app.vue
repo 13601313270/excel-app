@@ -1,8 +1,14 @@
 <template>
     <div class="content" @dragend="cancelDragDomFunc">
-        <header-nav></header-nav>
+        <div style="background-color: #e6e6e6">
+            开启修改
+            <img
+                style="width: 55px;height: 20px;"
+                @click="isEditing = !isEditing"
+                :src="isEditing?'https://n4-q.mafengwo.net/s10/M00/18/A2/wKgBZ1jc3R6AYhi_AAB-2Jyz1WU027.png':'https://c2-q.mafengwo.net/s10/M00/18/1D/wKgBZ1jc3A-AKDulAABm0wptOh4037.png'"/>
+        </div>
         <div class="app_page">
-            <div class="left_tools">
+            <div class="left_tools" v-if="isEditing">
                 <div :class="{active:leftToolSelect=='widget'}"
                      @click="leftToolSelect=(leftToolSelect==='widget'?'':'widget')">控件
                 </div>
@@ -10,7 +16,7 @@
                      @click="leftToolSelect=(leftToolSelect==='widget22'?'':'widget22')">控件
                 </div>
             </div>
-            <div class="left_tools_content" v-if="leftToolSelect!==''"
+            <div class="left_tools_content" v-if="isEditing && leftToolSelect!==''"
                  :style="{width:leftToolInfo[leftToolSelect]?leftToolInfo[leftToolSelect].width+'px':''}">
                 <tools_widget v-if="leftToolSelect=='widget'" @drag='drag'></tools_widget>
                 <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
@@ -21,15 +27,18 @@
                     <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
                     <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                     <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
-                    <use-file v-else-if="appType===1" :dragDomFunc="dragDomFunc" :fileData="fileData.file_data"
-                              @save="save"
-                              @eval="eval"></use-file>
+                    <use-file
+                        v-else-if="appType===1"
+                        :dragDomFunc="dragDomFunc" :fileData="fileData.file_data"
+                        :isEditing="isEditing"
+                        @save="save"
+                        @eval="eval"></use-file>
                     <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
                 </div>
             </div>
             <div
                 class="right_tools_content"
-                v-show="rightToolSelect!==''"
+                v-show="isEditing && rightToolSelect!==''"
                 :style="{width:rightToolInfo[rightToolSelect]?rightToolInfo[rightToolSelect].width+'px':''}"
             >
                 <datas-vue v-if="rightToolSelect=='data'" :connections="connections" @change="editVar"></datas-vue>
@@ -45,7 +54,7 @@
                     </div>
                 </div>
             </div>
-            <div class="right_tools">
+            <div class="right_tools" v-if="isEditing">
                 <div :class="{active:rightToolSelect=='var'}"
                      @click="rightToolSelect=(rightToolSelect==='var'?'':'var')">已添加对象
                 </div>
@@ -150,6 +159,7 @@ Vue.component(widget.name, widget);
 export default {
     data() {
         return {
+            isEditing: false,
             dashboardTemplate: [
                 {
                     id: 1,
@@ -158,7 +168,7 @@ export default {
                 }
             ],
             currentView: dashboard(),
-            leftToolSelect: 'widget',
+            leftToolSelect: '',
             leftToolInfo: {
                 widget: {
                     width: 200
@@ -167,7 +177,7 @@ export default {
                     width: 300
                 }
             },
-            rightToolSelect: 'var',
+            rightToolSelect: '',
             rightToolInfo: {
                 data: {
                     width: 200
@@ -422,26 +432,28 @@ export default {
             this.fileData = file;
         },
         save() {
-            let allData = allVar.getAllData();
-            let saveData = {};
-            console.log('++++++++++');
-            console.log(allData);
-            for (let i in allData) {
-                saveData[i] = getStrByObj(allData[i].value_);
-            }
-            console.log(JSON.stringify(saveData));
-            ajax({
-                type: 'PUT',
-                url: 'http://www.tablehub.cn/app/file.html',
-                data: {
-                    id: this.fileData.id,
-                    file_data: JSON.stringify(this.fileData.file_data),
-                    widgetIdToVar: JSON.stringify(widgetIdToVar),
-                    allVar: JSON.stringify(saveData)
+            if(this.isEditing) {
+                let allData = allVar.getAllData();
+                let saveData = {};
+                console.log('++++++++++');
+                console.log(allData);
+                for (let i in allData) {
+                    saveData[i] = getStrByObj(allData[i].value_);
                 }
-            }).then((data) => {
-                console.log(data);
-            });
+                console.log(JSON.stringify(saveData));
+                ajax({
+                    type: 'PUT',
+                    url: 'http://www.tablehub.cn/app/file.html',
+                    data: {
+                        id: this.fileData.id,
+                        file_data: JSON.stringify(this.fileData.file_data),
+                        widgetIdToVar: JSON.stringify(widgetIdToVar),
+                        allVar: JSON.stringify(saveData)
+                    }
+                }).then((data) => {
+                    console.log(data);
+                });
+            }
         }
     },
     mounted() {
