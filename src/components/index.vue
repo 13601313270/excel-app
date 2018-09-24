@@ -10,9 +10,15 @@
                 <div @click="chooseApp('excel')">
                     <div class="panel-heading">表格</div>
                 </div>
-                <div @click="chooseApp('freePanel')">黑板</div>
-                <div @click="chooseApp('ppt')">演示文稿</div>
-                <div @click="chooseApp('test')">测试</div>
+                <div @click="chooseApp('freePanel')">
+                    <div class="panel-heading">黑板</div>
+                </div>
+                <div @click="chooseApp('ppt')">
+                    <div class="panel-heading">演示文稿</div>
+                </div>
+                <div @click="chooseApp('test')">
+                    <div class="panel-heading">测试</div>
+                </div>
                 <div v-for="item in dashboardTemplate" @click="chooseApp(item.id)">
                     <div class="panel-heading" v-html="item.title"></div>
                 </div>
@@ -20,7 +26,7 @@
         </div>
         <!--文件选择-->
         <div v-if="isChooseFile" class="choose_file">
-            <ui_window class="body" @close="closeChooseFile">
+            <ui_window class="body" @close="closeChooseFile" title="选择app的记录">
                 <template v-for="item in fileList">
                     <ui_window
                         class="file_item"
@@ -153,6 +159,7 @@ export default {
 }
 </script>
 <style scoped lang="less">
+    @import "./ui/basic";
     h1, h2 {
         font-weight: normal;
     }
@@ -182,6 +189,7 @@ export default {
             flex-wrap: wrap;
             padding: 15px;
             .list > * {
+                .ui_list_item;
                 flex-shrink: 0;
                 float: left;
                 width: 300px;
@@ -211,11 +219,12 @@ export default {
         align-items: center;
         background-color: rgba(0, 0, 0, 0.3);
         .body {
-            width: 500px;
-            height: 300px;
+            width: 662px;
+            height: 500px;
             background-color: white;
             box-shadow: 1px 1px 400px -40px #5c5c5c;
             .file_item {
+                .ui_list_item;
                 float: left;
                 width: 200px;
                 height: 130px;

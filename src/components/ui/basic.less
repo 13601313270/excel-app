@@ -1,7 +1,13 @@
 // =======================
 // 带界限的封闭区域
-@ui_panel_padding: 10px 15px;
+@ui_panel_padding_y: 10px;
+@ui_panel_padding_x: 15px;
+@ui_panel_padding: @ui_panel_padding_y @ui_panel_padding_x;
 @ui_panel_borderColor: #ddd;
+
+//封闭区域之间的间距
+@ui_panel_margin_y: 10px;
+@ui_panel_margin_x: 15px;
 .ui_panel {
   background-color: #fff;
   border: 1px solid @ui_panel_borderColor;
@@ -10,32 +16,34 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
   padding: @ui_panel_padding;
 }
+
 //带厚度的
-.ui_panel_weight{
+.ui_panel_weight {
   .ui_panel;
   border: none;
-  .shaow(1,100);
+  .shaow(1, 100);
   .weight();
 }
+
 // =======================
 // 可以被点击
 @ui_min_click_width: 28px;
 @ui_min_click_height: 28px;
 .ui_can_be_click {
   cursor: pointer;
-  user-select:none;
+  user-select: none;
   min-width: @ui_min_click_width;
   min-height: @ui_min_click_height;
-  &:hover{
-    .shaow(1,100);
+  &:hover {
+    .shaow(1, 100);
     .weight();
   }
 }
 
 // =======================
 // 阴影
-@lightHeight: 200;// 光源离屏幕距离
-@lightAngle: pi()/5;// 光源照射角度
+@lightHeight: 200; // 光源离屏幕距离
+@lightAngle: pi()/5; // 光源照射角度
 /*获取光源阴影*/
 .shaow(@zIndex,@width) {
   @blur: @zIndex*0.8;
@@ -59,4 +67,14 @@
 .ui_single_text {
   font-size: 13px;
   line-height: 15px;
+}
+
+// =======================
+// 列表
+//列表中的子项
+.ui_list_item {
+  &:hover {
+    .shaow(2, 200);
+    .weight();
+  }
 }

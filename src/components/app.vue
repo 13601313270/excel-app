@@ -89,7 +89,7 @@
                 </div>
             </div>
         </div>
-        <!--文件选择-->
+        <dynamic-vue></dynamic-vue>
     </div>
 </template>
 <script>
@@ -155,6 +155,8 @@ import { mapActions, mapGetters } from 'vuex';
 
 import Vue from 'vue';
 import widget from './widget.vue';
+
+import dynamicVueObject from './dynamicVueObject/dynamicVueObject.vue';
 Vue.component(widget.name, widget);
 export default {
     data() {
@@ -457,9 +459,6 @@ export default {
         }
     },
     mounted() {
-        console.log(this.$route.params.fileId);
-        console.log(this.$route.params);
-        console.log(this.$route);
         ajax({
             type: 'POST',
             url: 'http://www.tablehub.cn/action/mysql.html',
@@ -546,7 +545,8 @@ export default {
         'free-panel': freePanel,
         'ppt': ppt,
         'useFile': useFile,
-        'ui_window': uiWindow
+        'ui_window': uiWindow,
+        'dynamic-vue': dynamicVueObject
     }
 }
 </script>

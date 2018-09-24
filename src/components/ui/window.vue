@@ -45,6 +45,8 @@ export default {
             border-bottom: solid 1px @ui_panel_borderColor;
             background-color: #f5f5f5;
             display: flex;
+            padding-top: 5px;
+            padding-bottom: 5px;
             .name {
                 .ui_single_text;
                 flex-grow: 1;
