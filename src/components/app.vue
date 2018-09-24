@@ -54,7 +54,7 @@
                     </div>
                 </div>
             </div>
-            <div class="right_tools" v-if="isEditing">
+            <div class="right_tools" v-show="isEditing">
                 <div :class="{active:rightToolSelect=='var'}"
                      @click="rightToolSelect=(rightToolSelect==='var'?'':'var')">已添加对象
                 </div>
@@ -413,7 +413,9 @@ export default {
             file.var_data = JSON.parse(file.var_data);
             file.widget_id_to_var = JSON.parse(file.widget_id_to_var);
             // 先创建对象，保证所有对象都存在
+            console.log('++++++++++');
             Object.keys(file.var_data).forEach(item => {
+                console.log('((((((',item);
                 let insertObj = getEvalObj(1, '""');
                 allVar.setVar(item, insertObj[0]);
             });

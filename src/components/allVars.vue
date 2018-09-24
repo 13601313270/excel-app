@@ -12,7 +12,7 @@
             </thead>
             <tbody>
             <tr v-for="(item,key) in datas"
-                v-if="item.type!=='relationalModel'"
+                v-if="item!==undefined && item.type!=='relationalModel'"
                 @mouseover="hover(key)"
                 @mouseout="leave(key)">
                 <td v-html="key"></td>
