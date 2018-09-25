@@ -50,7 +50,7 @@
                 </div>
                 <div v-show="rightToolSelect=='var'">
                     <div style="flex-grow: 1;padding: 3px 3px;overflow: auto">
-                        <all-vars @change="editVar" @hover="hover"></all-vars>
+                        <all-vars @change="editVar" @hover="varHover"></all-vars>
                     </div>
                 </div>
             </div>
@@ -405,7 +405,7 @@ export default {
                 this.editDataType = '';
             }
         },
-        hover(key, messageType) {
+        varHover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
         },
         selectFile(file) {
@@ -415,7 +415,6 @@ export default {
             // 先创建对象，保证所有对象都存在
             console.log('++++++++++');
             Object.keys(file.var_data).forEach(item => {
-                console.log('((((((',item);
                 let insertObj = getEvalObj(1, '""');
                 allVar.setVar(item, insertObj[0]);
             });
@@ -439,8 +438,6 @@ export default {
             if(this.isEditing) {
                 let allData = allVar.getAllData();
                 let saveData = {};
-                console.log('++++++++++');
-                console.log(allData);
                 for (let i in allData) {
                     saveData[i] = getStrByObj(allData[i].value_);
                 }

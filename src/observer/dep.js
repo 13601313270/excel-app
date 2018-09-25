@@ -65,11 +65,11 @@ class Dep {
         return isReady;
     }
 
-    action() {
+    action(actionType) {
         // 当有多个上级的时候，会收到多个render，所以只捕捉最后一次
         if (this.__allBeforeIsState0() && this.state === 1) {
             let result = [];
-            this.eventEmitter.emit('ready', function(listenResult) {
+            this.eventEmitter.emit(actionType, function(listenResult) {
                 result.push(listenResult);
             });
             let allPromise = [];
@@ -89,7 +89,7 @@ class Dep {
                 Promise.all(allPromise).then(() => {
                     this.state = 0;
                     if (this.sentEvent.length > 0) {
-                        this.sentEvent.forEach(i => i.action());
+                        this.sentEvent.forEach(i => i.action(actionType));
                     }
                 }).catch(() => {
                     this.state = 0;
@@ -97,7 +97,7 @@ class Dep {
             } else {
                 this.state = 0;
                 if (this.sentEvent.length > 0) {
-                    this.sentEvent.forEach(i => i.action());
+                    this.sentEvent.forEach(i => i.action(actionType));
                 }
             }
         }
@@ -106,7 +106,7 @@ class Dep {
     // 请求判断当前是否可以释放，如果可以则释放并通知下家
     update() {
         this.lock();
-        this.action();
+        this.action('ready');
     }
 
     // 当变为孤立点时，则会删除(sentEvent为空，说明不会再被任何对象使用)

@@ -6,7 +6,7 @@
         <widget data="$bbb"></widget>
         <div v-for="(item,key) in fileData.widget">
             <widget :key="item" class="widget" :class="{light:dragDomFunc}"></widget>
-            <div @click="deleteWidget(key)" v-if="isEditing">delete</div>
+            <div @click="deleteWidget(key)" class="delete_button" v-if="isEditing">delete</div>
         </div>
         <div @click="add" v-if="isEditing">click</div>
     </div>
@@ -43,5 +43,9 @@ export default {
         &.light {
             border: solid 1px red;
         }
+    }
+
+    .delete_button {
+        width: 40px;
     }
 </style>
