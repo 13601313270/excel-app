@@ -18,7 +18,7 @@
             </div>
             <div class="left_tools_content" v-if="isEditing && leftToolSelect!==''"
                  :style="{width:leftToolInfo[leftToolSelect]?leftToolInfo[leftToolSelect].width+'px':''}">
-                <tools_widget v-if="leftToolSelect=='widget'" @drag='drag'></tools_widget>
+                <tools_widget v-if="leftToolSelect=='widget'" @drag='dragWidget'></tools_widget>
                 <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
             </div>
             <div id="app_content">
@@ -278,7 +278,6 @@ export default {
             return code;
         },
         addData(varName, id, dom) {
-            console.log(varName, id, dom);
             let dragDomFunc = this.dragDomFunc;
             if(dragDomFunc === null) {
                 dragDomFunc = allMatch.find(item => {
@@ -295,6 +294,7 @@ export default {
                 this.addData_(varName, id, dom, code);
                 this.editVar(varName);
             }
+            this.cancelDragDomFunc();
             this.save();
         },
         addData_(varName, id, dom, code) {
@@ -348,7 +348,7 @@ export default {
             }
             this.save();
         },
-        drag(func) {
+        dragWidget(func) {
             this.setDragDomFunc(func);
         },
         allowDrop(e) {

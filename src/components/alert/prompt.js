@@ -11,12 +11,12 @@ export function prompt(text, initValue) {
             initValue
         }, {
             ok(res) {
-                resolve(res);
                 deleteVueObj(dyVueObj);
+                resolve(res);
             },
             cancel() {
-                reject('cancel');
                 deleteVueObj(dyVueObj);
+                reject('cancel');
             }
         });
     });
