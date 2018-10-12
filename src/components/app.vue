@@ -54,7 +54,6 @@
                             @change="editVar"
                             :varToDom="varToDom"
                             :useCreateVar="useCreateVar"
-                            :widgetIdToVar="widgetIdToVar"
                             @hover="varHover"
                             @delete="deleteVar"
                         ></all-vars>
@@ -154,7 +153,6 @@ import excel from './dashboard/excel.vue';
 import freePanel from './dashboard/freePanel.vue';
 import ppt from './dashboard/ppt.vue';
 import useFile from './dashboard/useFile.vue';
-import widgetIdToVar from './widgetIdToVar';
 
 import uiWindow from './ui/window.vue';
 
@@ -207,18 +205,17 @@ export default {
             fileList: [],
             // 保存的文件
             fileData: {},
-            useCreateVar: [],
-            widgetIdToVar: widgetIdToVar
+            useCreateVar: []
         }
     },
     computed: {
-        ...mapGetters('main', ['editObjArr', 'dragDomFunc']),
+        ...mapGetters('main', ['editObjArr', 'dragDomFunc', 'widgetIdToVar']),
         saveHtml() {
             return this.html.replace(/ random-id="r(\d+)"/g, '');
         }
     },
     methods: {
-        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc']),
+        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc', 'clearWidgetIdToVar']),
         cancelDragDomFunc() {
             this.$nextTick(() => {
                 this.setDragDomFunc(null);
@@ -318,8 +315,8 @@ export default {
             // 用来设置变量映射dom
             this.varToDom[varName] = dom;
             // 用来映射widgetId对应存放的变量
-            widgetIdToVar[widgetId] = varName;
-            this.widgetIdToVar = widgetIdToVar;
+            this.widgetIdToVar[widgetId] = varName;
+            // this.widgetIdToVar = widgetIdToVar;
             let reg = new RegExp('<widget random-id="' + widgetId + '"[^>]*>', 'g');
             this.html = this.html.replace(reg, '<widget random-id="' + widgetId + '" data="' + varName + '">');
             this.varToDom[varName].innerHTML = '';
@@ -429,8 +426,7 @@ export default {
             this.save();
         },
         destroyWidget(widgetId) {
-            delete widgetIdToVar[widgetId];
-            this.$delete(this.widgetIdToVar, widgetId);
+            console.log(widgetId);
             this.save();
         },
         varHover(key, messageType) {
@@ -456,8 +452,8 @@ export default {
 
             // console.log('-----file.widget_id_to_var-----');
             for (let i in file.widget_id_to_var) {
-                widgetIdToVar[i] = file.widget_id_to_var[i];
-                this.widgetIdToVar = widgetIdToVar;
+                this.widgetIdToVar[i] = file.widget_id_to_var[i];
+                // this.widgetIdToVar = widgetIdToVar;
             }
 
             // let insertObj = getEvalObj(1, code);
@@ -481,7 +477,7 @@ export default {
                     data: {
                         id: this.fileData.id,
                         file_data: JSON.stringify(this.fileData.file_data),
-                        widgetIdToVar: JSON.stringify(widgetIdToVar),
+                        widgetIdToVar: JSON.stringify(this.widgetIdToVar),
                         allVar: JSON.stringify(saveData)
                     }
                 }).then((data) => {
@@ -568,11 +564,7 @@ export default {
         widgetEvent.on('destroy', this.destroyWidget);
     },
     destroyed() {
-        let allKeys = Object.keys(widgetIdToVar);
-        allKeys.forEach(key => {
-            delete widgetIdToVar[key];
-        });
-
+        this.clearWidgetIdToVar();
         widgetEvent.removeListener('insertByCode');
         widgetEvent.removeListener('init');
         widgetEvent.removeListener('change');

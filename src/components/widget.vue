@@ -8,7 +8,7 @@
 </template>
 <script>
 import widgetEvent from './widgetChange';
-import widgetIdToVar from './widgetIdToVar';
+// import widgetIdToVar from './widgetIdToVar';
 import { mapGetters, mapActions } from 'vuex';
 import { prompt } from './alert/prompt';
 export default {
@@ -25,14 +25,14 @@ export default {
             widgetEvent.emit('init', this.data, this.key, this.$refs.content);
             this.$emit('init', this.data, this.key, this.$refs.content);
         } else {
-            this.data_ = widgetIdToVar[this.key];
+            this.data_ = this.widgetIdToVar[this.key];
 
             widgetEvent.emit('init', this.data_, this.key, this.$refs.content);
             this.$emit('init', this.data_, this.key, this.$refs.content);
         }
     },
     methods: {
-        ...mapActions('main', ['setDragDomFunc']),
+        ...mapActions('main', ['setDragDomFunc', 'deleteWidgetIdToVar']),
         getHighlightState(type) {
             // return this.$store.state.varHighlight.key;
             if(this.varHighlight.key === type) {
@@ -62,10 +62,10 @@ export default {
     },
     destroyed() {
         widgetEvent.emit('destroy', this.key);
-        delete widgetIdToVar[this.key];
+        this.deleteWidgetIdToVar(this.key);
     },
     computed: {
-        ...mapGetters('main', ['varHighlight', 'dragDomFunc'])
+        ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar'])
     }
 }
 </script>

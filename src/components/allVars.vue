@@ -34,6 +34,7 @@
 <script>
 import AllVarClass from '../observer/allVar.js';
 import getStrByObj from '../languageParser/getStrByObj';
+import { mapGetters } from 'vuex';
 export default {
     props: {
         varToDom: {
@@ -42,15 +43,15 @@ export default {
         },
         useCreateVar: {
             type: Array
-        },
-        widgetIdToVar: {
-            type: Object
         }
     },
     data() {
         return {
             datas: {}
         };
+    },
+    computed: {
+        ...mapGetters('main', ['widgetIdToVar'])
     },
     mounted() {
         let self = this;
@@ -59,12 +60,6 @@ export default {
             // console.log(val);
             self.$set(self.datas, key, val.value_);
         });
-    },
-    watch: {
-        widgetIdToVar(val) {
-            console.log('改成了');
-            console.log(val);
-        }
     },
     methods: {
         getCodeByVal(val) {
@@ -84,12 +79,11 @@ export default {
              console.log(this.useCreateVar, key);
              console.log(this.useCreateVar.has(key));
              */
-            let widgetIdToVarValue = Object.values(this.widgetIdToVar);
             if(!this.useCreateVar.includes(key)) {
                 return '系统变量';
             }
             console.log('---重新计算---');
-            if(widgetIdToVarValue.includes(key)) {
+            if(Object.values(this.widgetIdToVar).includes(key)) {
                 return '渲染';
             }
             if(item && item.dep.sentEvent.length > 0) {
