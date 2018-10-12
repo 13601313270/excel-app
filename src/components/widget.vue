@@ -25,8 +25,7 @@ export default {
             widgetEvent.emit('init', this.data, this.key, this.$refs.content);
             this.$emit('init', this.data, this.key, this.$refs.content);
         } else {
-            let key = widgetIdToVar[this.key];
-            this.data_ = key;
+            this.data_ = widgetIdToVar[this.key];
 
             widgetEvent.emit('init', this.data_, this.key, this.$refs.content);
             this.$emit('init', this.data_, this.key, this.$refs.content);
@@ -60,6 +59,10 @@ export default {
                 });
             }
         }
+    },
+    destroyed() {
+        widgetEvent.emit('destroy', this.key);
+        delete widgetIdToVar[this.key];
     },
     computed: {
         ...mapGetters('main', ['varHighlight', 'dragDomFunc'])

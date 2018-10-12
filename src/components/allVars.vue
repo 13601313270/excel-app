@@ -34,7 +34,6 @@
 <script>
 import AllVarClass from '../observer/allVar.js';
 import getStrByObj from '../languageParser/getStrByObj';
-import widgetIdToVar from './widgetIdToVar';
 export default {
     props: {
         varToDom: {

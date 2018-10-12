@@ -286,7 +286,7 @@ export default {
             code += ')';
             return code;
         },
-        addData(varName, id, dom) {
+        addData(varName, widgetId, dom) {
             let dragDomFunc = this.dragDomFunc;
             if(dragDomFunc === null) {
                 dragDomFunc = allMatch.find(item => {
@@ -300,7 +300,7 @@ export default {
 
             if(matchItem !== undefined) {
                 let code = this.getCodeByMatchItem(matchItem);
-                this.addData_(varName, id, dom, code);
+                this.addData_(varName, widgetId, dom, code);
                 this.editVar(varName);
                 if(!this.useCreateVar.includes(varName)) {
                     this.useCreateVar.push(varName);
@@ -309,7 +309,7 @@ export default {
             this.cancelDragDomFunc();
             this.save();
         },
-        addData_(varName, id, dom, code) {
+        addData_(varName, widgetId, dom, code) {
             let insertObj = getEvalObj(1, code);
             allVar.setVar(varName, insertObj[0]);
             this.editDataType = '';
@@ -318,10 +318,12 @@ export default {
             // 用来设置变量映射dom
             this.varToDom[varName] = dom;
             // 用来映射widgetId对应存放的变量
-            widgetIdToVar[id] = varName;
+            console.log('=======1=======');
+            console.log(widgetId);
+            widgetIdToVar[widgetId] = varName;
             this.widgetIdToVar = widgetIdToVar;
-            let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
-            this.html = this.html.replace(reg, '<widget random-id="' + id + '" data="' + varName + '">');
+            let reg = new RegExp('<widget random-id="' + widgetId + '"[^>]*>', 'g');
+            this.html = this.html.replace(reg, '<widget random-id="' + widgetId + '" data="' + varName + '">');
             this.varToDom[varName].innerHTML = '';
             this.varToDom[varName].appendChild(newVar.value_.dom);
         },
@@ -426,6 +428,10 @@ export default {
             }
             this.save();
         },
+        destroyWidget(widgetId) {
+            delete widgetIdToVar[widgetId];
+            this.widgetIdToVar = widgetIdToVar;
+        },
         varHover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
         },
@@ -434,7 +440,6 @@ export default {
             file.var_data = JSON.parse(file.var_data);
             file.widget_id_to_var = JSON.parse(file.widget_id_to_var);
             // 先创建对象，保证所有对象都存在
-            console.log('++++++++++');
             Object.keys(file.var_data).forEach(item => {
                 let insertObj = getEvalObj(1, '""');
                 allVar.setVar(item, insertObj[0]);
@@ -555,10 +560,23 @@ export default {
         this.currentView = newDash;
 
         console.log(widgetEvent);
-        widgetEvent.on('change', this.addData);
         widgetEvent.on('insertByCode', this.addData_);
         widgetEvent.on('init', this.dataInit);
+        widgetEvent.on('change', this.addData);
         widgetEvent.on('editVar', this.editVar);
+        widgetEvent.on('destroy', this.destroyWidget);
+    },
+    destroyed() {
+        let allKeys = Object.keys(widgetIdToVar);
+        allKeys.forEach(key => {
+            delete widgetIdToVar[key];
+        });
+
+        widgetEvent.removeListener('insertByCode');
+        widgetEvent.removeListener('init');
+        widgetEvent.removeListener('change');
+        widgetEvent.removeListener('editVar');
+        widgetEvent.removeListener('destroy');
     },
     components: {
         'all-vars': allPageVars,
