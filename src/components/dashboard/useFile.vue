@@ -8,7 +8,7 @@
             <widget :key="item" class="widget" :class="{light:dragDomFunc}"></widget>
             <div @click="deleteWidget(key)" class="delete_button" v-if="isEditing">delete</div>
         </div>
-        <div @click="add" v-if="isEditing">click</div>
+        <button @click="add" v-if="isEditing">click</button>
     </div>
 </template>
 <script>
@@ -19,10 +19,7 @@ export default {
             this.$set(this.fileData, 'widget', []);
         }
         this.$emit('eval', `$a111 = INPUT('string',"10")
-        $a3 = BAR(RELATIONAL_MODEL(1,'excel','DATE_FORMAT(ctime,"%Y-%m")',['count(id)','count(id)+4']))
-        $a411 = $a3.select
-        $bbb = INPUT('number',100)
-        $a511 = MIN($a1,1)`);
+        $bbb = INPUT('number',100)`);
     },
     methods: {
         add() {

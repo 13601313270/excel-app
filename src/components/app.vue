@@ -50,7 +50,13 @@
                 </div>
                 <div v-show="rightToolSelect=='var'">
                     <div style="flex-grow: 1;padding: 3px 3px;overflow: auto">
-                        <all-vars @change="editVar" @hover="varHover"></all-vars>
+                        <all-vars
+                            @change="editVar"
+                            :varToDom="varToDom"
+                            :useCreateVar="useCreateVar"
+                            @hover="varHover"
+                            @delete="deleteVar"
+                        ></all-vars>
                     </div>
                 </div>
             </div>
@@ -199,7 +205,8 @@ export default {
             appType: '',
             fileList: [],
             // 保存的文件
-            fileData: {}
+            fileData: {},
+            useCreateVar: []
         }
     },
     computed: {
@@ -293,6 +300,9 @@ export default {
                 let code = this.getCodeByMatchItem(matchItem);
                 this.addData_(varName, id, dom, code);
                 this.editVar(varName);
+                if(!this.useCreateVar.includes(varName)) {
+                    this.useCreateVar.push(varName);
+                }
             }
             this.cancelDragDomFunc();
             this.save();
@@ -382,6 +392,7 @@ export default {
             }
             this.save();
         },
+        // app内部可以调用 代码识别
         eval(evalContent) {
             console.log(evalContent);
             getEvalObj(1, evalContent);
@@ -405,6 +416,13 @@ export default {
                 this.editDataType = '';
             }
         },
+        deleteVar(key) {
+            console.log('删除了变量', key);
+            if(this.useCreateVar.includes(key)) {
+                this.useCreateVar.splice(this.useCreateVar.findIndex(index => index === key), 1);
+            }
+            this.save();
+        },
         varHover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
         },
@@ -422,6 +440,9 @@ export default {
             Object.keys(file.var_data).forEach(item => {
                 let insertObj = getEvalObj(1, file.var_data[item]);
                 allVar.setVar(item, insertObj[0]);
+                if(!this.useCreateVar.includes(item)) {
+                    this.useCreateVar.push(item);
+                }
             });
 
             // console.log('-----file.widget_id_to_var-----');
@@ -439,7 +460,9 @@ export default {
                 let allData = allVar.getAllData();
                 let saveData = {};
                 for (let i in allData) {
-                    saveData[i] = getStrByObj(allData[i].value_);
+                    if(this.useCreateVar.includes(i)) {
+                        saveData[i] = getStrByObj(allData[i].value_);
+                    }
                 }
                 console.log(JSON.stringify(saveData));
                 ajax({

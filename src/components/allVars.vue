@@ -23,6 +23,8 @@
                 <td v-else v-html="item.value.toString()"></td>
                 <td>
                     <button @click="change(key)">修改</button>
+                    <button v-if="isCanDelete(key,item)===true" @click="deleteItem(key)">删除</button>
+                    <span v-else v-html="isCanDelete(key,item)"></span>
                 </td>
             </tr>
             </tbody>
@@ -33,7 +35,15 @@
 import AllVarClass from '../observer/allVar.js';
 import getStrByObj from '../languageParser/getStrByObj';
 export default {
-    props: ['data', 'randomId'],
+    props: {
+        varToDom: {
+            type: Map,
+            required: true
+        },
+        useCreateVar: {
+            type: Array
+        }
+    },
     data() {
         return {
             datas: {}
@@ -42,8 +52,8 @@ export default {
     mounted() {
         let self = this;
         AllVarClass.on('valChange', function(key, val) {
-            console.log(key);
-            console.log(val);
+            // console.log(key);
+            // console.log(val);
             self.$set(self.datas, key, val.value_);
         });
     },
@@ -55,9 +65,35 @@ export default {
             this.$emit('change', key);
         },
         hover(key, item) {
-            console.log('------');
-            console.log(item);
             this.$emit('hover', key, 'info');
+        },
+        isCanDelete(key, item) {
+            // item.dep.sentEvent 指向 变量对应的计算公式的Dep
+            // 所有VarSentDep需要通知的对象
+            /*
+             console.log('**********');
+             console.log(this.useCreateVar, key);
+             console.log(this.useCreateVar.has(key));
+             */
+            if(!this.useCreateVar.includes(key)) {
+                return '系统变量';
+            }
+            if(this.varToDom.get(AllVarClass.getVar(key)) !== undefined) {
+                return '渲染';
+            }
+            if(item && item.dep.sentEvent.length > 0) {
+                let VarSentDep = item.dep.sentEvent[0].sentEvent.filter(item => {
+                    return !(item instanceof AllVarClass.constructor);
+                });
+                return VarSentDep.length === 0;
+            } else {
+                return '被使用';
+            }
+        },
+        deleteItem(key) {
+            AllVarClass.deleteVar(key);
+            this.$delete(this.datas, key);
+            this.$emit('delete', key);
         },
         leave(key) {
             this.$emit('hover', key, 'none');

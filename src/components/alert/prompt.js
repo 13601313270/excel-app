@@ -16,7 +16,7 @@ export function prompt(text, initValue) {
             },
             cancel() {
                 deleteVueObj(dyVueObj);
-                reject('cancel');
+                reject(new Error('cancel'));
             }
         });
     });

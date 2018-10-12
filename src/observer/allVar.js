@@ -8,15 +8,16 @@ class AllVarClass extends Dep {
     }
 
     setVar(key, val) {
-        if (this.allData[key] === undefined) {
+        if(this.allData[key] === undefined) {
             this.allData[key] = new Var(key);
-            this.listen(this.allData[key].dep);
+            // 如果每一个变量都被AllVarClass对象listen，则对象的Dep无法删除，因为删除的限制是没有其他对象listen对象的Dep
+            // this.listen(this.allData[key].dep);
             this.allData[key].dep.on('ready', () => {
                 this.eventEmitter.emit('valChange', key, this.allData[key]);
             });
         }
         this.allData[key].value = val;
-        if (val instanceof Obj) {
+        if(val instanceof Obj) {
             val.dep.update();
         } else {
             this.allData[key].dep.update();
@@ -29,6 +30,21 @@ class AllVarClass extends Dep {
 
     getVar(key) {
         return this.allData[key];
+    }
+
+    deleteVar(key) {
+        let varObj = this.getVar(key);
+        let varEqualObj = varObj.value_;
+        if(varObj.dep.sentEvent.length === 0) {
+            varObj.dep.destory();
+            delete varObj.dep;
+            delete this.allData[key];
+            varEqualObj.dep.destory();
+            delete varEqualObj.dep;
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 export default new AllVarClass();
