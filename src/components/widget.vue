@@ -61,8 +61,8 @@ export default {
         }
     },
     destroyed() {
-        widgetEvent.emit('destroy', this.key);
         this.deleteWidgetIdToVar(this.key);
+        widgetEvent.emit('destroy', this.key);
     },
     computed: {
         ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar'])

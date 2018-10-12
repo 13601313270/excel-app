@@ -28,7 +28,7 @@ export default {
             state.widgetIdToVar = data;
         },
         clearWidgetIdToVar(state) {
-            state.widgetIdToVar = [];
+            state.widgetIdToVar = {};
         },
         deleteWidgetIdToVar(state, key) {
             Vue.delete(state.widgetIdToVar, key);
