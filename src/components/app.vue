@@ -565,11 +565,7 @@ export default {
     },
     destroyed() {
         this.clearWidgetIdToVar();
-        widgetEvent.removeListener('insertByCode');
-        widgetEvent.removeListener('init');
-        widgetEvent.removeListener('change');
-        widgetEvent.removeListener('editVar');
-        widgetEvent.removeListener('destroy');
+        widgetEvent.removeAllListeners();
 
         allVar.clear();
     },

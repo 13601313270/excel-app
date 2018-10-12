@@ -197,6 +197,7 @@ export default {
                 margin: 0 10px 20px 10px;
                 background-color: #fff;
                 border: 1px solid #ddd;
+                overflow: hidden;
                 border-radius: 4px;
                 box-sizing: border-box;
                 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
