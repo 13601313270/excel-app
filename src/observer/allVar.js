@@ -46,5 +46,9 @@ class AllVarClass extends Dep {
             return false;
         }
     }
+
+    clear() {
+        this.allData = {};
+    }
 }
 export default new AllVarClass();

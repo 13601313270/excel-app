@@ -318,8 +318,6 @@ export default {
             // 用来设置变量映射dom
             this.varToDom[varName] = dom;
             // 用来映射widgetId对应存放的变量
-            console.log('=======1=======');
-            console.log(widgetId);
             widgetIdToVar[widgetId] = varName;
             this.widgetIdToVar = widgetIdToVar;
             let reg = new RegExp('<widget random-id="' + widgetId + '"[^>]*>', 'g');
@@ -327,12 +325,14 @@ export default {
             this.varToDom[varName].innerHTML = '';
             this.varToDom[varName].appendChild(newVar.value_.dom);
         },
-        dataInit(varName, id, dom) {
+        dataInit(varName, widgetId, dom) {
             let initVar = allVar.getVar(varName);
             if(initVar) {
                 this.varToDom[varName] = dom;
                 this.varToDom[varName].innerHTML = '';
                 this.varToDom[varName].appendChild(initVar.value_.dom);
+            } else {
+                this.save();
             }
         },
         // 通过变量对象，修改生成的code
@@ -430,7 +430,8 @@ export default {
         },
         destroyWidget(widgetId) {
             delete widgetIdToVar[widgetId];
-            this.widgetIdToVar = widgetIdToVar;
+            this.$delete(this.widgetIdToVar, widgetId);
+            this.save();
         },
         varHover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
@@ -577,6 +578,8 @@ export default {
         widgetEvent.removeListener('change');
         widgetEvent.removeListener('editVar');
         widgetEvent.removeListener('destroy');
+
+        allVar.clear();
     },
     components: {
         'all-vars': allPageVars,

@@ -60,6 +60,12 @@ export default {
             self.$set(self.datas, key, val.value_);
         });
     },
+    watch: {
+        widgetIdToVar(val) {
+            console.log('改成了');
+            console.log(val);
+        }
+    },
     methods: {
         getCodeByVal(val) {
             return getStrByObj(val);
@@ -78,10 +84,12 @@ export default {
              console.log(this.useCreateVar, key);
              console.log(this.useCreateVar.has(key));
              */
+            let widgetIdToVarValue = Object.values(this.widgetIdToVar);
             if(!this.useCreateVar.includes(key)) {
                 return '系统变量';
             }
-            if(Object.values(this.widgetIdToVar).includes(key)) {
+            console.log('---重新计算---');
+            if(widgetIdToVarValue.includes(key)) {
                 return '渲染';
             }
             if(item && item.dep.sentEvent.length > 0) {

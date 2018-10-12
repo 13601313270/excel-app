@@ -25,11 +25,9 @@ export default {
         add() {
             let widgetKey = 'widget_' + parseInt(Math.random() * 100000);
             this.fileData.widget.push(widgetKey);
-            this.$emit('save');
         },
         deleteWidget(key) {
             this.fileData.widget.splice(key, 1);
-            this.$emit('save');
         }
     }
 }
