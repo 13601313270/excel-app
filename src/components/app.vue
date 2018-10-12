@@ -54,6 +54,7 @@
                             @change="editVar"
                             :varToDom="varToDom"
                             :useCreateVar="useCreateVar"
+                            :widgetIdToVar="widgetIdToVar"
                             @hover="varHover"
                             @delete="deleteVar"
                         ></all-vars>
@@ -200,13 +201,14 @@ export default {
             editDataType: '',
             connections: [],
             html: '',
-            varToDom: new Map(),
+            varToDom: {},
             // 选择的app类型
             appType: '',
             fileList: [],
             // 保存的文件
             fileData: {},
-            useCreateVar: []
+            useCreateVar: [],
+            widgetIdToVar: widgetIdToVar
         }
     },
     computed: {
@@ -314,20 +316,21 @@ export default {
             let newVar = allVar.getVar(varName);
 
             // 用来设置变量映射dom
-            this.varToDom.set(newVar, dom);
+            this.varToDom[varName] = dom;
             // 用来映射widgetId对应存放的变量
             widgetIdToVar[id] = varName;
+            this.widgetIdToVar = widgetIdToVar;
             let reg = new RegExp('<widget random-id="' + id + '"[^>]*>', 'g');
             this.html = this.html.replace(reg, '<widget random-id="' + id + '" data="' + varName + '">');
-            this.varToDom.get(newVar).innerHTML = '';
-            this.varToDom.get(newVar).appendChild(newVar.value_.dom);
+            this.varToDom[varName].innerHTML = '';
+            this.varToDom[varName].appendChild(newVar.value_.dom);
         },
         dataInit(varName, id, dom) {
             let initVar = allVar.getVar(varName);
             if(initVar) {
-                this.varToDom.set(initVar, dom);
-                this.varToDom.get(initVar).innerHTML = '';
-                this.varToDom.get(initVar).appendChild(initVar.value_.dom);
+                this.varToDom[varName] = dom;
+                this.varToDom[varName].innerHTML = '';
+                this.varToDom[varName].appendChild(initVar.value_.dom);
             }
         },
         // 通过变量对象，修改生成的code
@@ -336,7 +339,7 @@ export default {
             editObj.code = createCodeText(editObj.obj);
             if(editVarName !== undefined) {
                 let updateVar = allVar.getVar(editVarName);
-                let widgePanel = this.varToDom.get(updateVar);
+                let widgePanel = this.varToDom[editVarName];
                 if(widgePanel !== undefined) {
                     widgePanel.innerHTML = '';
                 }
@@ -448,6 +451,7 @@ export default {
             // console.log('-----file.widget_id_to_var-----');
             for (let i in file.widget_id_to_var) {
                 widgetIdToVar[i] = file.widget_id_to_var[i];
+                this.widgetIdToVar = widgetIdToVar;
             }
 
             // let insertObj = getEvalObj(1, code);

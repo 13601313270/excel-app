@@ -34,14 +34,18 @@
 <script>
 import AllVarClass from '../observer/allVar.js';
 import getStrByObj from '../languageParser/getStrByObj';
+import widgetIdToVar from './widgetIdToVar';
 export default {
     props: {
         varToDom: {
-            type: Map,
+            type: Object,
             required: true
         },
         useCreateVar: {
             type: Array
+        },
+        widgetIdToVar: {
+            type: Object
         }
     },
     data() {
@@ -78,7 +82,7 @@ export default {
             if(!this.useCreateVar.includes(key)) {
                 return '系统变量';
             }
-            if(this.varToDom.get(AllVarClass.getVar(key)) !== undefined) {
+            if(Object.values(this.widgetIdToVar).includes(key)) {
                 return '渲染';
             }
             if(item && item.dep.sentEvent.length > 0) {
