@@ -1,0 +1,73 @@
+<template>
+    <div style="display: flex">
+        <select
+            @change="change"
+            v-model="data"
+        >
+            <option v-for="(item,key) in columnObj" :value="key">
+                {{item.title}}
+            </option>
+        </select>
+        <slot name="default"></slot>
+    </div>
+</template>
+<script>
+import ajax from '../../../api/ajax';
+export default {
+    props: {
+        sourceId: String,
+        table: String,
+        value: String
+    },
+    mounted() {
+        this.init();
+    },
+    data() {
+        return {
+            columnObj: [],
+            data: ''
+        };
+    },
+    methods: {
+        init() {
+            if(this.table && this.sourceId) {
+                ajax({
+                    type: 'POST',
+                    url: 'http://www.tablehub.cn/action/mysql.html',
+                    data: {
+                        type: 'showCreateTable',
+                        connection: this.sourceId,
+                        table: this.table
+                    }
+                }).then((data) => {
+                    this.columnObj = data;
+                });
+            } else {
+                this.columnObj = [];
+            }
+        },
+        change() {
+            this.$emit('input', this.data);
+            this.$emit('change');
+        },
+        clear() {
+            this.$emit('input', '');
+            this.$emit('change');
+        }
+    },
+    watch: {
+        sourceId() {
+            this.init();
+        },
+        table() {
+            this.init();
+        },
+        value(val) {
+            this.data = val;
+        }
+    }
+}
+</script>
+<style scoped lang="less">
+
+</style>

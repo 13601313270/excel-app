@@ -78,7 +78,7 @@ __allMatch__.push({
     props: [
         {
             name: 'source',
-            title: '关系模型.js',
+            title: '关系模型',
             dataType: 'number',
             default: ''
         },

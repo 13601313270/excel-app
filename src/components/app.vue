@@ -193,7 +193,7 @@ export default {
                     width: 400
                 },
                 'var': {
-                    width: 400
+                    width: 500
                 }
             },
             editDataType: '',
@@ -498,6 +498,7 @@ export default {
             this.connections = data;
             this.setConnections(data);
         });
+        /**
         ajax({
             type: 'POST',
             url: 'http://www.tablehub.cn/action/mysql.html',
@@ -509,6 +510,7 @@ export default {
         }).then((data) => {
             console.log(data);
         });
+        */
         ajax({
             type: 'GET',
             url: 'http://www.tablehub.cn/app/file.html',

@@ -46,8 +46,9 @@
                             </select>
                             <template v-else>
                                 <replace
-                                    :type="innerOption.name+'_'+codeOption.props[key].name"
+                                    :type="innerOption.name+'=>'+codeOption.props[key].name"
                                     @change="emitChange"
+                                    :props="innerOption.props"
                                     v-model="innerOption.props[key]"
                                     :dataType="getDataType(key)"
                                 >
@@ -292,6 +293,8 @@ export default {
             }
         },
         emitChange() {
+            console.log('---this.innerOption---');
+            console.log(this.innerOption);
             this.$emit('input', this.innerOption);// 根目录不用，但是子元素修改完修改影响父层
             this.$emit('change');
         },
