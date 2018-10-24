@@ -2,17 +2,13 @@
     <div style="display: flex">
         <select
             @change="change"
-            v-if="data===''"
             v-model="data"
         >
             <option v-for="item in tableList" :value="item.name">
                 {{item.name}}
             </option>
         </select>
-        <template v-else>
-            <slot name="default"></slot>
-            <div @click="clear">X</div>
-        </template>
+        <slot name="default"></slot>
     </div>
 </template>
 <script>
@@ -28,7 +24,7 @@ export default {
     data() {
         return {
             tableList: [],
-            data: ''
+            data: this.value
         };
     },
     methods: {
@@ -46,10 +42,6 @@ export default {
         },
         change() {
             this.$emit('input', this.data);
-            this.$emit('change');
-        },
-        clear() {
-            this.$emit('input', '');
             this.$emit('change');
         }
     },

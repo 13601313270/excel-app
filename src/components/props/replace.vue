@@ -17,6 +17,12 @@
                 <slot name="default"></slot>
             </relation-model-x>
         </div>
+        <div v-else-if="type==='RELATIONAL_MODEL=>y'">
+            <relation-model-y :sourceId="props[0]" :table="props[1]" :dataType="dataType" @change="change"
+                              v-model="data">
+                <slot name="default"></slot>
+            </relation-model-y>
+        </div>
         <div v-else>
             <slot name="default"></slot>
         </div>
@@ -26,9 +32,11 @@
 import { mapGetters } from 'vuex';
 import relationModelTable from './replace/RELATIONAL_MODEL__table.vue'
 import relationModelX from './replace/RELATIONAL_MODEL__x.vue'
+import relationModelY from './replace/RELATIONAL_MODEL__y.vue'
 export default {
+    name: 'replace',
     components: {
-        relationModelTable, relationModelX
+        relationModelTable, relationModelX, relationModelY
     },
     props: {
         type: String,

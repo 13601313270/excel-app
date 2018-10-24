@@ -225,7 +225,7 @@ import { createCodeText, createRunObjItem } from './createCodeText';
 import replace from './replace.vue';
 import { mapActions, mapGetters } from 'vuex';
 export default {
-    name: 'inner-dom',
+    name: 'innerDom',
     props: {
         value: {},
         isRoot: Boolean,
@@ -233,9 +233,7 @@ export default {
         tdStyle: {}
     },
     components: {
-        'inner-dom': innerDom,
-        'select-type': selectType,
-        'replace': replace
+        innerDom, selectType, replace
     },
     computed: {
         ...mapGetters('main', ['editObjArr'])

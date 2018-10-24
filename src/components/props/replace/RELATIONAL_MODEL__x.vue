@@ -25,7 +25,7 @@ export default {
     data() {
         return {
             columnObj: [],
-            data: ''
+            data: this.value
         };
     },
     methods: {
