@@ -378,6 +378,7 @@ export default {
             });
         },
         changeCode(obj, code) {
+            console.log('========');
             console.log(code);
             console.log(getEvalObj(1, code)[0]);
             let newObj = getOptionByObj(getEvalObj(1, code)[0]);
@@ -401,6 +402,8 @@ export default {
         },
         editVar(key) {
             let Var = allVar.getVar(key);
+            console.log('---------');
+            console.log(Var);
             let self = this;
             let pushEditObj = {
                 name: key,

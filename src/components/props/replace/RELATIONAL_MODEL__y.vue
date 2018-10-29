@@ -6,16 +6,28 @@
         <div>
             <div v-for="(item,key) in data.props" style="display: flex">
                 <div v-if="data.props[key].type===keyType">
-
+                    <select v-model="data.props[key].groupType" @change="change">
+                        <option value="count">count</option>
+                        <option value="sum">sum</option>
+                    </select>
+                    <select
+                        @change="change"
+                        v-model="data.props[key].column"
+                    >
+                        <option v-for="(item,key) in columnObj" :value="key">
+                            {{item.title}}
+                        </option>
+                    </select>
                 </div>
                 <inner-dom
+                    v-else
                     v-model="data.props[key]"
                     @change="change"
-                    :dataType="dataType.match(/array\((.*)\)/)[1]"
+                    :dataType="'string'"
                 ></inner-dom>
                 <div @click="data.props.splice(key,1)">X</div>
             </div>
-            <appButton size="mini" @click="data.props.push('')">添加</appButton>
+            <appButton size="mini" @click="addEmpty">添加</appButton>
         </div>
     </div>
 </template>
@@ -23,6 +35,7 @@
 import ajax from '../../../api/ajax';
 import innerDom from '../props.vue';
 import appButton from '../../ui/button.vue';
+import cloneUtils from '../../clone.utils';
 export default {
     name: 'relationModelY',
     props: {
@@ -33,12 +46,13 @@ export default {
     },
     mounted() {
         this.init();
+        this.data = this.initData(this.value);
     },
     data() {
         return {
             columnObj: [],
-            data: this.initData(this.value),
-            keyType: Symbol('temp type')
+            data: {},
+            keyType: 'hubhjjknhnniu'
         };
     },
     methods: {
@@ -62,21 +76,39 @@ export default {
         // 将传入的配置中字符串分解，例如count(id)，转换成count和id两个信息
         initData(data) {
             data.props = data.props.map(item => {
-                if(false && typeof item === 'string') {
+                if(typeof item === 'string') {
                     let temp = item.match(/(\S+)\((\S+)\)/);
-                    return {
-                        type: this.keyType,
-                        groupType: temp[1],
-                        column: temp[2]
-                    };
+                    if(temp) {
+                        return {
+                            type: this.keyType,
+                            groupType: temp[1],
+                            column: temp[2]
+                        };
+                    }
                 } else {
                     return item;
                 }
             });
             return data
         },
+        addEmpty() {
+            this.data.props.push({
+                type: this.keyType,
+                groupType: 'count',
+                column: ''
+            })
+        },
         change() {
-            this.$emit('input', this.data);
+            let returnObj = cloneUtils.deep(this.data);
+            returnObj.props = returnObj.props.map(item => {
+                if(item.type === this.keyType) {
+                    return item.groupType + '(' + item.column + ')';
+                } else {
+                    return item;
+                }
+            });
+            console.log(returnObj);
+            this.$emit('input', returnObj);
             this.$emit('change');
         },
         clear() {
@@ -92,7 +124,7 @@ export default {
             this.init();
         },
         value(val) {
-            this.data = val;
+            this.data = this.initData(this.value);
         }
     },
     components: {

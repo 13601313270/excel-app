@@ -23,6 +23,7 @@ class relationalModel extends FuncObj {
     }
 
     render(handle) {
+        console.log(9999);
         handle(new Promise((resolve, reject) => {
             console.log(this.props);
             let source = this.props[0] instanceof Obj ? this.props[0].value : this.props[0];

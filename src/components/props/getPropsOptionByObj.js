@@ -8,10 +8,10 @@ import __dictionary__ from '../../languageParser/dictionary';
 import dictionaryGet from '../../languageParser/dictionaryGet';
 function getOptionByObj(obj) {
     let returnOption = {};
-    if (['boolean', 'number', 'string'].includes(typeof obj)) {
+    if(['boolean', 'number', 'string'].includes(typeof obj)) {
         returnOption = obj;
     }
-    else if (obj instanceof __array__) {
+    else if(obj instanceof __array__) {
         returnOption = {
             type: 'array',
             props: []
@@ -20,13 +20,13 @@ function getOptionByObj(obj) {
             returnOption.props.push(getOptionByObj(item));
         });
     }
-    else if (obj instanceof __dictionary__) {
+    else if(obj instanceof __dictionary__) {
         returnOption = {
             type: 'dict',
             props: obj.map
         };
     }
-    else if (obj instanceof dictionaryGet) {
+    else if(obj instanceof dictionaryGet) {
         returnOption = {
             type: 'dictionaryGet',
             dictionary: getOptionByObj(obj.dictionary),
@@ -34,14 +34,14 @@ function getOptionByObj(obj) {
             key: obj.key
         };
     }
-    else if (obj instanceof Var) {
+    else if(obj instanceof Var) {
         returnOption = {
             type: 'var',
             name: obj.name,
             value: obj.value
         };
     }
-    else if (obj instanceof __runObj__) {
+    else if(obj instanceof __runObj__) {
         returnOption = {
             type: 'runObj',
             name: '',
@@ -50,6 +50,12 @@ function getOptionByObj(obj) {
         obj.params.forEach(item => {
             returnOption.props.push(getOptionByObj(item));
         });
+    }
+    else if(obj === null) {
+        returnOption = {
+            type: 'null',
+            name: 'null'
+        };
     }
     else {
         returnOption = {
