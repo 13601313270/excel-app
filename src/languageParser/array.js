@@ -13,7 +13,7 @@ class __array__ extends Obj {
     get value() {
         let result = [];
         this.value_.forEach((item) => {
-            if (item instanceof Obj) {
+            if(item instanceof Obj) {
                 result.push(item.value);
             } else {
                 result.push(item);
@@ -40,24 +40,32 @@ __allMatch__.push({
     title: '数组',
     value(tableNum, word, befordWord, forAction, forword) {
         var params = [];
-        if (forword(true) === ']') {
+        if(forword(true) === ']') {
             forword();
         } else {
             let limit = 0;
             while (limit++ < 9999) {
                 params.push(forAction([',', ';', ']']));
                 let nextKey = forword(true);
-                if (nextKey === undefined) {
+                if(nextKey === undefined) {
                     break;
-                } else if ([',', ';'].indexOf(nextKey) > -1) {
+                } else if([',', ';'].indexOf(nextKey) > -1) {
                     forword();
-                } else if (nextKey === ']') {
+                } else if(nextKey === ']') {
                     forword();
                     break;
                 }
             }
         }
-        return new __array__(params);
+        let returnData = new __array__(params);
+        params.forEach(item => {
+            console.log('------');
+            console.log(item);
+            if(item instanceof Obj) {
+                returnData.listen(item);
+            }
+        });
+        return returnData;
     }
 });
 export default __array__;
