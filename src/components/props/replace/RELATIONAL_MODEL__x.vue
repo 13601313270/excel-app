@@ -1,6 +1,7 @@
 <template>
     <div style="display: flex">
         <select
+            v-if="typeof data === 'string'"
             @change="change"
             v-model="data"
         >
@@ -8,7 +9,7 @@
                 {{item.title}}
             </option>
         </select>
-        <slot name="default"></slot>
+        <slot v-else name="default"></slot>
     </div>
 </template>
 <script>
@@ -17,7 +18,7 @@ export default {
     props: {
         sourceId: String,
         table: String,
-        value: String
+        value: [String, Object]
     },
     mounted() {
         this.init();

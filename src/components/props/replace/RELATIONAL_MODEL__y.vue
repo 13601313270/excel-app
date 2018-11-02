@@ -5,7 +5,7 @@
         </div>
         <div>
             <div v-for="(item,key) in data.props" style="display: flex">
-                <div v-if="data.props[key].type===keyType">
+                <div v-if="data.props[key] && data.props[key].type===keyType">
                     <select v-model="data.props[key].groupType" @change="change">
                         <option value="count">count</option>
                         <option value="sum">sum</option>
@@ -25,7 +25,7 @@
                     @change="change"
                     :dataType="'string'"
                 ></inner-dom>
-                <div @click="data.props.splice(key,1)">X</div>
+                <div @click="data.props.splice(key,1),change()">X</div>
             </div>
             <appButton size="mini" @click="addEmpty">添加</appButton>
         </div>
@@ -33,7 +33,7 @@
 </template>
 <script>
 import ajax from '../../../api/ajax';
-import innerDom from '../props.vue';
+import innerDom from '../props_bak.vue';
 import appButton from '../../ui/button.vue';
 import cloneUtils from '../../clone.utils';
 export default {
@@ -92,11 +92,13 @@ export default {
             return data
         },
         addEmpty() {
+            let allKeys = Object.keys(this.columnObj);
             this.data.props.push({
                 type: this.keyType,
                 groupType: 'count',
-                column: ''
-            })
+                column: allKeys[0]
+            });
+            this.change();
         },
         change() {
             let returnObj = cloneUtils.deep(this.data);
