@@ -28,7 +28,7 @@
                     <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
                     <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
                     <use-file
-                        v-else-if="appType===1"
+                        v-else-if="appType===1 && fileData.file_data"
                         :dragDomFunc="dragDomFunc" :fileData="fileData.file_data"
                         :isEditing="isEditing"
                         @save="save"

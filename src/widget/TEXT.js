@@ -13,7 +13,11 @@ class TEXT extends FuncObj {
 
     get value() {
         if(this.text instanceof Obj) {
-            return this.text.value.toString();
+            if(this.text.value !== null) {
+                return this.text.value.toString();
+            } else {
+                return '';
+            }
         } else {
             return this.text.toString();
         }
