@@ -1,9 +1,12 @@
 <template>
     <div>
-        <div class="widget" :class="{warning:getHighlightState(data_)=='info'}"
-             ref="content"
-             @dragover="allowDrop($event)"
-             @drop="ondrop($event)"></div>
+        <div
+            class="widget" :class="{warning:getHighlightState(data_)=='info'}"
+            ref="content"
+            @dragover="allowDrop($event)"
+            @drop="ondrop($event)"
+            @click="clickAdd"
+        ></div>
     </div>
 </template>
 <script>
@@ -43,11 +46,8 @@ export default {
         allowDrop(e) {
             e.preventDefault();
         },
-        ondrop(e) {
-            // 如果没有设置key，则不允许拖拽widget，用来定义不可修改组件。反过来说，所有添加了key的widget可以拖拽组件
-            if(this.key !== undefined) {
-                // 抬起鼠标dragDomFunc就会释放为null，这里弹窗将值保留住
-                let dragDomFunc = this.dragDomFunc;
+        addFunction(dragDomFunc) {
+            if(this.isEditing) {
                 prompt('请输入名称', 'a7').then((varName) => {
                     if(varName !== null) {
                         this.setDragDomFunc(dragDomFunc);
@@ -58,6 +58,18 @@ export default {
                     }
                 });
             }
+        },
+        ondrop(e) {
+            // 如果没有设置key，则不允许拖拽widget，用来定义不可修改组件。反过来说，所有添加了key的widget可以拖拽组件
+            if(this.key !== undefined) {
+                // 抬起鼠标dragDomFunc就会释放为null，这里弹窗将值保留住
+                this.addFunction(this.dragDomFunc);
+            }
+        },
+        clickAdd() {
+            if(this.data_ === undefined) {
+                this.addFunction('TEXT');
+            }
         }
     },
     destroyed() {
@@ -65,7 +77,7 @@ export default {
         widgetEvent.emit('destroy', this.key);
     },
     computed: {
-        ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar'])
+        ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing'])
     }
 }
 </script>

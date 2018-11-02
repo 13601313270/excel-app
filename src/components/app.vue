@@ -215,7 +215,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc', 'clearWidgetIdToVar']),
+        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc', 'clearWidgetIdToVar', 'setIsEditing']),
         cancelDragDomFunc() {
             this.$nextTick(() => {
                 this.setDragDomFunc(null);
@@ -502,7 +502,7 @@ export default {
             this.setConnections(data);
         });
         /**
-        ajax({
+         ajax({
             type: 'POST',
             url: 'http://www.tablehub.cn/action/mysql.html',
             data: {
@@ -513,7 +513,7 @@ export default {
         }).then((data) => {
             console.log(data);
         });
-        */
+         */
         ajax({
             type: 'GET',
             url: 'http://www.tablehub.cn/app/file.html',
@@ -573,6 +573,11 @@ export default {
         widgetEvent.removeAllListeners();
 
         allVar.clear();
+    },
+    watch: {
+        isEditing(val) {
+            this.setIsEditing(val);
+        }
     },
     components: {
         'all-vars': allPageVars,

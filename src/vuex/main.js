@@ -6,7 +6,8 @@ export default {
         connections: [],
         editObjArr: [],
         widgetIdToVar: {},
-        dragDomFunc: null
+        dragDomFunc: null,
+        isEditing: false
     },
     mutations: {
         varHighlightSet(state, data) {
@@ -32,6 +33,9 @@ export default {
         },
         deleteWidgetIdToVar(state, key) {
             Vue.delete(state.widgetIdToVar, key);
+        },
+        setIsEditing(state, data) {
+            state.isEditing = data;
         }
     },
     actions: {
@@ -58,6 +62,9 @@ export default {
         },
         deleteWidgetIdToVar({commit}, key) {
             return commit('deleteWidgetIdToVar', key);
+        },
+        setIsEditing({commit}, data) {
+            return commit('setIsEditing', data);
         }
     },
     getters: {
@@ -65,6 +72,7 @@ export default {
         varHighlight: state => state.varHighlight,
         editObjArr: state => state.editObjArr,
         dragDomFunc: state => state.dragDomFunc,
-        widgetIdToVar: state => state.widgetIdToVar
+        widgetIdToVar: state => state.widgetIdToVar,
+        isEditing: state => state.isEditing
     }
 };
