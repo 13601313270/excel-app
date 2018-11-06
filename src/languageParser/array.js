@@ -59,8 +59,8 @@ __allMatch__.push({
         }
         let returnData = new __array__(params);
         params.forEach(item => {
-            console.log('------');
-            console.log(item);
+            // console.log('------');
+            // console.log(item);
             if(item instanceof Obj) {
                 returnData.listen(item);
             }

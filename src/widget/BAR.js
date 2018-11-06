@@ -57,11 +57,14 @@ class BAR extends FuncObj {
             handle(false);
             return;
         }
-        let data = model.value;
+        let data = model.value.dataValue;
+        console.log('******');
+        console.log(data);
+        console.log(model.value);
         let option = {
             tooltip: {},
             legend: {
-                data: model.dataColumn
+                data: model.value.dataColumn
             },
             xAxis: {
                 data: []
@@ -74,10 +77,10 @@ class BAR extends FuncObj {
         if(data.length > 0) {
             data.forEach((item) => {
                 item.forEach((item2, key) => {
-                    if(key < model.groupColumn.length) {
+                    if(key < model.value.groupColumn.length) {
                         option.xAxis.data.push(item2);
                     } else {
-                        let thisOne = key - model.groupColumn.length;
+                        let thisOne = key - model.value.groupColumn.length;
                         if(option.series[thisOne] === undefined) {
                             option.series[thisOne] = {
                                 type: 'bar',
@@ -105,7 +108,7 @@ class BAR extends FuncObj {
                                         }
                                     }
                                 },
-                                name: model.dataColumn[thisOne],
+                                name: model.value.dataColumn[thisOne],
                                 selectedMode: 'single',
                                 data: []
                             };

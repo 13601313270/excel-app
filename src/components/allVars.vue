@@ -57,15 +57,16 @@ export default {
     mounted() {
         let self = this;
         AllVarClass.on('valChange', function(key, val) {
-            let matchItem = allMatch.find(item => {
-                return item.match.test(val.value_.name);
-            });
-            if(matchItem) {
-                if(matchItem.returnType !== 'relationalModel') {
-                    self.$set(self.datas, key, val.value_);
+            if(val.value_ !== undefined) {
+                let matchItem = allMatch.find(item => {
+                    return item.match.test(val.value_.name);
+                });
+                if(matchItem) {
+                    if(matchItem.returnType !== 'relationalModel') {
+                        self.$set(self.datas, key, val.value_);
+                    }
                 }
             }
-            //self.$set(self.datas, key, val.value_);
         });
     },
     methods: {

@@ -34,6 +34,20 @@
                         <div>表：{{getCodeByVal(item.props[1])}}</div>
                         <div>分类X：{{getCodeByVal(item.props[2])}}</div>
                         <div>数据Y：{{getCodeByVal(item.props[3])}}</div>
+                        <button @click="showData(key)">查看数据({{isShowData[key] ? '开' : '关'}})</button>
+                        <table v-if="isShowData[key]">
+                            <thead>
+                            <tr>
+                                <td v-for="group in item.value.groupColumn" v-html="group"></td>
+                                <td v-for="column in item.value.dataColumn" v-html="column"></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="dataItem in item.value.dataValue">
+                                <td v-for="data in dataItem" v-html="data"></td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </td>
                     <td>
                         <button @click="change(key)">修改</button>
@@ -63,22 +77,21 @@ export default {
     },
     data() {
         return {
-            datas: {}
+            datas: {},
+            isShowData: {}
         };
     },
     mounted() {
         let self = this;
         AllVarClass.on('valChange', function(key, val) {
-            let matchItem = allMatch.find(item => {
-                return item.match.test(val.value_.name);
-            });
-            console.log('----key----');
-            console.log(key);
-            console.log(val.value_.name);
-            console.log(matchItem);
-            if(matchItem) {
-                if(matchItem.returnType === 'relationalModel') {
-                    self.$set(self.datas, key, val.value_);
+            if(val.value_ !== undefined) {
+                let matchItem = allMatch.find(item => {
+                    return item.match.test(val.value_.name);
+                });
+                if(matchItem) {
+                    if(matchItem.returnType === 'relationalModel') {
+                        self.$set(self.datas, key, val.value_);
+                    }
                 }
             }
         });
@@ -118,6 +131,11 @@ export default {
         change(key) {
             this.$emit('change', key);
         },
+        deleteItem(key) {
+            AllVarClass.deleteVar(key);
+            this.$delete(this.datas, key);
+            this.$emit('delete', key);
+        },
         addData() {
             prompt('请输入数据变量名称', 'data1').then((varName) => {
                 if(varName !== null) {
@@ -127,6 +145,9 @@ export default {
                     widgetEvent.emit('change', varName);
                 }
             });
+        },
+        showData(key) {
+            this.$set(this.isShowData, key, !this.isShowData[key]);
         }
     }
 }

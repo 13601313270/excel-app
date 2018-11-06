@@ -19,7 +19,12 @@ class relationalModel extends FuncObj {
     }
 
     get value() {
-        return this.dataValue;
+        return {
+            type: 'relationalModel',
+            groupColumn: this.groupColumn,
+            dataColumn: this.dataColumn,
+            dataValue: this.dataValue
+        };
     }
 
     render(handle) {
@@ -63,12 +68,14 @@ class relationalModel extends FuncObj {
                     });
                     resolve();
                 }
+            }).catch(() => {
+                resolve();
             });
         }));
     }
 }
 __allMatch__.push({
-    match: /^RELATIONAL_MODEL/,
+    match: /^RELATIONAL_MODEL$/,
     type: 'function',
     name: 'RELATIONAL_MODEL',
     title: '关系模型',

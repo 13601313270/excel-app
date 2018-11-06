@@ -1,110 +1,77 @@
 /**
  * Created by ptmind on 2018/3/30.
  */
-import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
 import funcLanguageParser from '../languageParser/functionCall';
-import ajax from '../api/ajax';
 import FuncObj from './FuncObj';
 
-class relationalModel2 extends FuncObj {
-    constructor(source, table, x, y, where) {
+class relationalModelMerge extends FuncObj {
+    constructor(mergeType) {
         super(...Array.from(arguments));
+        this.mergeType = mergeType;
+        this.allRelation = Array.from(arguments).slice(1);
         this.props = Array.from(arguments);
-        this.name = 'RELATIONAL_MODEL';
-        this.groupColumn = [];
-        this.dataColumn = [];
-        this.dataValue = [];
+        this.name = 'RELATIONAL_MODEL_MERGE';
         this.dep.update();
     }
 
     get value() {
-        return this.dataValue;
-    }
-
-    render(handle) {
-        handle(new Promise((resolve, reject) => {
-            let source = this.props[0] instanceof Obj ? this.props[0].value : this.props[0];
-            let table = this.props[1] instanceof Obj ? this.props[1].value : this.props[1];
-            let x = this.props[2] instanceof Obj ? this.props[2].value : this.props[2];
-            let y = this.props[3] instanceof Obj ? this.props[3].value : this.props[3];
-            ajax({
-                type: 'POST',
-                url: 'http://www.tablehub.cn/action/mysql.html',
-                data: {
-                    type: 'run',
-                    connection: parseInt(source),
-                    table: table,
-                    sql: {
-                        select: y.concat(x),
-                        groupBy: x
-                    }
-                }
-            }).then((data) => {
-                this.groupColumn = [];
-                this.dataColumn = [];
-                this.dataValue = [];
-                if(data === false) {
-                    resolve();
-                } else {
-                    let x = this.props[2];
-                    if(x instanceof Obj) {
-                        x = x.value;
-                    }
-                    let y = this.props[3].value;
-                    this.groupColumn.push(x);
-                    this.dataColumn.push(...y);
-                    data.forEach((item) => {
-                        let insert = [item[x]];
-                        y.forEach((eachY) => {
-                            insert.push(item[eachY]);
+        let self = this;
+        return {
+            type: 'relationalModel',
+            groupColumn: this.allRelation[0].value.groupColumn,
+            dataColumn: (function() {
+                let returnArr = [];
+                self.allRelation.map(item => {
+                    returnArr.push(...item.value.dataColumn);
+                });
+                return returnArr;
+            })(),
+            dataValue: this.allRelation[0].value.dataValue.map((item, key) => {
+                let returnArr = Array.from(item);
+                let findMatchInfo = {};
+                this.allRelation[0].value.groupColumn.forEach((item2, key2) => {
+                    findMatchInfo[item2] = returnArr[key2];
+                });
+                this.allRelation.slice(1).forEach(relationItem => {
+                    let find = relationItem.value.dataValue.find(item2 => {
+                        let isMatch = true;
+                        Object.keys(findMatchInfo).forEach(matchKey => {
+                            isMatch = isMatch && findMatchInfo[matchKey] === item2[relationItem.value.groupColumn.indexOf(matchKey)];
                         });
-                        this.dataValue.push(insert);
+                        return isMatch;
                     });
-                    resolve();
-                }
-            });
-        }));
+                    returnArr.push(...find.slice(relationItem.value.groupColumn.length));
+                });
+                return returnArr;
+            })
+        };
     }
 }
 __allMatch__.push({
-    match: /^RELATIONAL_MODEL2/,
+    match: /^RELATIONAL_MODEL_MERGE$/,
     type: 'function',
-    name: 'RELATIONAL_MODEL2',
-    title: '!!!!!关系模型2',
-    func: relationalModel2,
+    name: 'RELATIONAL_MODEL_MERGE',
+    title: '关系模型合并',
+    func: relationalModelMerge,
     value: funcLanguageParser,
     props: [
         {
-            name: 'source',
-            title: '关系模型',
-            dataType: 'number',
-            default: ''
-        },
-        {
-            name: 'table',
-            title: '表',
+            name: 'mergeType',
+            title: '合并方式',
             dataType: 'string',
-            default: ''
+            enum: {
+                'merge': '合并',
+                'add': '累加'
+            },
+            default: 'merge'
         },
         {
-            name: 'x',
-            title: 'X轴',
-            dataType: 'string,var',
-            default: ''
-        },
-        {
-            name: 'y',
-            title: 'Y轴',
-            dataType: 'array(string)',
-            default: ''
-        },
-        {
-            name: 'where',
-            title: '条件',
-            dataType: 'array(string)'
+            name: 'tableList',
+            title: '表',
+            dataType: ['var']
         }
     ],
     returnType: 'relationalModel'
 });
-export default relationalModel2;
+export default relationalModelMerge;

@@ -474,7 +474,14 @@ export default {
         },
         changeVar(val) {
             let map = this.allVar[val].value;
-            if(!(map instanceof Array) && map instanceof Object) {
+            if(map.type === 'relationalModel') {
+                let item = {
+                    type: 'var',
+                    name: val
+                };
+                this.setInnerOption(item);
+            }
+            else if(!(map instanceof Array) && map instanceof Object) {
                 let item = {
                     type: 'dictionaryGet',
                     dictionary: getOptionByObj(this.allVar[val]),

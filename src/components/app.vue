@@ -49,6 +49,7 @@
                     :connections="connections"
                     @change="editVar"
                     :useCreateVar="useCreateVar"
+                    @delete="deleteVar"
                 ></datas-vue>
                 <div
                     v-show="rightToolSelect=='var'">
@@ -574,10 +575,10 @@ export default {
         widgetEvent.on('destroy', this.destroyWidget);
     },
     destroyed() {
-        this.clearWidgetIdToVar();
-        widgetEvent.removeAllListeners();
-
-        allVar.clear();
+//        this.clearWidgetIdToVar();
+//        widgetEvent.removeAllListeners();
+//
+//        allVar.clear();
     },
     watch: {
         isEditing(val) {
