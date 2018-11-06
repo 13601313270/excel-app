@@ -33,44 +33,51 @@ class relationalModel extends FuncObj {
             let table = this.props[1] instanceof Obj ? this.props[1].value : this.props[1];
             let x = this.props[2] instanceof Obj ? this.props[2].value : this.props[2];
             let y = this.props[3] instanceof Obj ? this.props[3].value : this.props[3];
-            ajax({
-                type: 'POST',
-                url: 'http://www.tablehub.cn/action/mysql.html',
-                data: {
-                    type: 'run',
-                    connection: parseInt(source),
-                    table: table,
-                    sql: {
-                        select: y.concat(x),
-                        groupBy: x
-                    }
-                }
-            }).then((data) => {
-                this.groupColumn = [];
-                this.dataColumn = [];
-                this.dataValue = [];
-                if(data === false) {
-                    resolve();
-                } else {
-                    let x = this.props[2];
-                    if(x instanceof Obj) {
-                        x = x.value;
-                    }
-                    let y = this.props[3].value;
-                    this.groupColumn.push(x);
-                    this.dataColumn.push(...y);
-                    data.forEach((item) => {
-                        let insert = [item[x]];
-                        y.forEach((eachY) => {
-                            insert.push(item[eachY]);
-                        });
-                        this.dataValue.push(insert);
-                    });
-                    resolve();
-                }
-            }).catch(() => {
-                resolve();
+            let isFindWrongSql = y.concat(x).find(item => {
+                return item.match(/\S+\(\)/);
             });
+            if(isFindWrongSql) {
+                reject(new Error());
+            } else {
+                ajax({
+                    type: 'POST',
+                    url: 'http://www.tablehub.cn/action/mysql.html',
+                    data: {
+                        type: 'run',
+                        connection: parseInt(source),
+                        table: table,
+                        sql: {
+                            select: y.concat(x),
+                            groupBy: x
+                        }
+                    }
+                }).then((data) => {
+                    this.groupColumn = [];
+                    this.dataColumn = [];
+                    this.dataValue = [];
+                    if(data === false) {
+                        resolve();
+                    } else {
+                        let x = this.props[2];
+                        if(x instanceof Obj) {
+                            x = x.value;
+                        }
+                        let y = this.props[3].value;
+                        this.groupColumn.push(x);
+                        this.dataColumn.push(...y);
+                        data.forEach((item) => {
+                            let insert = [item[x]];
+                            y.forEach((eachY) => {
+                                insert.push(item[eachY]);
+                            });
+                            this.dataValue.push(insert);
+                        });
+                        resolve();
+                    }
+                }).catch(() => {
+                    resolve();
+                });
+            }
         }));
     }
 }

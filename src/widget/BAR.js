@@ -58,9 +58,6 @@ class BAR extends FuncObj {
             return;
         }
         let data = model.value.dataValue;
-        console.log('******');
-        console.log(data);
-        console.log(model.value);
         let option = {
             tooltip: {},
             legend: {

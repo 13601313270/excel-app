@@ -12,7 +12,6 @@ class relationalModelMerge extends FuncObj {
         this.allRelation = Array.from(arguments).slice(1);
         this.props = Array.from(arguments);
         this.name = 'RELATIONAL_MODEL_MERGE';
-        this.dep.update();
     }
 
     get value() {
