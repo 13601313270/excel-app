@@ -4,7 +4,7 @@
             class="widget" :class="{warning:getHighlightState(data_)=='info'}"
             ref="content"
             @dragover="allowDrop($event)"
-            @drop="ondrop($event)"
+            @drop.stop="ondrop($event)"
             @click="clickAdd"
         ></div>
     </div>
@@ -33,6 +33,11 @@ export default {
             widgetEvent.emit('init', this.data_, this.key, this.$refs.content);
             this.$emit('init', this.data_, this.key, this.$refs.content);
         }
+        widgetEvent.on('addWidgetContent', (key) => {
+            if(this.key === key) {
+                this.ondrop();
+            }
+        });
     },
     methods: {
         ...mapActions('main', ['setDragDomFunc', 'deleteWidgetIdToVar']),

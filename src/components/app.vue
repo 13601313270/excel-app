@@ -31,8 +31,11 @@
                         v-else-if="appType===1 && fileData.file_data"
                         :dragDomFunc="dragDomFunc" :fileData="fileData.file_data"
                         :isEditing="isEditing"
+                        class="used-dashboard"
                         @save="save"
-                        @eval="eval"></use-file>
+                        @eval="eval"
+                        @addWidgetContent="addWidgetContent"
+                    ></use-file>
                     <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
                 </div>
             </div>
@@ -435,6 +438,9 @@ export default {
         varHover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
         },
+        addWidgetContent(widgetKey) {
+            widgetEvent.emit('addWidgetContent', widgetKey);
+        },
         selectFile(file) {
             file.file_data = JSON.parse(file.file_data);
             file.var_data = JSON.parse(file.var_data);
@@ -665,6 +671,10 @@ export default {
                 display: flex;
                 flex-direction: column;
                 overflow: scroll;
+                .used-dashboard {
+                    position: relative;
+                    min-height: 100%;
+                }
                 > div {
                     flex-grow: 1;
                     position: relative;
