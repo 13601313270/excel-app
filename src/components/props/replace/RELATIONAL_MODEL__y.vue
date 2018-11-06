@@ -39,7 +39,7 @@ import cloneUtils from '../../clone.utils';
 export default {
     name: 'relationModelY',
     props: {
-        sourceId: String,
+        sourceId: [Number, String],
         table: String,
         value: Object,
         dataType: String

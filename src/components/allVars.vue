@@ -35,6 +35,7 @@
 import AllVarClass from '../observer/allVar.js';
 import getStrByObj from '../languageParser/getStrByObj';
 import { mapGetters } from 'vuex';
+import allMatch from '../languageParser/allMatch';
 export default {
     props: {
         varToDom: {
@@ -56,9 +57,15 @@ export default {
     mounted() {
         let self = this;
         AllVarClass.on('valChange', function(key, val) {
-            // console.log(key);
-            // console.log(val);
-            self.$set(self.datas, key, val.value_);
+            let matchItem = allMatch.find(item => {
+                return item.match.test(val.value_.name);
+            });
+            if(matchItem) {
+                if(matchItem.returnType !== 'relationalModel') {
+                    self.$set(self.datas, key, val.value_);
+                }
+            }
+            //self.$set(self.datas, key, val.value_);
         });
     },
     methods: {
@@ -82,7 +89,7 @@ export default {
             if(!this.useCreateVar.includes(key)) {
                 return '系统变量';
             }
-            console.log('---重新计算---');
+            // console.log('---重新计算---');
             if(Object.values(this.widgetIdToVar).includes(key)) {
                 return '渲染';
             }

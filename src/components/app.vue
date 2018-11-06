@@ -44,14 +44,14 @@
                 v-show="isEditing && rightToolSelect!==''"
                 :style="{width:rightToolInfo[rightToolSelect]?rightToolInfo[rightToolSelect].width+'px':''}"
             >
-                <datas-vue v-if="rightToolSelect=='data'" :connections="connections" @change="editVar"></datas-vue>
-                <div v-else-if="rightToolSelect=='html'">
-                    <div style="overflow: auto;border: solid 1px black;">
-                        <textarea :value="saveHtml"
-                                  style="flex-grow: 1;width: 400px;height:200px;border: none"></textarea>
-                    </div>
-                </div>
-                <div v-show="rightToolSelect=='var'">
+                <datas-vue
+                    v-show="rightToolSelect=='data'"
+                    :connections="connections"
+                    @change="editVar"
+                    :useCreateVar="useCreateVar"
+                ></datas-vue>
+                <div
+                    v-show="rightToolSelect=='var'">
                     <div style="flex-grow: 1;padding: 3px 3px;overflow: auto">
                         <all-vars
                             @change="editVar"
@@ -70,9 +70,9 @@
                 <div :class="{active:rightToolSelect=='data'}"
                      @click="rightToolSelect=(rightToolSelect==='data'?'':'data')">数据
                 </div>
-                <div :class="{active:rightToolSelect=='html'}"
-                     @click="rightToolSelect=(rightToolSelect==='html'?'':'')">HTML
-                </div>
+                <!--<div :class="{active:rightToolSelect=='html'}"-->
+                <!--@click="rightToolSelect=(rightToolSelect==='html'?'':'')">HTML-->
+                <!--</div>-->
             </div>
         </div>
         <div class="floatVal" v-if="editObjArr.length > 0"
@@ -136,6 +136,7 @@ import '../widget/LEFT';
 import '../widget/RIGHT';
 import '../widget/MID';
 import '../widget/LEN';
+import '../widget/relationalModelDelete';
 import relationalModel from '../widget/relationalModel';
 
 import allVar from '../observer/allVar';
@@ -190,7 +191,7 @@ export default {
             rightToolSelect: '',
             rightToolInfo: {
                 data: {
-                    width: 200
+                    width: 600
                 },
                 html: {
                     width: 400
@@ -199,7 +200,6 @@ export default {
                     width: 500
                 }
             },
-            editDataType: '',
             connections: [],
             html: '',
             varToDom: {},
@@ -294,13 +294,17 @@ export default {
                 }).name;
                 dragDomFunc = 'INPUT';
             }
+            console.log(1);
+            console.log(dragDomFunc);
             let matchItem = allMatch.find(item => {
                 return item.func !== undefined && dragDomFunc.match(item.match);
             });
-
+            console.log(matchItem);
             if(matchItem !== undefined) {
                 let code = this.getCodeByMatchItem(matchItem);
+                // 新加变量
                 this.addData_(varName, widgetId, dom, code);
+                // 弹出编辑变量的窗口
                 this.editVar(varName);
                 if(!this.useCreateVar.includes(varName)) {
                     this.useCreateVar.push(varName);
@@ -312,18 +316,19 @@ export default {
         addData_(varName, widgetId, dom, code) {
             let insertObj = getEvalObj(1, code);
             allVar.setVar(varName, insertObj[0]);
-            this.editDataType = '';
             let newVar = allVar.getVar(varName);
-
             // 用来设置变量映射dom
-            this.varToDom[varName] = dom;
+            if(dom !== undefined) {
+                this.varToDom[varName] = dom;
+            }
             // 用来映射widgetId对应存放的变量
-            this.widgetIdToVar[widgetId] = varName;
-            // this.widgetIdToVar = widgetIdToVar;
-            let reg = new RegExp('<widget random-id="' + widgetId + '"[^>]*>', 'g');
-            this.html = this.html.replace(reg, '<widget random-id="' + widgetId + '" data="' + varName + '">');
-            this.varToDom[varName].innerHTML = '';
-            this.varToDom[varName].appendChild(newVar.value_.dom);
+            if(widgetId !== undefined) {
+                this.widgetIdToVar[widgetId] = varName;
+            }
+            if(dom !== undefined) {
+                this.varToDom[varName].innerHTML = '';
+                this.varToDom[varName].appendChild(newVar.value_.dom);
+            }
         },
         dataInit(varName, widgetId, dom) {
             let initVar = allVar.getVar(varName);
@@ -390,7 +395,6 @@ export default {
             // 不能直接覆盖obj.obj，因为js是引用赋值
             obj.obj.type = newObj.type;
             obj.obj.props = newObj.props;
-            console.log(1);
             this.codeUpdate(obj);
             if(obj.parent !== undefined) {
                 console.log(obj.parent.emitChange);
@@ -418,11 +422,6 @@ export default {
                 dataType: ((Var.value_ instanceof relationalModel) ? 'relationalModel' : '')
             };
             this.editObjArrPush(pushEditObj);
-            if(Var.value_ instanceof relationalModel) {
-                this.editDataType = 'relationalModel';
-            } else {
-                this.editDataType = '';
-            }
         },
         deleteVar(key) {
             console.log('删除了变量', key);

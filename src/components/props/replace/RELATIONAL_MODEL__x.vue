@@ -16,7 +16,7 @@
 import ajax from '../../../api/ajax';
 export default {
     props: {
-        sourceId: String,
+        sourceId: [Number, String],
         table: String,
         value: [String, Object]
     },

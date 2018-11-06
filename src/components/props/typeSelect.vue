@@ -1,9 +1,9 @@
 <template>
     <div class="all">
         <div v-if="(showMatch.length+((dataType===''||dataType.split(',').includes('var'))?1:0))===1">
+            <span v-html="dataType"></span>
             <span
-                v-for="item in allMatch"
-                v-if="item.type === dataType"
+                v-for="item in showMatch"
                 v-html="item.title">
             </span>
         </div>
@@ -24,6 +24,7 @@
 <script>
 import allMatch from '../../languageParser/allMatch';
 export default {
+    name: 'typeSelect',
     props: {
         value: {},
         dataType: ''

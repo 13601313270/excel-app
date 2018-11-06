@@ -15,24 +15,52 @@
         </div>
         <h2>数据表</h2>
         <div>
-            <div v-for="(item,key) in datas" v-if="item.type==='relationalModel'">
-                <div><span v-html="key"></span>
-                    <button @click="change(key)">修改</button>
-                </div>
-                <div>链接：{{getCodeByVal(item.props[0])}}</div>
-                <div>表：{{getCodeByVal(item.props[1])}}</div>
-                <div>分类X：{{getCodeByVal(item.props[2])}}</div>
-                <div>数据Y：{{getCodeByVal(item.props[3])}}</div>
-            </div>
+            <button @click="addData">添加数据</button>
+            <table style="width: 100%;">
+                <thead>
+                <tr>
+                    <td style="min-width: 50px;">对象</td>
+                    <td>公式</td>
+                    <td>计算值</td>
+                    <td style="min-width: 36px;">操作</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(item,key) in datas">
+                    <td v-html="key"></td>
+                    <td v-html="getCodeByVal(item)"></td>
+                    <td style="min-width: 150px;">
+                        <div>链接：{{getConnection(item.props[0])}}</div>
+                        <div>表：{{getCodeByVal(item.props[1])}}</div>
+                        <div>分类X：{{getCodeByVal(item.props[2])}}</div>
+                        <div>数据Y：{{getCodeByVal(item.props[3])}}</div>
+                    </td>
+                    <td>
+                        <button @click="change(key)">修改</button>
+                        <button v-if="isCanDelete(key,item)===true" @click="deleteItem(key)">删除</button>
+                        <span v-else v-html="isCanDelete(key,item)"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
 <script>
 import AllVarClass from '../../observer/allVar.js';
 import getStrByObj from '../../languageParser/getStrByObj';
-
+// import getEvalObj from '../../languageParser/evalObjAndStr';
+import { mapActions } from 'vuex';
+import widgetEvent from '../widgetChange';
+import { prompt } from '../alert/prompt';
+import allMatch from '../../languageParser/allMatch';
 export default {
-    props: ['connections'],
+    props: {
+        connections: {},
+        useCreateVar: {
+            type: Array
+        }
+    },
     data() {
         return {
             datas: {}
@@ -41,18 +69,76 @@ export default {
     mounted() {
         let self = this;
         AllVarClass.on('valChange', function(key, val) {
-            self.$set(self.datas, key, val.value_);
+            let matchItem = allMatch.find(item => {
+                return item.match.test(val.value_.name);
+            });
+            console.log('----key----');
+            console.log(key);
+            console.log(val.value_.name);
+            console.log(matchItem);
+            if(matchItem) {
+                if(matchItem.returnType === 'relationalModel') {
+                    self.$set(self.datas, key, val.value_);
+                }
+            }
         });
     },
     methods: {
+        ...mapActions('main', ['setDragDomFunc']),
+        isCanDelete(key, item) {
+            // item.dep.sentEvent 指向 变量对应的计算公式的Dep
+            // 所有VarSentDep需要通知的对象
+            if(!this.useCreateVar.includes(key)) {
+                return '系统变量';
+            }
+
+            if(item && item.dep.sentEvent.length > 0) {
+                let VarSentDep = item.dep.sentEvent[0].sentEvent.filter(item => {
+                    return !(item instanceof AllVarClass.constructor);
+                });
+                return VarSentDep.length === 0;
+            } else {
+                return '被使用';
+            }
+        },
+        getConnection(val) {
+            let runValue = getStrByObj(val);
+            let matchObj = this.connections.find(item => {
+                return parseInt(item.id) === runValue;
+            });
+            if(matchObj) {
+                return matchObj.name;
+            } else {
+                return runValue;
+            }
+        },
         getCodeByVal(val) {
             return getStrByObj(val);
         },
         change(key) {
             this.$emit('change', key);
+        },
+        addData() {
+            prompt('请输入数据变量名称', 'data1').then((varName) => {
+                if(varName !== null) {
+                    this.setDragDomFunc('RELATIONAL_MODEL');
+                    // this.setDragDomFunc('MIN');
+                    varName = '$' + varName.replace(/^\$/, '');
+                    widgetEvent.emit('change', varName);
+                }
+            });
         }
     }
 }
 </script>
 <style scoped lang="less">
+    table {
+        border-collapse: collapse;
+        td {
+            border: solid 1px #b0b0b0;
+            word-break: break-all;
+            word-wrap: break-word;
+        }
+
+    }
 </style>

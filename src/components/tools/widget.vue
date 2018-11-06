@@ -1,12 +1,5 @@
 <template>
     <div>
-        <h2>容器</h2>
-        <div>2</div>
-        <div>3</div>
-        <div>4</div>
-        <div>TAB</div>
-        <div>折叠面板</div>
-
         <h2>表单</h2>
         <div draggable="true" @dragstart='drag("INPUT")'>输入框</div>
         <div draggable="true" @dragstart='drag("INPUT_DATE")'>日期</div>
