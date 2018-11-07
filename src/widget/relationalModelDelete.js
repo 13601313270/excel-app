@@ -14,37 +14,57 @@ class relationalModelMerge extends FuncObj {
         this.name = 'RELATIONAL_MODEL_MERGE';
     }
 
+    checkParams() {
+        if(this.allRelation.length > 0) {
+            let allOk = true;
+            this.allRelation.forEach(item => {
+                allOk = allOk && item.value && (item.value.type === 'relationalModel');
+            });
+            return allOk;
+        } else {
+            return false;
+        }
+    }
+
     get value() {
         let self = this;
-        return {
-            type: 'relationalModel',
-            groupColumn: this.allRelation[0].value.groupColumn,
-            dataColumn: (function() {
-                let returnArr = [];
-                self.allRelation.map(item => {
-                    returnArr.push(...item.value.dataColumn);
-                });
-                return returnArr;
-            })(),
-            dataValue: this.allRelation[0].value.dataValue.map((item, key) => {
-                let returnArr = Array.from(item);
-                let findMatchInfo = {};
-                this.allRelation[0].value.groupColumn.forEach((item2, key2) => {
-                    findMatchInfo[item2] = returnArr[key2];
-                });
-                this.allRelation.slice(1).forEach(relationItem => {
-                    let find = relationItem.value.dataValue.find(item2 => {
-                        let isMatch = true;
-                        Object.keys(findMatchInfo).forEach(matchKey => {
-                            isMatch = isMatch && findMatchInfo[matchKey] === item2[relationItem.value.groupColumn.indexOf(matchKey)];
-                        });
-                        return isMatch;
+        if(this.checkParams()) {
+            return {
+                type: 'relationalModel',
+                groupColumn: this.allRelation[0].value.groupColumn,
+                dataColumn: (function() {
+                    let returnArr = [];
+                    self.allRelation.map(item => {
+                        returnArr.push(...item.value.dataColumn);
                     });
-                    returnArr.push(...find.slice(relationItem.value.groupColumn.length));
-                });
-                return returnArr;
-            })
-        };
+                    return returnArr;
+                })(),
+                dataValue: this.allRelation[0].value.dataValue.map((item, key) => {
+                    let returnArr = Array.from(item);
+                    let findMatchInfo = {};
+                    this.allRelation[0].value.groupColumn.forEach((item2, key2) => {
+                        findMatchInfo[item2] = returnArr[key2];
+                    });
+                    this.allRelation.slice(1).forEach(relationItem => {
+                        let find = relationItem.value.dataValue.find(item2 => {
+                            let isMatch = true;
+                            Object.keys(findMatchInfo).forEach(matchKey => {
+                                isMatch = isMatch && findMatchInfo[matchKey] === item2[relationItem.value.groupColumn.indexOf(matchKey)];
+                            });
+                            return isMatch;
+                        });
+                        if(find) {
+                            returnArr.push(...find.slice(relationItem.value.groupColumn.length));
+                        } else {
+                            returnArr.push(...Array(relationItem.value.groupColumn.length).fill(null));
+                        }
+                    });
+                    return returnArr;
+                })
+            };
+        } else {
+            return null;
+        }
     }
 }
 __allMatch__.push({
