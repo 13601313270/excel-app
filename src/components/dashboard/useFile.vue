@@ -9,7 +9,7 @@
         <!--<widget saveId="sf"></widget>-->
         <widget data="$bbb"></widget>
         <div v-for="(item,key) in fileData.widget" :style="getStyle(item.style)">
-            <widget :key="item.id" class="widget" :class="{light:dragDomFunc}"></widget>
+            <widget :key="item.id" class="widget" :class="{light:dragDomFunc}" @delete="deleteWidget(key)"></widget>
             <!--<div @click="deleteWidget(key)" class="delete_button" v-if="isEditing">delete</div>-->
         </div>
         <!--<button @click="add" v-if="isEditing">click</button>-->
@@ -73,6 +73,7 @@ export default {
 
     .widget {
         border: solid 1px black;
+        display: inline-block;
         &.light {
             border: solid 1px red;
         }

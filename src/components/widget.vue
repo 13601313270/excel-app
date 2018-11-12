@@ -1,7 +1,22 @@
 <template>
-    <div>
+    <div class="widget">
+        <div class="head_tool" v-if="isEditing">
+            <template v-if="data_!==undefined">
+                <app-button size="mini" @click="editVar">编辑</app-button>
+                <app-button size="mini" @click="chooseExistItem('')">清空</app-button>
+            </template>
+            <template v-else>
+                <app-button size="mini" @click="clickAdd">新增</app-button>
+                <app-button size="mini" @click="chooseExist">绑定现有的</app-button>
+                <drop-list v-if="isChooseExist" style="position: absolute;top:30px;left: 55px;">
+                    <div v-for="item in allVars" v-html="item" @click="chooseExistItem(item)"></div>
+                </drop-list>
+            </template>
+            <app-button size="mini" @click="deleteWidget">删除</app-button>
+        </div>
         <div
-            class="widget" :class="{warning:getHighlightState(data_)=='info'}"
+            class="widget_content"
+            :class="{warning:getHighlightState(data_)=='info'}"
             ref="content"
             @dragover="allowDrop($event)"
             @drop.stop="ondrop($event)"
@@ -12,15 +27,24 @@
 <script>
 import widgetEvent from './widgetChange';
 // import widgetIdToVar from './widgetIdToVar';
+import appButton from './ui/button.vue';
+import dropList from './ui/dropList.vue';
 import { mapGetters, mapActions } from 'vuex';
 import { prompt } from './alert/prompt';
+
+import allVar from '../observer/allVar';
+
+import allMatch from '../languageParser/allMatch';
+
 export default {
     name: 'widget',
     props: ['data'],
     data() {
         return {
             data_: this.data,
-            key: this.$vnode.key
+            key: this.$vnode.key,
+            isChooseExist: false,
+            allVars: []
         };
     },
     mounted() {
@@ -75,6 +99,38 @@ export default {
             if(this.data_ === undefined) {
                 this.addFunction('TEXT');
             }
+        },
+        editVar() {
+            widgetEvent.emit('editVar', this.data_);
+        },
+        chooseExist() {
+            this.isChooseExist = !this.isChooseExist;
+            if(this.isChooseExist) {
+                let keys = [];
+                let aaa = allVar.getAllData();
+                for (let key in aaa) {
+                    let val = aaa[key];
+                    if(val.value_ !== undefined) {
+                        let matchItem = allMatch.find(item => {
+                            return item.match.test(val.value_.name);
+                        });
+                        if(matchItem) {
+                            if(matchItem.returnType !== 'relationalModel') {
+                                keys.push(key);
+                            }
+                        }
+                    }
+                }
+                this.allVars = keys;
+            }
+        },
+        chooseExistItem(key) {
+            this.data_ = key;
+            widgetEvent.emit('bindVar', key, this.key, this.$refs.content);
+            this.$emit('bindVar', key, this.key, this.$refs.content);
+        },
+        deleteWidget() {
+            this.$emit('delete');
         }
     },
     destroyed() {
@@ -83,18 +139,40 @@ export default {
     },
     computed: {
         ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing'])
+    },
+    components: {
+        appButton, dropList
     }
 }
 </script>
 <style scoped lang="less">
-    .warning {
-        background-color: rgba(193, 42, 12, 0.71);
-    }
-
     .widget {
-        min-width: 20px;
-        min-height: 20px;
-        display: inline-block;
+        position: relative;
+        .warning {
+            background-color: rgba(193, 42, 12, 0.71);
+        }
+
+        .widget_content {
+            min-width: 20px;
+            min-height: 20px;
+            /*display: inline-block;*/
+        }
+        .head_tool {
+            position: absolute;
+            width: 100%;
+            min-width: 220px;
+            height: 30px;
+            top: -30px;
+            left: -1px;
+            background-color: rgb(228, 228, 228);
+            border: solid 1px #a6a6a6;
+            display: none;
+        }
+        &:hover {
+            .head_tool {
+                display: block;
+            }
+        }
     }
 </style>
 <style>

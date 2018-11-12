@@ -317,18 +317,28 @@ export default {
         addData_(varName, widgetId, dom, code) {
             let insertObj = getEvalObj(1, code);
             allVar.setVar(varName, insertObj[0]);
-            let newVar = allVar.getVar(varName);
-            // 用来设置变量映射dom
-            if(dom !== undefined) {
-                this.varToDom[varName] = dom;
-            }
-            // 用来映射widgetId对应存放的变量
-            if(widgetId !== undefined) {
-                this.widgetIdToVar[widgetId] = varName;
-            }
-            if(dom !== undefined) {
-                this.varToDom[varName].innerHTML = '';
-                this.varToDom[varName].appendChild(newVar.value_.dom);
+            this.bindVar(varName, widgetId, dom);
+        },
+        bindVar(varName, widgetId, dom) {
+            if(varName === '') {
+                console.log(this.varToDom);
+                this.varToDom[this.widgetIdToVar[widgetId]].innerHTML = '';
+                delete this.varToDom[varName];
+                delete this.widgetIdToVar[widgetId];
+            } else {
+                let newVar = allVar.getVar(varName);
+                // 用来设置变量映射dom
+                if(dom !== undefined) {
+                    this.varToDom[varName] = dom;
+                }
+                // 用来映射widgetId对应存放的变量
+                if(widgetId !== undefined) {
+                    this.widgetIdToVar[widgetId] = varName;
+                }
+                if(dom !== undefined) {
+                    this.varToDom[varName].innerHTML = '';
+                    this.varToDom[varName].appendChild(newVar.value_.dom);
+                }
             }
         },
         dataInit(varName, widgetId, dom) {
@@ -572,13 +582,16 @@ export default {
         widgetEvent.on('init', this.dataInit);
         widgetEvent.on('change', this.addData);
         widgetEvent.on('editVar', this.editVar);
+        widgetEvent.on('bindVar', (varName, widgetId, dom) => {
+            this.bindVar(varName, widgetId, dom);
+            this.save();
+        });
         widgetEvent.on('destroy', this.destroyWidget);
     },
     destroyed() {
-        this.clearWidgetIdToVar();
-        widgetEvent.removeAllListeners();
-
-        allVar.clear();
+        // this.clearWidgetIdToVar();
+        // widgetEvent.removeAllListeners();
+        // allVar.clear();
     },
     watch: {
         isEditing(val) {
