@@ -80,10 +80,7 @@
              v-for="item,key in editObjArr" :style="{zIndex:key+100}">
             <div>
                 <div>对象：{{item.name}}
-                    <div @click="editObjArrPop"
-                         style="position: absolute;right: 0px;top: 0;background-color: grey;width: 20px;color: white;text-align: center;">
-                        X
-                    </div>
+                    <div class="close_button" @click="editObjArrPop">X</div>
                 </div>
                 <props-com
                     @change="item.change(item)"
@@ -92,6 +89,11 @@
                     :is-root="true"
                     style="min-height: 250px;"
                 ></props-com>
+
+                <div v-if="editObjArr[key].obj.type === 'function' && editObjArr[key].obj.name === 'RELATIONAL_MODEL'">
+                    可视化数据
+                    <div v-html="getRelationalModel(item.name)"></div>
+                </div>
                 <div>
                     <textarea @change="changeCode(editObjArr[key],$event.target.value)"
                               :value="item.code"
@@ -503,6 +505,10 @@ export default {
                     console.log(data);
                 });
             }
+        },
+        getRelationalModel(varName) {
+            let newVar = allVar.getVar(varName);
+            return newVar.value.toString();
         }
     },
     mounted() {
@@ -749,6 +755,21 @@ export default {
             padding: 5px;
             position: relative;
             overflow: hidden;
+            .close_button {
+                position: absolute;
+                right: 0;
+                top: 0;
+                background-color: grey;
+                color: white;
+                text-align: center;
+                border-radius: 0 0 0 4px;
+                width: 30px;
+                cursor: pointer;
+                &:hover {
+                    background-color: #d76327;
+                    color: white;
+                }
+            }
         }
     }
 </style>

@@ -1,6 +1,24 @@
 <template>
     <div>
         <h2>数据链接</h2>
+        <button @click="addConnection">添加连接</button>
+        <popup v-if="showDataKey" class="www" @close="showDataKey=''">
+            <div style="max-height:400px;overflow: scroll">
+                <table style="width: 100%;color:black">
+                    <thead>
+                    <tr>
+                        <td v-for="group in datas[showDataKey].value.groupColumn" v-html="group"></td>
+                        <td v-for="column in datas[showDataKey].value.dataColumn" v-html="column"></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="dataItem in datas[showDataKey].value.dataValue">
+                        <td v-for="data in dataItem" v-html="data"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </popup>
         <div v-for="item in connections">
             <div v-html="item.name"></div>
             <div style="display: none">
@@ -34,20 +52,7 @@
                         <div>表：{{getCodeByVal(item.props[1])}}</div>
                         <div>分类X：{{getCodeByVal(item.props[2])}}</div>
                         <div>数据Y：{{getCodeByVal(item.props[3])}}</div>
-                        <button @click="showData(key)">查看数据({{isShowData[key] ? '开' : '关'}})</button>
-                        <table v-if="isShowData[key]">
-                            <thead>
-                            <tr>
-                                <td v-for="group in item.value.groupColumn" v-html="group"></td>
-                                <td v-for="column in item.value.dataColumn" v-html="column"></td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="dataItem in item.value.dataValue">
-                                <td v-for="data in dataItem" v-html="data"></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <button @click="showData(key)">查看数据</button>
                     </td>
                     <td>
                         <button @click="change(key)">修改</button>
@@ -63,11 +68,14 @@
 <script>
 import AllVarClass from '../../observer/allVar.js';
 import getStrByObj from '../../languageParser/getStrByObj';
+import ptWindow from '../ui/window.vue';
 // import getEvalObj from '../../languageParser/evalObjAndStr';
+import popup from '../ui/popup.vue';
 import { mapActions } from 'vuex';
 import widgetEvent from '../widgetChange';
 import { prompt } from '../alert/prompt';
 import allMatch from '../../languageParser/allMatch';
+import dynamicForm from '../dynamicForm/form';
 export default {
     props: {
         connections: {},
@@ -78,6 +86,7 @@ export default {
     data() {
         return {
             datas: {},
+            showDataKey: '',
             isShowData: {}
         };
     },
@@ -146,9 +155,34 @@ export default {
                 }
             });
         },
+        addConnection() {
+            dynamicForm([
+                {
+                    title: 'db',
+                    name: 'db'
+                },
+                {
+                    title: '端口',
+                    type: Number,
+                    name: 'port'
+                },
+                {
+                    title: '端口',
+                    type: Boolean,
+                    name: 'isTrue'
+                }
+            ]).then((data) => {
+                console.log('=======');
+                console.log(data);
+            });
+        },
         showData(key) {
+            this.showDataKey = key;
             this.$set(this.isShowData, key, !this.isShowData[key]);
         }
+    },
+    components: {
+        ptWindow, popup
     }
 }
 </script>

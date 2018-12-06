@@ -7,9 +7,8 @@ var events = require('events');
 var eventEmitter = new events.EventEmitter();
 export const dynamicVueEvent = eventEmitter;
 export function createVueObj(vueClass, attr, event) {
-    let randomId = parseInt(Math.random() * 1000000);
     let vueObj = Vue.extend(vueClass);
-    dynamicVueEvent.emit('addVueObj', randomId, vueObj, attr, event);
+    dynamicVueEvent.emit('addVueObj', vueObj, attr, event);
     return vueObj;
 }
 export function deleteVueObj(obj) {

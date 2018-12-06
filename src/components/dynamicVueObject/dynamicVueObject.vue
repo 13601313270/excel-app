@@ -4,9 +4,9 @@ import { dynamicVueEvent } from './dynamicVueObject';
 export default {
     created() {
         // 支持全局调用临时添加，用完即删型vue组件
-        dynamicVueEvent.on('addVueObj', (randomId, vueObj, attr, event) => {
+        dynamicVueEvent.on('addVueObj', (vueObj, attr, event) => {
             this.allGlobleVue.push({
-                randomId, vueObj, attr, event
+                vueObj, attr, event
             });
         });
         dynamicVueEvent.on('deleteVueObj', (vueObj) => {

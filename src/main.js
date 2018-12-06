@@ -5,8 +5,10 @@ import App from './App.vue'
 import router from './router'
 import Vuex from 'vuex'
 import vuexConfig from './vuex/index';
+import ElementUI from 'element-ui';
 
 Vue.use(Vuex);
+Vue.use(ElementUI);
 Vue.config.productionTip = false;
 
 let store = new Vuex.Store(vuexConfig);
