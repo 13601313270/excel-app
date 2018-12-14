@@ -40,5 +40,9 @@ __allMatch__.push({
             default: ''
         }
     ],
-    returnType: 'dom'
+    returnType: 'dom',
+    defaultSize: {
+        width: 143,
+        height: 27
+    }
 });

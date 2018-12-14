@@ -29,7 +29,9 @@
                     <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
                     <use-file
                         v-else-if="appType===1 && fileData.file_data"
-                        :dragDomFunc="dragDomFunc" :fileData="fileData.file_data"
+                        :dragDomFunc="dragDomFunc"
+                        :dragDomFuncInfo="getWidgetInfoByName(dragDomFunc)"
+                        :fileData="fileData.file_data"
                         :isEditing="isEditing"
                         class="used-dashboard"
                         @save="save"
@@ -298,6 +300,12 @@ export default {
             code += propsArr.join(',');
             code += ')';
             return code;
+        },
+        // 通过函数名，获取函数配置信息
+        getWidgetInfoByName(name) {
+            return allMatch.find(item => {
+                return item.name === name;
+            });
         },
         addData(varName, widgetId, dom) {
             let dragDomFunc = this.dragDomFunc;
@@ -710,7 +718,7 @@ export default {
                 &.edit {
                     > div {
                         margin: 32px 16px;
-                        box-shadow: 0 0 20px 0px #4f4f4f;
+                        box-shadow: 0 0 20px 0 #4f4f4f;
                     }
                 }
                 .used-dashboard {

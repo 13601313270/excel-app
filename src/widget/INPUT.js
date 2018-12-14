@@ -11,7 +11,7 @@ class INPUT extends FuncObj {
         // this.dom.type = type;
         let self = this;
         this.dom.addEventListener('change', function() {
-            if (type === 'number') {
+            if(type === 'number') {
                 self.valueee = parseFloat(this.value);
             } else {
                 self.valueee = this.value.toString();
@@ -54,5 +54,9 @@ __allMatch__.push({
             default: ''
         }
     ],
-    returnType: 'dom'
+    returnType: 'dom',
+    defaultSize: {
+        width: 133,
+        height: 24
+    }
 });

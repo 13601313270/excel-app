@@ -18,7 +18,7 @@
 <script>
 import cloneUtils from '../clone.utils';
 export default {
-    props: ['fileData', 'isEditing', 'dragDomFunc'],
+    props: ['fileData', 'isEditing', 'dragDomFunc', 'dragDomFuncInfo'],
     data() {
         return {
             style: {
@@ -45,8 +45,19 @@ export default {
             this.fileData.widget.splice(key, 1);
         },
         dragover(e) {
-            this.style.left = (e.offsetX - 50) + 'px';
-            this.style.top = (e.offsetY - 50) + 'px';
+            this.style.left = (e.offsetX) + 'px';
+            this.style.top = (e.offsetY) + 'px';
+            if(this.dragDomFuncInfo && this.dragDomFuncInfo.defaultSize && this.dragDomFuncInfo.defaultSize.width && this.dragDomFuncInfo.defaultSize.height) {
+                this.style.left = (e.offsetX - this.dragDomFuncInfo.defaultSize.width / 2) + 'px';
+                this.style.top = (e.offsetY - this.dragDomFuncInfo.defaultSize.height / 2) + 'px';
+                this.style.width = this.dragDomFuncInfo.defaultSize.width + 'px';
+                this.style.height = this.dragDomFuncInfo.defaultSize.height + 'px';
+            } else {
+                this.style.left = (e.offsetX - 50) + 'px';
+                this.style.top = (e.offsetY - 50) + 'px';
+                this.style.width = '100px';
+                this.style.height = '100px';
+            }
             e.preventDefault();
         },
         ondrop() {
@@ -65,6 +76,7 @@ export default {
 <style scoped lang="less">
     .droging-seat {
         position: absolute;
+        z-index: 9999999;
         width: 100px;
         height: 100px;
         background-color: rgba(255, 0, 0, 0.41);
