@@ -1,39 +1,7 @@
 <template>
     <div>
-        <h2>数据链接</h2>
-        <button @click="addConnection">添加连接</button>
-        <popup v-if="showDataKey" class="www" @close="showDataKey=''">
-            <div style="max-height:400px;overflow: scroll">
-                <table style="width: 100%;color:black">
-                    <thead>
-                    <tr>
-                        <td v-for="group in datas[showDataKey].value.groupColumn" v-html="group"></td>
-                        <td v-for="column in datas[showDataKey].value.dataColumn" v-html="column"></td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="dataItem in datas[showDataKey].value.dataValue">
-                        <td v-for="data in dataItem" v-html="data"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </popup>
-        <div v-for="item in connections">
-            <div v-html="item.name"></div>
-            <div style="display: none">
-                <div v-html="item.id"></div>
-                <div v-html="item.uid"></div>
-                <div v-html="item.type"></div>
-                <div v-html="item.info.db"></div>
-                <div v-html="item.info.host"></div>
-                <div v-html="item.info.port"></div>
-                <div v-html="item.info.username"></div>
-            </div>
-        </div>
-        <h2>数据表</h2>
         <div>
-            <button @click="addData">添加数据</button>
+            <ui-button @click="addData" size="mini">添加数据</ui-button>
             <table style="width: 100%;">
                 <thead>
                 <tr>
@@ -63,6 +31,23 @@
                 </tbody>
             </table>
         </div>
+        <popup v-if="showDataKey" class="www" @close="showDataKey=''">
+            <div style="max-height:400px;overflow: scroll">
+                <table style="width: 100%;color:black">
+                    <thead>
+                    <tr>
+                        <td v-for="group in datas[showDataKey].value.groupColumn" v-html="group"></td>
+                        <td v-for="column in datas[showDataKey].value.dataColumn" v-html="column"></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="dataItem in datas[showDataKey].value.dataValue">
+                        <td v-for="data in dataItem" v-html="data"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </popup>
     </div>
 </template>
 <script>
@@ -75,7 +60,6 @@ import { mapActions } from 'vuex';
 import widgetEvent from '../widgetChange';
 import { prompt } from '../alert/prompt';
 import allMatch from '../../languageParser/allMatch';
-import dynamicForm from '../dynamicForm/form';
 export default {
     props: {
         connections: {},
@@ -153,27 +137,6 @@ export default {
                     varName = '$' + varName.replace(/^\$/, '');
                     widgetEvent.emit('change', varName);
                 }
-            });
-        },
-        addConnection() {
-            dynamicForm([
-                {
-                    title: 'db',
-                    name: 'db'
-                },
-                {
-                    title: '端口',
-                    type: Number,
-                    name: 'port'
-                },
-                {
-                    title: '端口',
-                    type: Boolean,
-                    name: 'isTrue'
-                }
-            ]).then((data) => {
-                console.log('=======');
-                console.log(data);
             });
         },
         showData(key) {

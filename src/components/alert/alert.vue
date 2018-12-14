@@ -3,7 +3,7 @@
         <ui-window>
             <div class="text" v-html="text"></div>
             <ui-button @click="ok">确定</ui-button>
-            <ui-button>否定</ui-button>
+            <ui-button @click="cancel">否定</ui-button>
         </ui-window>
     </popupBackground>
 </template>
@@ -19,6 +19,9 @@ export default {
     methods: {
         ok() {
             this.$emit('ok');
+        },
+        cancel() {
+            this.$emit('cancel');
         }
     },
     components: {

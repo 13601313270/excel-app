@@ -3,7 +3,7 @@
         <div class="panel-heading">
             <div class="name" v-html="title"></div>
             <div class="tools">
-                <ui_button size="mini" @click.native.stop="closeWindow">X</ui_button>
+                <ui-button size="mini" @click.native.stop="closeWindow">X</ui-button>
             </div>
         </div>
         <div class="body">
@@ -12,8 +12,8 @@
     </div>
 </template>
 <script>
-import button from './button.vue';
 export default {
+    name: 'uiWindow',
     props: ['title', 'isCanClose'],
     data() {
         return {};
@@ -22,9 +22,6 @@ export default {
         closeWindow() {
             this.$emit('close');
         }
-    },
-    components: {
-        ui_button: button
     }
 }
 </script>
@@ -37,6 +34,7 @@ export default {
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        box-shadow: 0 0 100px -20px #ffffff30;
         .panel-heading {
             .ui_panel;
             border: none;
@@ -47,6 +45,7 @@ export default {
             display: flex;
             padding-top: 5px;
             padding-bottom: 5px;
+            height: @form_mini + 10px;
             .name {
                 .ui_single_text;
                 flex-grow: 1;

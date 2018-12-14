@@ -5,6 +5,7 @@
 </template>
 <script>
 export default {
+    name: 'uiButton',
     props: {
         size: String
     },
@@ -18,6 +19,7 @@ export default {
     @import "basic";
 
     .mini {
+        height: @form_mini;
         padding: 7px 15px !important;
         font-size: 12px;
         line-height: 12px;
@@ -27,5 +29,6 @@ export default {
         display: inline-block;
         .ui_panel;
         .ui_can_be_click;
+        color: black;
     }
 </style>

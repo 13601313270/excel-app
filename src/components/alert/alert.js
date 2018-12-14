@@ -12,6 +12,10 @@ export function alert(text) {
             ok(res) {
                 resolve(res);
                 deleteVueObj(dyVueObj);
+            },
+            cancel() {
+                reject();
+                deleteVueObj(dyVueObj);
             }
         });
     });

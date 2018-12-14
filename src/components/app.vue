@@ -51,6 +51,11 @@
                     :useCreateVar="useCreateVar"
                     @delete="deleteVar"
                 ></datas-vue>
+                <connection-vue
+                    v-show="rightToolSelect=='connection'"
+                    :connections="connections"
+                >
+                </connection-vue>
                 <div
                     v-show="rightToolSelect=='var'">
                     <div style="flex-grow: 1;padding: 3px 3px;overflow: auto">
@@ -67,6 +72,9 @@
             <div class="right_tools" v-show="isEditing">
                 <div :class="{active:rightToolSelect=='var'}"
                      @click="rightToolSelect=(rightToolSelect==='var'?'':'var')">已添加对象
+                </div>
+                <div :class="{active:rightToolSelect=='connection'}"
+                     @click="rightToolSelect=(rightToolSelect==='connection'?'':'connection')">链接
                 </div>
                 <div :class="{active:rightToolSelect=='data'}"
                      @click="rightToolSelect=(rightToolSelect==='data'?'':'data')">数据
@@ -149,6 +157,7 @@ import propsCom from './props/props.vue';
 import Obj from '../observer/obj';
 import getStrByObj from '../languageParser/getStrByObj';
 import datasVue from './tools/datas.vue';
+import connectionVue from './tools/connection.vue';
 import getOptionByObj from './props/getPropsOptionByObj';
 import { createCodeText } from './props/createCodeText';
 
@@ -160,8 +169,6 @@ import excel from './dashboard/excel.vue';
 import freePanel from './dashboard/freePanel.vue';
 import ppt from './dashboard/ppt.vue';
 import useFile from './dashboard/useFile.vue';
-
-import uiWindow from './ui/window.vue';
 
 import { mapActions, mapGetters } from 'vuex';
 
@@ -201,6 +208,9 @@ export default {
                 },
                 'var': {
                     width: 500
+                },
+                connection: {
+                    width: 300
                 }
             },
             connections: [],
@@ -615,8 +625,8 @@ export default {
         'free-panel': freePanel,
         'ppt': ppt,
         'useFile': useFile,
-        'ui_window': uiWindow,
-        'dynamic-vue': dynamicVueObject
+        'dynamic-vue': dynamicVueObject,
+        connectionVue
     }
 }
 </script>

@@ -6,10 +6,12 @@ import router from './router'
 import Vuex from 'vuex'
 import vuexConfig from './vuex/index';
 import ElementUI from 'element-ui';
+import ui from './components/ui/index';
 
 Vue.use(Vuex);
 Vue.use(ElementUI);
 Vue.config.productionTip = false;
+Vue.use(ui);
 
 let store = new Vuex.Store(vuexConfig);
 /* eslint-disable no-new */

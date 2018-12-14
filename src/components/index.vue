@@ -26,9 +26,9 @@
         </div>
         <!--文件选择-->
         <div v-if="isChooseFile" class="choose_file">
-            <ui_window class="body" @close="closeChooseFile" title="选择app的记录">
+            <ui-window class="body" @close="closeChooseFile" title="选择app的记录">
                 <template v-for="item in fileList">
-                    <ui_window
+                    <ui-window
                         class="file_item"
                         :key="item.id"
                         @click.native="selectFile(item)"
@@ -36,12 +36,12 @@
                         @close="deleteFile(item.id)"
                     >
                         asdfsda
-                    </ui_window>
+                    </ui-window>
                 </template>
                 <div @click="createFile" class="file_item"
                      style="background-color: #dce4e4;text-align: center;padding-top: 50px;box-sizing: border-box;">新建
                 </div>
-            </ui_window>
+            </ui-window>
         </div>
     </div>
 </template>
@@ -49,7 +49,6 @@
 <script>
 import headerNav from './head.vue';
 import ajax from '../api/ajax';
-import uiWindow from './ui/window.vue';
 import { mapActions } from 'vuex';
 
 export default {
@@ -153,8 +152,7 @@ export default {
          */
     },
     components: {
-        'header-nav': headerNav,
-        'ui_window': uiWindow
+        'header-nav': headerNav
     }
 }
 </script>

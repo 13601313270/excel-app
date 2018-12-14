@@ -4,7 +4,10 @@
             <div>
                 <div v-for="item in inputPropts" class="item">
                     <h3 v-html="item.title"></h3>
-                    <input v-if="item.type===Number" v-model.number="saveData[item.name]" type="number"/>
+                    <select v-if="item.enum" v-model="saveData[item.name]">
+                        <option :value="key2" v-for="(item2,key2) in item.enum" v-html="item2"></option>
+                    </select>
+                    <input v-else-if="item.type===Number" v-model.number="saveData[item.name]" type="number"/>
                     <input v-else-if="item.type===Boolean" v-model="saveData[item.name]" type="checkbox"/>
                     <input v-else v-model="saveData[item.name]"/>
                 </div>
