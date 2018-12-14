@@ -373,10 +373,11 @@ export default {
         dataInit(varName, widgetId, dom, vueDom) {
             let initVar = allVar.getVar(varName);
             if(initVar) {
-                this.varToDom[varName] = dom;
                 if(initVar.value_.dom instanceof Array) {
+                    this.varToDom[varName] = vueDom;
                     vueDom.setInnerVueObj(initVar.value_);
                 } else {
+                    this.varToDom[varName] = dom;
                     this.varToDom[varName].innerHTML = '';
                     this.varToDom[varName].appendChild(initVar.value_.dom);
                 }
@@ -401,7 +402,14 @@ export default {
                 if(widgePanel !== undefined) {
                     if(value_ instanceof Obj) {
                         if(value_.dom) {
-                            widgePanel.appendChild(value_.dom);
+                            if(value_.dom instanceof Array) {
+                                // widgePanel.appendChild(value_.dom);
+                                console.log(1111);
+                                console.log(1111);
+                                widgePanel.setInnerVueObj(value_);
+                            } else {
+                                widgePanel.appendChild(value_.dom);
+                            }
                         } else {
                             widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
                         }

@@ -9,39 +9,28 @@ class CHECK_BOX extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
         this.name = 'CHECK_BOX';
+        this.isSelect = value;
+        let self = this;
         this.dom = [
             check,
             {
-                name: this.name
+                value: this.isSelect
             },
             {
                 change(state) {
-                    alert(state);
+                    console.log(2222, state);
+                    self.isSelect = state;
+                    self.dep.update();
                 }
             }
         ];
-        // document.createElement('div');
-        // this.dom.innerHTML = `<div
-        //         style="width: 40px;border: solid 1px #bababa;border-radius: 20px;display: inline-block;height: 24px;position: relative">
-        //         <div
-        //             style="position: absolute;width: 20px;height: 20px;background-color: gray;border-radius: 50%;top: 2px;left: 2px;"></div>
-        //     </div>`;
-        // this.dom.checked = value;
-        // this.dom.type = 'checkbox';
-        // let self = this;
-        this.isSelect = value;
     }
-
-    vue() {
-        return {};
-    };
 
     get value() {
         return this.isSelect;
     }
 
     render() {
-        this.dom.value = this.isSelect;
     }
 }
 __allMatch__.push({
