@@ -307,7 +307,7 @@ export default {
                 return item.name === name;
             });
         },
-        addData(varName, widgetId, dom) {
+        addData(varName, widgetId, dom, vueDom) {
             let dragDomFunc = this.dragDomFunc;
             if(dragDomFunc === null) {
                 dragDomFunc = allMatch.find(item => {
@@ -324,7 +324,7 @@ export default {
             if(matchItem !== undefined) {
                 let code = this.getCodeByMatchItem(matchItem);
                 // 新加变量
-                this.addData_(varName, widgetId, dom, code);
+                this.addData_(varName, widgetId, dom, code, vueDom);
                 // 弹出编辑变量的窗口
                 this.editVar(varName);
                 if(!this.useCreateVar.includes(varName)) {
@@ -334,12 +334,12 @@ export default {
             this.cancelDragDomFunc();
             this.save();
         },
-        addData_(varName, widgetId, dom, code) {
+        addData_(varName, widgetId, dom, code, vueDom) {
             let insertObj = getEvalObj(1, code);
             allVar.setVar(varName, insertObj[0]);
-            this.bindVar(varName, widgetId, dom);
+            this.bindVar(varName, widgetId, dom, vueDom);
         },
-        bindVar(varName, widgetId, dom) {
+        bindVar(varName, widgetId, dom, vueDom) {
             if(varName === '') {
                 console.log(this.varToDom);
                 this.varToDom[this.widgetIdToVar[widgetId]].innerHTML = '';
@@ -347,26 +347,39 @@ export default {
                 delete this.widgetIdToVar[widgetId];
             } else {
                 let newVar = allVar.getVar(varName);
-                // 用来设置变量映射dom
-                if(dom !== undefined) {
-                    this.varToDom[varName] = dom;
-                }
-                // 用来映射widgetId对应存放的变量
-                if(widgetId !== undefined) {
-                    this.widgetIdToVar[widgetId] = varName;
-                }
-                if(dom !== undefined) {
-                    this.varToDom[varName].innerHTML = '';
-                    this.varToDom[varName].appendChild(newVar.value_.dom);
+                if(newVar.value_.dom instanceof Array) {
+                    vueDom.setInnerVueObj(newVar.value_);
+                    // 用来映射widgetId对应存放的变量
+                    if(widgetId !== undefined) {
+                        this.widgetIdToVar[widgetId] = varName;
+                    }
+                } else {
+                    // 用来设置变量映射dom
+                    if(dom !== undefined) {
+                        this.varToDom[varName] = dom;
+                    }
+                    // 用来映射widgetId对应存放的变量
+                    if(widgetId !== undefined) {
+                        this.widgetIdToVar[widgetId] = varName;
+                    }
+                    if(dom !== undefined) {
+                        this.varToDom[varName].innerHTML = '';
+                        console.log(newVar);
+                        this.varToDom[varName].appendChild(newVar.value_.dom);
+                    }
                 }
             }
         },
-        dataInit(varName, widgetId, dom) {
+        dataInit(varName, widgetId, dom, vueDom) {
             let initVar = allVar.getVar(varName);
             if(initVar) {
                 this.varToDom[varName] = dom;
-                this.varToDom[varName].innerHTML = '';
-                this.varToDom[varName].appendChild(initVar.value_.dom);
+                if(initVar.value_.dom instanceof Array) {
+                    vueDom.setInnerVueObj(initVar.value_);
+                } else {
+                    this.varToDom[varName].innerHTML = '';
+                    this.varToDom[varName].appendChild(initVar.value_.dom);
+                }
             } else {
                 this.save();
             }
@@ -606,8 +619,8 @@ export default {
         widgetEvent.on('init', this.dataInit);
         widgetEvent.on('change', this.addData);
         widgetEvent.on('editVar', this.editVar);
-        widgetEvent.on('bindVar', (varName, widgetId, dom) => {
-            this.bindVar(varName, widgetId, dom);
+        widgetEvent.on('bindVar', (varName, widgetId, dom, vueDom) => {
+            this.bindVar(varName, widgetId, dom, vueDom);
             this.save();
         });
         widgetEvent.on('destroy', this.destroyWidget);

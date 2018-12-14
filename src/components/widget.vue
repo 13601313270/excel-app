@@ -21,7 +21,11 @@
             @dragover="allowDrop($event)"
             @drop.stop="ondrop($event)"
             @click="clickAdd"
-        ></div>
+        >
+            <div v-if="vueShow">
+                <tempVueClass :initProps="vueShow.dom"></tempVueClass>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -31,11 +35,20 @@ import appButton from './ui/button.vue';
 import dropList from './ui/dropList.vue';
 import { mapGetters, mapActions } from 'vuex';
 import { prompt } from './alert/prompt';
-
 import allVar from '../observer/allVar';
-
 import allMatch from '../languageParser/allMatch';
 
+let tempVueClass = {
+    props: {
+        initProps: Array
+    },
+    render(createElement) {
+        return createElement(this.initProps[0], {
+            props: this.initProps[1],
+            on: this.initProps[2]
+        })
+    }
+}
 export default {
     name: 'widget',
     props: ['data'],
@@ -44,17 +57,18 @@ export default {
             data_: this.data,
             key: this.$vnode.key,
             isChooseExist: false,
-            allVars: []
+            allVars: [],
+            vueShow: null
         };
     },
     mounted() {
         if(this.data !== undefined) {
-            widgetEvent.emit('init', this.data, this.key, this.$refs.content);
+            widgetEvent.emit('init', this.data, this.key, this.$refs.content, this);
             this.$emit('init', this.data, this.key, this.$refs.content);
         } else {
             this.data_ = this.widgetIdToVar[this.key];
 
-            widgetEvent.emit('init', this.data_, this.key, this.$refs.content);
+            widgetEvent.emit('init', this.data_, this.key, this.$refs.content, this);
             this.$emit('init', this.data_, this.key, this.$refs.content);
         }
         widgetEvent.on('addWidgetContent', (key) => {
@@ -82,7 +96,7 @@ export default {
                         this.setDragDomFunc(dragDomFunc);
                         varName = '$' + varName.replace(/^\$/, '');
                         this.data_ = varName;
-                        widgetEvent.emit('change', varName, this.key, this.$refs.content);
+                        widgetEvent.emit('change', varName, this.key, this.$refs.content, this);
                         this.$emit('change', varName, this.key, this.$refs.content);
                     }
                 });
@@ -126,11 +140,16 @@ export default {
         },
         chooseExistItem(key) {
             this.data_ = key;
-            widgetEvent.emit('bindVar', key, this.key, this.$refs.content);
-            this.$emit('bindVar', key, this.key, this.$refs.content);
+            widgetEvent.emit('bindVar', key, this.key, this.$refs.content, this);
+            this.$emit('bindVar', key, this.key, this.$refs.content, this);
         },
         deleteWidget() {
             this.$emit('delete');
+        },
+        setInnerVueObj(funcObj) {
+            console.log('=========');
+            console.log(funcObj);
+            this.vueShow = funcObj;
         }
     },
     destroyed() {
@@ -141,7 +160,7 @@ export default {
         ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing'])
     },
     components: {
-        appButton, dropList
+        appButton, dropList, tempVueClass
     }
 }
 </script>

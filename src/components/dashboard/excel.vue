@@ -165,7 +165,7 @@ export default {
                 });
                 this.$nextTick(() => {
                     this.data.forEach(item => {
-                        widgetEvent.emit('insertByCode', item.data, item.randomId, this.$refs[item.data][0].$refs.content, item.code);
+                        widgetEvent.emit('insertByCode', item.data, item.randomId, this.$refs[item.data][0].$refs.content, item.code, this);
                     });
                 });
             }
@@ -194,7 +194,7 @@ export default {
                 if(varName !== null) {
                     this.$nextTick(() => {
                         console.log(this.$refs[varName][0].$refs.content);
-                        widgetEvent.emit('change', varName, randomId, this.$refs[varName][0].$refs.content);
+                        widgetEvent.emit('change', varName, randomId, this.$refs[varName][0].$refs.content, this.$refs[varName][0]);
                     });
                 }
             }
