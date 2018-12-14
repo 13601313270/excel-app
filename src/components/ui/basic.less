@@ -4,13 +4,14 @@
 @ui_panel_padding_x: 15px;
 @ui_panel_padding: @ui_panel_padding_y @ui_panel_padding_x;
 @ui_panel_borderColor: #ddd;
+@ui_panel_borderWidth: 1px;
 
 //封闭区域之间的间距
 @ui_panel_margin_y: 10px;
 @ui_panel_margin_x: 15px;
 .ui_panel {
   background-color: #fff;
-  border: 1px solid @ui_panel_borderColor;
+  border: @ui_panel_borderWidth solid @ui_panel_borderColor;
   border-radius: 4px;
   overflow: hidden;
   box-sizing: border-box;
@@ -84,4 +85,5 @@
 
 // =======================
 // 表单尺寸
-@form_mini: 28px;
+@form_default_height: 44px;
+@form_mini_height: 28px;

@@ -19,7 +19,7 @@ export default {
     @import "basic";
 
     .mini {
-        height: @form_mini;
+        height: @form_mini_height;
         padding: 7px 15px !important;
         font-size: 12px;
         line-height: 12px;

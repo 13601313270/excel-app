@@ -159,6 +159,8 @@ export default {
         }
         .head_tool {
             position: absolute;
+            padding-top: 1px;
+            padding-left: 2px;
             width: 100%;
             min-width: 220px;
             height: 30px;
@@ -167,6 +169,9 @@ export default {
             background-color: rgb(228, 228, 228);
             border: solid 1px #a6a6a6;
             display: none;
+            > * {
+                margin-left: 2px;
+            }
         }
         &:hover {
             .head_tool {

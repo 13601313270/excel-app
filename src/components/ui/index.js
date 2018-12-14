@@ -3,7 +3,8 @@
  */
 import button from './button.vue';
 import window from './window.vue';
-const ptUI = [button, window];
+import input from './input.vue';
+const ptUI = [button, window, input];
 export default {
     install(Vue) {
         ptUI.forEach(component => {

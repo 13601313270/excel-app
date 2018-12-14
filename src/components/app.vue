@@ -21,7 +21,7 @@
                 <tools_widget v-if="leftToolSelect=='widget'" @drag='dragWidget'></tools_widget>
                 <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
             </div>
-            <div id="app_content">
+            <div id="app_content" :class="{edit:isEditing}">
                 <div>
                     <word v-if="appType==='word'" :dragDomFunc="dragDomFunc"></word>
                     <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
@@ -207,7 +207,7 @@ export default {
                     width: 400
                 },
                 'var': {
-                    width: 500
+                    width: 550
                 },
                 connection: {
                     width: 300
@@ -666,6 +666,7 @@ export default {
                 background-color: #3c3f41;
                 color: #d9d9d9;
                 border-right: solid 1px #4f4f4f;
+                padding-top: 1px;
                 > * {
                     word-wrap: break-word;
                     margin: 0 1px 2px 0;
@@ -679,6 +680,11 @@ export default {
                         background: #333333;
                         margin-right: -1px;
                         color: white;
+                        border: solid 1px #4f4f4f;
+                        border-right: none;
+                        &:hover {
+                            box-shadow: none;
+                        }
                     }
                     &:hover {
                         box-shadow: inset 2px 0 5px 0 #717171;
@@ -700,6 +706,13 @@ export default {
                 display: flex;
                 flex-direction: column;
                 overflow: scroll;
+                background-color: grey;
+                &.edit {
+                    > div {
+                        margin: 32px 16px;
+                        box-shadow: 0 0 20px 0px #4f4f4f;
+                    }
+                }
                 .used-dashboard {
                     position: relative;
                     min-height: 100%;
@@ -707,7 +720,7 @@ export default {
                 > div {
                     flex-grow: 1;
                     position: relative;
-                    overflow: auto;
+                    // overflow: auto;
                     background-color: #f9f9f9;
                     height: 100%;
                 }
@@ -727,6 +740,7 @@ export default {
                 background-color: #3c3f41;
                 color: #d9d9d9;
                 border-left: solid 1px #4f4f4f;
+                padding-top: 1px;
                 > * {
                     word-wrap: break-word;
                     margin: 0 1px 2px 0;
@@ -740,6 +754,11 @@ export default {
                         background: #333333;
                         margin-left: -1px;
                         color: white;
+                        border: solid 1px #4f4f4f;
+                        border-left: none;
+                        &:hover {
+                            box-shadow: none;
+                        }
                     }
                     &:hover {
                         box-shadow: inset -2px 0px 5px 0px #717171;

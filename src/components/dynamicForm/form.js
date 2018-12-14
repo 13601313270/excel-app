@@ -4,10 +4,10 @@
 import { createVueObj, deleteVueObj } from '../dynamicVueObject/dynamicVueObject';
 import form from './form.vue';
 
-export default function(inputPropts) {
+export default function(inputProps, initData = {}) {
     return new Promise((resolve, reject) => {
         let dyVueObj = createVueObj(form, {
-            inputPropts
+            inputProps, initData
         }, {
             save(res) {
                 deleteVueObj(dyVueObj);
@@ -15,7 +15,7 @@ export default function(inputPropts) {
             },
             cancel() {
                 deleteVueObj(dyVueObj);
-                reject(new Error('cancel'));
+                reject();
             }
         });
     });

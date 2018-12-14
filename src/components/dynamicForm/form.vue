@@ -2,14 +2,14 @@
     <popupBackground class="center">
         <ui-window @close="cancel">
             <div>
-                <div v-for="item in inputPropts" class="item">
+                <div v-for="item in inputProps" class="item">
                     <h3 v-html="item.title"></h3>
                     <select v-if="item.enum" v-model="saveData[item.name]">
                         <option :value="key2" v-for="(item2,key2) in item.enum" v-html="item2"></option>
                     </select>
-                    <input v-else-if="item.type===Number" v-model.number="saveData[item.name]" type="number"/>
-                    <input v-else-if="item.type===Boolean" v-model="saveData[item.name]" type="checkbox"/>
-                    <input v-else v-model="saveData[item.name]"/>
+                    <ui-input size="mini" v-else-if="item.type===Number" v-model.number="saveData[item.name]" type="number"/>
+                    <ui-input size="mini" v-else-if="item.type===Boolean" v-model="saveData[item.name]" type="checkbox"/>
+                    <ui-input size="mini" v-else v-model="saveData[item.name]"/>
                 </div>
                 <div style="display: flex;margin-top: 20px;">
                     <pt-button style="margin: 0 auto;" @click="save">保存</pt-button>
@@ -24,19 +24,23 @@ import uiWindow from '../ui/window.vue';
 import ptButton from '../ui/button.vue';
 export default {
     props: {
-        inputPropts: {
+        inputProps: {
             type: Array
+        },
+        initData: {
+            type: Object,
+            default: {}
         }
     },
     data() {
         let saveData = {};
-        this.inputPropts.forEach(item => {
+        this.inputProps.forEach(item => {
             if(item.type === Number) {
-                saveData[item.name] = NaN;
+                saveData[item.name] = this.initData[item.name] || item.default || NaN;
             } else if(item.type === Boolean) {
-                saveData[item.name] = false;
+                saveData[item.name] = this.initData[item.name] || item.default || false;
             } else {
-                saveData[item.name] = '';
+                saveData[item.name] = this.initData[item.name] || item.default || '';
             }
         });
         return {

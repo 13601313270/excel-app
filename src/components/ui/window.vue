@@ -45,7 +45,7 @@ export default {
             display: flex;
             padding-top: 5px;
             padding-bottom: 5px;
-            height: @form_mini + 10px;
+            height: @form_mini_height + 10px;
             .name {
                 .ui_single_text;
                 flex-grow: 1;

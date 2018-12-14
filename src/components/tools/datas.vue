@@ -1,20 +1,22 @@
 <template>
-    <div>
-        <div>
+    <div class="datas">
+        <div class="tools">
             <ui-button @click="addData" size="mini">添加数据</ui-button>
+        </div>
+        <div>
             <table style="width: 100%;">
                 <thead>
                 <tr>
                     <td style="min-width: 50px;">对象</td>
                     <td>公式</td>
                     <td>计算值</td>
-                    <td style="min-width: 36px;">操作</td>
+                    <td style="min-width: 80px;">操作</td>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="(item,key) in datas">
                     <td v-html="key"></td>
-                    <td v-html="getCodeByVal(item)"></td>
+                    <td class="code" v-html="getCodeSingle(getCodeByVal(item))"></td>
                     <td style="min-width: 150px;">
                         <div>链接：{{getConnection(item.props[0])}}</div>
                         <div>表：{{getCodeByVal(item.props[1])}}</div>
@@ -118,6 +120,10 @@ export default {
                 return runValue;
             }
         },
+        getCodeSingle(code) {
+            let codeMatch = code.match(/([^\(]+)(\(.*\))/);
+            return '<div>' + codeMatch[1] + '</div><div>' + codeMatch[2] + '</div>';
+        },
         getCodeByVal(val) {
             return getStrByObj(val);
         },
@@ -150,12 +156,27 @@ export default {
 }
 </script>
 <style scoped lang="less">
+    .datas {
+        padding: 5px;
+        .tools {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 5px;
+        }
+    }
+
     table {
         border-collapse: collapse;
         td {
             border: solid 1px #b0b0b0;
             word-break: break-all;
             word-wrap: break-word;
+            &.code {
+                div {
+                    float: left;
+                }
+            }
         }
 
     }

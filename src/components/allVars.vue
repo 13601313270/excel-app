@@ -3,10 +3,10 @@
         <table style="width: 100%;">
             <thead>
             <tr>
-                <td style="min-width: 50px;">对象</td>
-                <td>公式</td>
+                <td style="min-width: 60px;">对象</td>
+                <td style="min-width: 180px;">公式</td>
                 <td>计算值</td>
-                <td style="min-width: 36px;">操作</td>
+                <td style="width: 130px">操作</td>
             </tr>
             </thead>
             <tbody>
@@ -21,9 +21,9 @@
                 <td v-else-if="item.value instanceof Array">数组</td>
                 <td v-else-if="item.value instanceof Object">对象:<br/>{{item.value}}</td>
                 <td v-else v-html="item.value.toString()"></td>
-                <td>
-                    <button @click="change(key)">修改</button>
-                    <button v-if="isCanDelete(key,item)===true" @click="deleteItem(key)">删除</button>
+                <td class="tool">
+                    <ui-button size="mini" @click="change(key)">修改</ui-button>
+                    <ui-button size="mini" v-if="isCanDelete(key,item)===true" @click="deleteItem(key)">删除</ui-button>
                     <span v-else v-html="isCanDelete(key,item)"></span>
                 </td>
             </tr>
@@ -92,7 +92,7 @@ export default {
             }
             // console.log('---重新计算---');
             if(Object.values(this.widgetIdToVar).includes(key)) {
-                return '渲染';
+                return '已渲染';
             }
             if(item && item.dep.sentEvent.length > 0) {
                 let VarSentDep = item.dep.sentEvent[0].sentEvent.filter(item => {
@@ -128,6 +128,12 @@ export default {
             border: solid 1px #b0b0b0;
             word-break: break-all;
             word-wrap: break-word;
+            &.tool {
+                > * {
+                    float: left;
+                    margin-left: 3px;
+                }
+            }
         }
 
     }

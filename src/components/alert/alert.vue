@@ -1,6 +1,6 @@
 <template>
     <popupBackground class="center">
-        <ui-window>
+        <ui-window @close="cancel">
             <div class="text" v-html="text"></div>
             <ui-button @click="ok">确定</ui-button>
             <ui-button @click="cancel">否定</ui-button>
@@ -38,6 +38,7 @@ export default {
         align-items: center;
         .text {
             padding-bottom: @ui_panel_margin_y;
+            text-align: center;
         }
     }
 </style>

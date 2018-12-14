@@ -41,6 +41,8 @@ module.exports = {
             'asyncArrow': 'never'
         }],
         'semi': ['off', 'always'],
-        'no-eval': ['off']
+        'no-eval': ['off'],
+        'prefer-promise-reject-errors': ["error", {"allowEmptyReject": true}],
+        'allowEmptyReject': true
     }
 };
