@@ -70,6 +70,11 @@ export default {
                             type: 'PIE',
                             name: '饼状图',
                             icon: '&#xe60c;'
+                        },
+                        {
+                            type: 'RADAR',
+                            name: '雷达图',
+                            icon: '&#xe669;'
                         }
                     ]
                 }, {

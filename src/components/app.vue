@@ -126,6 +126,7 @@ import '../widget/CHECK_BOX';
 import '../widget/BAR';
 import '../widget/COLUMN_BAR';
 import '../widget/LINE';
+import '../widget/RADAR';
 import '../widget/PIE';
 import '../widget/INPUT';
 import '../widget/TEXT';
