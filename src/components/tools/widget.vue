@@ -45,6 +45,16 @@ export default {
                             type: 'BAR',
                             name: '柱状图',
                             icon: '&#xe600;'
+                        },
+                        {
+                            type: 'LINE',
+                            name: '折线图',
+                            icon: '&#xe636;'
+                        },
+                        {
+                            type: 'PIE',
+                            name: '饼状图',
+                            icon: '&#xe60c;'
                         }
                     ]
                 }, {

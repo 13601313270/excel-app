@@ -13,13 +13,13 @@
                      @click="leftToolSelect=(leftToolSelect==='widget'?'':'widget')">控件
                 </div>
                 <div :class="{active:leftToolSelect=='widget22'}"
-                     @click="leftToolSelect=(leftToolSelect==='widget22'?'':'widget22')">控件
+                     @click="leftToolSelect=(leftToolSelect==='widget22'?'':'widget22')">布局
                 </div>
             </div>
             <div class="left_tools_content" v-if="isEditing && leftToolSelect!==''"
                  :style="{width:leftToolInfo[leftToolSelect]?leftToolInfo[leftToolSelect].width+'px':''}">
                 <tools_widget v-if="leftToolSelect=='widget'" @drag='dragWidget'></tools_widget>
-                <div v-else-if="leftToolSelect=='widget22'">afasdf</div>
+                <div v-else-if="leftToolSelect=='widget22'"></div>
             </div>
             <div id="app_content" :class="{edit:isEditing}">
                 <div>
@@ -124,6 +124,8 @@ import '../languageParser/dictionary';
 import '../languageParser/dictionaryGet';
 import '../widget/CHECK_BOX';
 import '../widget/BAR';
+import '../widget/LINE';
+import '../widget/PIE';
 import '../widget/INPUT';
 import '../widget/TEXT';
 import '../widget/IF';
