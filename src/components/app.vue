@@ -737,7 +737,7 @@ export default {
             }
             #app_content {
                 flex-grow: 1;
-                display: flex;
+                // display: flex;
                 flex-direction: column;
                 overflow: scroll;
                 background-color: grey;
@@ -752,7 +752,11 @@ export default {
                     min-height: 100%;
                 }
                 > div {
-                    flex-grow: 1;
+                    /*flex-grow: 1;*/
+                    display: inline;
+                    min-width: 100%;
+                    white-space: nowrap;
+                    float: left;
                     position: relative;
                     // overflow: auto;
                     background-color: #f9f9f9;

@@ -2,6 +2,7 @@
     <div
         @dragover.self="dragover"
         @drop="ondrop"
+        :style="{minWidth: minWidth + 'px'}"
     >
         <div>文件保存</div>
         <div :style="style" v-show="dragDomFunc" class="droging-seat"></div>
@@ -25,6 +26,7 @@ export default {
                 left: 0,
                 top: 0
             },
+            minWidth: 0,
             dragPos: ''
         }
     },
@@ -37,6 +39,8 @@ export default {
     },
     methods: {
         getStyle(item) {
+            console.log(parseInt(item.left) + 500);
+            this.minWidth = Math.max(parseInt(item.left) + 500, this.minWidth);
             return Object.assign({
                 position: 'absolute'
             }, item);
