@@ -128,6 +128,7 @@ import '../widget/COLUMN_BAR';
 import '../widget/LINE';
 import '../widget/RADAR';
 import '../widget/PIE';
+import '../widget/TABLE';
 import '../widget/INPUT';
 import '../widget/TEXT';
 import '../widget/IF';

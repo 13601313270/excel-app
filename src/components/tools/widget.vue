@@ -75,6 +75,11 @@ export default {
                             type: 'RADAR',
                             name: '雷达图',
                             icon: '&#xe669;'
+                        },
+                        {
+                            type: 'TABLE',
+                            name: '表格',
+                            icon: '&#xe6b1;'
                         }
                     ]
                 }, {

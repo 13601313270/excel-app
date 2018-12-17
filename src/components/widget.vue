@@ -147,8 +147,8 @@ export default {
             this.$emit('delete');
         },
         setInnerVueObj(funcObj) {
-            console.log('=========');
-            console.log(funcObj);
+            // console.log('=========');
+            // console.log(funcObj);
             this.vueShow = funcObj;
         }
     },

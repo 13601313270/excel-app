@@ -20,7 +20,7 @@ class Temp extends Obj {
 }
 
 class LINE extends FuncObj {
-    constructor(source, table, x, y, where) {
+    constructor(source) {
         super(...Array.from(arguments));
         this.name = 'LINE';
         this.dom = document.createElement('div');

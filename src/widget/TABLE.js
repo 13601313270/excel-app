@@ -1,65 +1,43 @@
-/**
- * Created by ptmind on 2018/3/9.
- */
-import echarts from 'echarts';
 import FuncObj from './FuncObj';
-import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
 import Var from '../observer/Var';
-import Dict from '../languageParser/dictionary';
 import tableVue from './TABLE.vue';
-class Temp extends Obj {
-    get value() {
-        return this.value_;
-    }
-
-    set value(varObj) {
-        this.dep.lock();
-        this.value_ = varObj;
-        this.dep.update();
-    }
-}
 
 class TABLE extends FuncObj {
-    constructor(source, table, x, y, where) {
+    constructor(source, pageSize = 10) {
         super(...Array.from(arguments));
         this.name = 'TABLE';
+        this.model = this.value;
         this.dom = [
             tableVue,
             {
-                value: this.value
+                value: this.model,
+                pageSize
             }
         ];
     }
 
     get value() {
-        return this.dict.value;
+        let model = this.props[0];
+        if(model instanceof Var) {
+            model = model.value_;
+        }
+        return model.value;
     }
 
     render(handle) {
         // let self = this;
-        // let model = this.props[0];
-        // if(model instanceof Var) {
-        //     model = model.value_;
-        // }
-        // if(model === '') {
-        //     handle(false);
-        //     return;
-        // }
-        // let data = model.value.dataValue;
-        // let option = {
-        //     tooltip: {},
-        //     legend: {
-        //         data: model.value.dataColumn
-        //     },
-        //     xAxis: {
-        //         data: []
-        //     },
-        //     yAxis: {},
-        //     series: []
-        // };
-        // option.xAxis.data = [];
-        // option.series = [];
+        let model = this.props[0];
+        if(model instanceof Var) {
+            model = model.value_;
+        }
+        if(model === '') {
+            handle(false);
+            return;
+        }
+        this.model.groupColumn = model.groupColumn;
+        this.model.dataColumn = model.dataColumn;
+        this.model.dataValue = model.dataValue;
     }
 }
 __allMatch__.push({
