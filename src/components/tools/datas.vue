@@ -121,7 +121,7 @@ export default {
             }
         },
         getCodeSingle(code) {
-            let codeMatch = code.match(/([^\(]+)(\(.*\))/);
+            let codeMatch = code.match(/([^(]+)(\(.*\))/);
             return '<div>' + codeMatch[1] + '</div><div>' + codeMatch[2] + '</div>';
         },
         getCodeByVal(val) {

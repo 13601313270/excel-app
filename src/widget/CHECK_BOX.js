@@ -18,7 +18,6 @@ class CHECK_BOX extends FuncObj {
             },
             {
                 change(state) {
-                    console.log(2222, state);
                     self.isSelect = state;
                     self.dep.update();
                 }
@@ -47,5 +46,9 @@ __allMatch__.push({
             default: ''
         }
     ],
-    returnType: 'dom'
+    returnType: 'dom',
+    defaultSize: {
+        width: 42,
+        height: 26
+    }
 });
