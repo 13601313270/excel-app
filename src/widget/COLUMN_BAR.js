@@ -18,14 +18,15 @@ class Temp extends Obj {
         this.dep.update();
     }
 }
-
-class PIE extends FuncObj {
+// &#xeb62;
+class COLUMN_BAR extends FuncObj {
     constructor(source, table, x, y, where) {
         super(...Array.from(arguments));
-        this.name = 'PIE';
+        this.name = 'COLUMN_BAR';
         this.dom = document.createElement('div');
         this.myChart = echarts.init(this.dom);
         this.selectBar = -1;
+        this.isStack = false;
         let xColumn = new Temp();
         let select = new Temp();
         let value = new Temp();
@@ -48,6 +49,7 @@ class PIE extends FuncObj {
     }
 
     render(handle) {
+        let self = this;
         let model = this.props[0];
         if(model instanceof Var) {
             model = model.value_;
@@ -62,46 +64,65 @@ class PIE extends FuncObj {
             legend: {
                 data: model.value.dataColumn
             },
+            xAxis: {
+                type: 'value',
+                data: []
+            },
+            yAxis: {
+                type: 'category'
+            },
             series: []
         };
+        console.log(option);
+        option.yAxis.data = [];
         option.series = [];
         if(data.length > 0) {
-            data.forEach((item, dataNum) => {
+            data.forEach((item) => {
                 item.forEach((item2, key) => {
                     if(key < model.value.groupColumn.length) {
+                        option.yAxis.data.push(item2);
                     } else {
                         let thisOne = key - model.value.groupColumn.length;
                         if(option.series[thisOne] === undefined) {
-                            let radius = [0, '30%'];
-                            if(item.length - model.value.groupColumn.length === 1) {
-                                radius = [0, '80%'];
-                            }
-                            if(key > 1) {
-                                radius = ['40%', '55%'];
-                            }
                             option.series[thisOne] = {
-                                type: 'pie',
-                                radius: radius,
-                                label: {
+                                type: 'bar',
+                                itemStyle: {
                                     normal: {
-                                        position: 'inner'
+                                        color: function(params) {
+                                            let colorList = Array(data.length);
+                                            let allColor = [
+                                                '#c03736', '#304553', '#63a0a7', '#d28268', '#93c6af',
+                                                '#759e84', '#c9852f', '#bca29b', '#6e7074', '#55656f',
+                                                '#c4ccd3'
+                                            ];
+                                            let baseColor = allColor[params.seriesIndex % allColor.length];
+                                            colorList.fill(baseColor);
+                                            let index = option.yAxis.data.indexOf(self.selectBar);
+                                            if(index === -1) {
+                                                return baseColor;
+                                            }
+                                            colorList[index] = '#e2633b';
+                                            return colorList[params.dataIndex];
+                                        },
+                                        label: {
+                                            show: true,
+                                            position: 'top'
+                                        }
                                     }
                                 },
                                 name: model.value.dataColumn[thisOne],
                                 selectedMode: 'single',
                                 data: []
                             };
+                            if(this.isStack) {
+                                option.series[thisOne].stack = 'one';
+                            }
                         }
-                        option.series[thisOne].data.push({
-                            value: item2,
-                            name: item[0]
-                        });
+                        option.series[thisOne].data.push(item2);
                     }
                 });
             });
         }
-        // console.log('------');
-        // console.log(option);
         this.myChart.setOption(option, true);
         setTimeout(() => {
             this.dom.style.width = '500px';
@@ -111,11 +132,32 @@ class PIE extends FuncObj {
     }
 }
 __allMatch__.push({
-    match: /^PIE/,
+    match: /^COLUMN_BAR/,
     type: 'function',
-    name: 'PIE',
-    title: '折线图',
-    func: PIE,
+    name: 'COLUMN_BAR',
+    title: '条形图',
+    func: COLUMN_BAR,
+    props: [{
+        name: 'source',
+        title: '关系模型',
+        dataType: 'var,relationalModel'
+    }],
+    returnType: 'dom'
+});
+
+class STACK_COLUMN_BAR extends COLUMN_BAR {
+    constructor(source, table, x, y, where) {
+        super(...Array.from(arguments));
+        this.name = 'STACK_COLUMN_BAR';
+        this.isStack = true;
+    }
+}
+__allMatch__.push({
+    match: /^STACK_COLUMN_BAR/,
+    type: 'function',
+    name: 'STACK_COLUMN_BAR',
+    title: '堆叠条形图',
+    func: STACK_COLUMN_BAR,
     props: [{
         name: 'source',
         title: '关系模型',

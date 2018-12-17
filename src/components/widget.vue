@@ -92,7 +92,7 @@ export default {
         addFunction(dragDomFunc) {
             if(this.isEditing) {
                 prompt('请输入名称', 'a7').then((varName) => {
-                    if(varName !== null) {
+                    if(varName !== null && varName !== '') {
                         this.setDragDomFunc(dragDomFunc);
                         varName = '$' + varName.replace(/^\$/, '');
                         this.data_ = varName;

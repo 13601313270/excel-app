@@ -47,6 +47,21 @@ export default {
                             icon: '&#xe600;'
                         },
                         {
+                            type: 'STACK_BAR',
+                            name: '堆积柱状图',
+                            icon: '&#xe603;'
+                        },
+                        {
+                            type: 'COLUMN_BAR',
+                            name: '条形图',
+                            icon: '&#xeb62;'
+                        },
+                        {
+                            type: 'STACK_COLUMN_BAR',
+                            name: '堆叠条形图',
+                            icon: '&#xe816;'
+                        },
+                        {
                             type: 'LINE',
                             name: '折线图',
                             icon: '&#xe636;'

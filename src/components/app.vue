@@ -124,6 +124,7 @@ import '../languageParser/dictionary';
 import '../languageParser/dictionaryGet';
 import '../widget/CHECK_BOX';
 import '../widget/BAR';
+import '../widget/COLUMN_BAR';
 import '../widget/LINE';
 import '../widget/PIE';
 import '../widget/INPUT';

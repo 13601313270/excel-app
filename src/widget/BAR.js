@@ -26,6 +26,7 @@ class BAR extends FuncObj {
         this.dom = document.createElement('div');
         this.myChart = echarts.init(this.dom);
         this.selectBar = -1;
+        this.isStack = false;
         let xColumn = new Temp();
         let select = new Temp();
         let value = new Temp();
@@ -57,70 +58,75 @@ class BAR extends FuncObj {
             handle(false);
             return;
         }
-        let data = model.value.dataValue;
-        let option = {
-            tooltip: {},
-            legend: {
-                data: model.value.dataColumn
-            },
-            xAxis: {
-                data: []
-            },
-            yAxis: {},
-            series: []
-        };
-        option.xAxis.data = [];
-        option.series = [];
-        if(data.length > 0) {
-            data.forEach((item) => {
-                item.forEach((item2, key) => {
-                    if(key < model.value.groupColumn.length) {
-                        option.xAxis.data.push(item2);
-                    } else {
-                        let thisOne = key - model.value.groupColumn.length;
-                        if(option.series[thisOne] === undefined) {
-                            option.series[thisOne] = {
-                                type: 'bar',
-                                itemStyle: {
-                                    normal: {
-                                        color: function(params) {
-                                            let colorList = Array(data.length);
-                                            let allColor = [
-                                                '#c03736', '#304553', '#63a0a7', '#d28268', '#93c6af',
-                                                '#759e84', '#c9852f', '#bca29b', '#6e7074', '#55656f',
-                                                '#c4ccd3'
-                                            ];
-                                            let baseColor = allColor[params.seriesIndex % allColor.length];
-                                            colorList.fill(baseColor);
-                                            let index = option.xAxis.data.indexOf(self.selectBar);
-                                            if(index === -1) {
-                                                return baseColor;
+        if(model.value) {
+            let data = model.value.dataValue;
+            let option = {
+                tooltip: {},
+                legend: {
+                    data: model.value.dataColumn
+                },
+                xAxis: {
+                    data: []
+                },
+                yAxis: {},
+                series: []
+            };
+            option.xAxis.data = [];
+            option.series = [];
+            if(data.length > 0) {
+                data.forEach((item) => {
+                    item.forEach((item2, key) => {
+                        if(key < model.value.groupColumn.length) {
+                            option.xAxis.data.push(item2);
+                        } else {
+                            let thisOne = key - model.value.groupColumn.length;
+                            if(option.series[thisOne] === undefined) {
+                                option.series[thisOne] = {
+                                    type: 'bar',
+                                    itemStyle: {
+                                        normal: {
+                                            color: function(params) {
+                                                let colorList = Array(data.length);
+                                                let allColor = [
+                                                    '#c03736', '#304553', '#63a0a7', '#d28268', '#93c6af',
+                                                    '#759e84', '#c9852f', '#bca29b', '#6e7074', '#55656f',
+                                                    '#c4ccd3'
+                                                ];
+                                                let baseColor = allColor[params.seriesIndex % allColor.length];
+                                                colorList.fill(baseColor);
+                                                let index = option.xAxis.data.indexOf(self.selectBar);
+                                                if(index === -1) {
+                                                    return baseColor;
+                                                }
+                                                colorList[index] = '#e2633b';
+                                                return colorList[params.dataIndex];
+                                            },
+                                            label: {
+                                                show: true,
+                                                position: 'top'
                                             }
-                                            colorList[index] = '#e2633b';
-                                            return colorList[params.dataIndex];
-                                        },
-                                        label: {
-                                            show: true,
-                                            position: 'top'
                                         }
-                                    }
-                                },
-                                name: model.value.dataColumn[thisOne],
-                                selectedMode: 'single',
-                                data: []
-                            };
+                                    },
+                                    name: model.value.dataColumn[thisOne],
+                                    selectedMode: 'single',
+                                    data: []
+                                };
+                                if(this.isStack) {
+                                    option.series[thisOne].stack = 'one';
+                                }
+                            }
+                            option.series[thisOne].data.push(item2);
                         }
-                        option.series[thisOne].data.push(item2);
-                    }
+                    });
                 });
-            });
+            }
+            this.myChart.setOption(option, true);
+            setTimeout(() => {
+                this.dom.style.width = '500px';
+                this.dom.style.height = '300px';
+                this.myChart.resize();
+            }, 0);
         }
-        this.myChart.setOption(option, true);
-        setTimeout(() => {
-            this.dom.style.width = '500px';
-            this.dom.style.height = '300px';
-            this.myChart.resize();
-        }, 0);
     }
 }
 __allMatch__.push({
@@ -129,6 +135,26 @@ __allMatch__.push({
     name: 'BAR',
     title: '柱状图',
     func: BAR,
+    props: [{
+        name: 'source',
+        title: '关系模型',
+        dataType: 'var,relationalModel'
+    }],
+    returnType: 'dom'
+});
+class STACK_BAR extends BAR {
+    constructor(source, table, x, y, where) {
+        super(...Array.from(arguments));
+        this.name = 'STACK_BAR';
+        this.isStack = true;
+    }
+}
+__allMatch__.push({
+    match: /^STACK_BAR/,
+    type: 'function',
+    name: 'STACK_BAR',
+    title: '堆积柱状图',
+    func: STACK_BAR,
     props: [{
         name: 'source',
         title: '关系模型',
