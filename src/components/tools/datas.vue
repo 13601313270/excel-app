@@ -22,11 +22,11 @@
                         <div>表：{{getCodeByVal(item.props[1])}}</div>
                         <div>分类X：{{getCodeByVal(item.props[2])}}</div>
                         <div>数据Y：{{getCodeByVal(item.props[3])}}</div>
-                        <button @click="showData(key)">查看数据</button>
+                        <ui-button @click="showData(key)" size="mini">查看数据</ui-button>
                     </td>
                     <td>
-                        <button @click="change(key)">修改</button>
-                        <button v-if="isCanDelete(key,item)===true" @click="deleteItem(key)">删除</button>
+                        <ui-button @click="change(key)" size="mini">修改</ui-button>
+                        <ui-button v-if="isCanDelete(key,item)===true" size="mini" @click="deleteItem(key)">删除</ui-button>
                         <span v-else v-html="isCanDelete(key,item)"></span>
                     </td>
                 </tr>

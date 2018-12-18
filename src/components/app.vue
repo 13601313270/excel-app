@@ -812,7 +812,7 @@ export default {
                 .used-dashboard {
                     position: relative;
                     min-height: 100%;
-                    overflow: hidden;
+                    // overflow: hidden;一定不能加，悬浮tip无法显示
                 }
                 > div {
                     /*flex-grow: 1;*/
