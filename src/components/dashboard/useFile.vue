@@ -125,7 +125,7 @@ export default {
             width: 30px;
             height: 30px;
             text-align: center;
-            left: 0;
+            left: -31px;
             top: 0;
             cursor: move;
             &:hover {

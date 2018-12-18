@@ -1,5 +1,6 @@
 <template>
     <div class="button_content" :class="{mini:size==='mini'}" @click="$emit('click')">
+        <div class="icon" v-html="icon" v-if="icon"></div>
         <slot></slot>
     </div>
 </template>
@@ -7,7 +8,8 @@
 export default {
     name: 'uiButton',
     props: {
-        size: String
+        size: String,
+        icon: String
     },
     data() {
         return {};
@@ -26,9 +28,14 @@ export default {
     }
 
     .button_content {
-        display: inline-block;
+        display: inline-flex;
         .ui_panel;
         .ui_can_be_click;
         color: black;
+        .icon {
+            font-family: iconfont;
+            margin-left: -7px;
+            margin-right: 6px;
+        }
     }
 </style>

@@ -8,7 +8,7 @@
                     @click="isEditing = !isEditing"
                     :src="isEditing?'https://n4-q.mafengwo.net/s10/M00/18/A2/wKgBZ1jc3R6AYhi_AAB-2Jyz1WU027.png':'https://c2-q.mafengwo.net/s10/M00/18/1D/wKgBZ1jc3A-AKDulAABm0wptOh4037.png'"/>
             </div>
-            <ui-button @click="fullScreen" size="mini">全屏</ui-button>
+            <ui-button @click="fullScreen" size="mini" icon="&#xe657;">全屏</ui-button>
         </div>
         <!--<header-nav></header-nav>-->
         <div class="app_page">
@@ -235,7 +235,8 @@ export default {
             // 保存的文件
             fileData: {},
             useCreateVar: [],
-            isFullScreen: false
+            isFullScreen: false,
+            lastSaveTime: (new Date()).getTime()
         }
     },
     computed: {
@@ -556,19 +557,27 @@ export default {
                         saveData[i] = getStrByObj(allData[i].value_);
                     }
                 }
-                console.log(JSON.stringify(saveData));
-                ajax({
-                    type: 'PUT',
-                    url: 'http://www.tablehub.cn/app/file.html',
-                    data: {
-                        id: this.fileData.id,
-                        file_data: JSON.stringify(this.fileData.file_data),
-                        widgetIdToVar: JSON.stringify(this.widgetIdToVar),
-                        allVar: JSON.stringify(saveData)
+                // console.log(JSON.stringify(saveData));
+                let actionTime = (new Date()).getTime();
+                if(actionTime > this.lastSaveTime) {
+                    this.lastSaveTime = actionTime;
+                }
+                setTimeout(() => {
+                    if(this.lastSaveTime === actionTime) {
+                        ajax({
+                            type: 'PUT',
+                            url: 'http://www.tablehub.cn/app/file.html',
+                            data: {
+                                id: this.fileData.id,
+                                file_data: JSON.stringify(this.fileData.file_data),
+                                widgetIdToVar: JSON.stringify(this.widgetIdToVar),
+                                allVar: JSON.stringify(saveData)
+                            }
+                        }).then((data) => {
+                            console.log(data);
+                        });
                     }
-                }).then((data) => {
-                    console.log(data);
-                });
+                }, 1000);
             }
         },
         getRelationalModel(varName) {

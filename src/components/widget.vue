@@ -163,7 +163,7 @@ export default {
     watch: {
         // 需要保存的样式
         'item.style'(val) {
-            console.log(val);
+            // console.log(val);
             widgetEvent.emit('setStyle', this.item.id, val);
         }
     }
