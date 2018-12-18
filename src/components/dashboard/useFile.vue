@@ -2,7 +2,7 @@
     <div
         @dragover.self="dragover"
         @drop="ondrop"
-        :style="{appMinWidth: appMinWidth + 'px'}"
+        :style="{minWidth: appMinWidth + 'px'}"
     >
         <div>文件保存</div>
         <div :style="style" v-show="dragDomFunc" class="droging-seat"></div>

@@ -815,10 +815,9 @@ export default {
                 }
                 > div {
                     /*flex-grow: 1;*/
-                    display: inline;
+                    display: inline-block;
                     min-width: 100%;
                     white-space: nowrap;
-                    float: left;
                     position: relative;
                     // overflow: auto;
                     background-color: #f9f9f9;
