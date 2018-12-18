@@ -1,12 +1,16 @@
 <template>
     <div class="content" @dragend="cancelDragDomFunc">
-        <div style="background-color: #e6e6e6">
-            开启修改
-            <img
-                style="width: 55px;height: 20px;"
-                @click="isEditing = !isEditing"
-                :src="isEditing?'https://n4-q.mafengwo.net/s10/M00/18/A2/wKgBZ1jc3R6AYhi_AAB-2Jyz1WU027.png':'https://c2-q.mafengwo.net/s10/M00/18/1D/wKgBZ1jc3A-AKDulAABm0wptOh4037.png'"/>
+        <div class="head" v-show="!isFullScreen">
+            <div style="display: flex;align-items: center;margin-right: 50px;">
+                <span>开启修改</span>
+                <img
+                    style="width: 55px;height: 20px;"
+                    @click="isEditing = !isEditing"
+                    :src="isEditing?'https://n4-q.mafengwo.net/s10/M00/18/A2/wKgBZ1jc3R6AYhi_AAB-2Jyz1WU027.png':'https://c2-q.mafengwo.net/s10/M00/18/1D/wKgBZ1jc3A-AKDulAABm0wptOh4037.png'"/>
+            </div>
+            <ui-button @click="fullScreen" size="mini">全屏</ui-button>
         </div>
+        <!--<header-nav></header-nav>-->
         <div class="app_page">
             <div class="left_tools" v-if="isEditing">
                 <div :class="{active:leftToolSelect=='widget'}"
@@ -30,6 +34,7 @@
                     <use-file
                         v-else-if="appType===1 && fileData.file_data"
                         :dragDomFunc="dragDomFunc"
+                        :isFullScreen="isFullScreen"
                         :dragDomFuncInfo="getWidgetInfoByName(dragDomFunc)"
                         :fileData="fileData.file_data"
                         :isEditing="isEditing"
@@ -183,6 +188,7 @@ import Vue from 'vue';
 import widget from './widget.vue';
 
 import dynamicVueObject from './dynamicVueObject/dynamicVueObject.vue';
+import UiButton from './ui/button';
 Vue.component(widget.name, widget);
 export default {
     data() {
@@ -228,7 +234,8 @@ export default {
             fileList: [],
             // 保存的文件
             fileData: {},
-            useCreateVar: []
+            useCreateVar: [],
+            isFullScreen: false
         }
     },
     computed: {
@@ -488,7 +495,12 @@ export default {
             this.save();
         },
         destroyWidget(widgetId) {
-            console.log(widgetId);
+            let deleteWidgetIndex = this.fileData.file_data.widget.findIndex(item => {
+                return item.id === widgetId;
+            });
+            if(deleteWidgetIndex > -1) {
+                this.fileData.file_data.widget.splice(deleteWidgetIndex, 1);
+            }
             this.save();
         },
         varHover(key, messageType) {
@@ -496,6 +508,15 @@ export default {
         },
         addWidgetContent(widgetKey) {
             widgetEvent.emit('addWidgetContent', widgetKey);
+        },
+        setWidgetStyle(id, style) {
+            let deleteWidgetIndex = this.fileData.file_data.widget.findIndex(item => {
+                return item.id === id;
+            });
+            if(deleteWidgetIndex > -1) {
+                this.$set(this.fileData.file_data.widget, 'style', style);
+            }
+            this.save();
         },
         selectFile(file) {
             file.file_data = JSON.parse(file.file_data);
@@ -553,6 +574,20 @@ export default {
         getRelationalModel(varName) {
             let newVar = allVar.getVar(varName);
             return newVar.value.toString();
+        },
+        fullScreen() {
+            this.isFullScreen = true;
+            let el = document.documentElement;
+            let rfs = el.requestFullScreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+            if(typeof rfs !== 'undefined' && rfs) {
+                rfs.call(el);
+            }
+        },
+        isFullscreen() {
+            return document.fullscreenElement ||
+                document.msFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.webkitFullscreenElement || false;
         }
     },
     mounted() {
@@ -636,7 +671,15 @@ export default {
             this.bindVar(varName, widgetId, dom, vueDom);
             this.save();
         });
+        widgetEvent.on('setStyle', this.setWidgetStyle);
         widgetEvent.on('destroy', this.destroyWidget);
+
+        // 检测全屏
+        this.setIntervalObj = setInterval(() => {
+            if(this.isFullscreen() === false) {
+                this.isFullScreen = false;
+            }
+        }, 1000);
     },
     destroyed() {
         // this.clearWidgetIdToVar();
@@ -649,6 +692,7 @@ export default {
         }
     },
     components: {
+        UiButton,
         'all-vars': allPageVars,
         'props-com': propsCom,
         'datas-vue': datasVue,
@@ -689,6 +733,15 @@ export default {
         min-width: 930px;
         display: flex;
         flex-direction: column;
+        .head {
+            background-color: #e6e6e6;
+            padding: 3px;
+            display: flex;
+            align-items: center;
+            > * {
+                margin-right: 10px;
+            }
+        }
         .app_page {
             display: flex;
             width: 100%;
@@ -788,6 +841,7 @@ export default {
                     cursor: default;
                     line-height: 18px;
                     color: #b1b1b1;
+                    user-select: none;
                     &.active {
                         background: #333333;
                         margin-left: -1px;

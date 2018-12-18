@@ -51,7 +51,7 @@ let tempVueClass = {
 }
 export default {
     name: 'widget',
-    props: ['data'],
+    props: ['data', 'item'],
     data() {
         return {
             data_: this.data,
@@ -80,7 +80,6 @@ export default {
     methods: {
         ...mapActions('main', ['setDragDomFunc', 'deleteWidgetIdToVar']),
         getHighlightState(type) {
-            // return this.$store.state.varHighlight.key;
             if(this.varHighlight.key === type) {
                 return this.varHighlight.info;
             }
@@ -96,15 +95,15 @@ export default {
                         this.setDragDomFunc(dragDomFunc);
                         varName = '$' + varName.replace(/^\$/, '');
                         this.data_ = varName;
-                        widgetEvent.emit('change', varName, this.key, this.$refs.content, this);
-                        this.$emit('change', varName, this.key, this.$refs.content);
+                        widgetEvent.emit('change', varName, this.item.id, this.$refs.content, this);
+                        this.$emit('change', varName, this.item.id, this.$refs.content);
                     }
                 });
             }
         },
         ondrop(e) {
             // 如果没有设置key，则不允许拖拽widget，用来定义不可修改组件。反过来说，所有添加了key的widget可以拖拽组件
-            if(this.key !== undefined) {
+            if(this.item.id !== undefined) {
                 // 抬起鼠标dragDomFunc就会释放为null，这里弹窗将值保留住
                 this.addFunction(this.dragDomFunc);
             }
@@ -140,11 +139,11 @@ export default {
         },
         chooseExistItem(key) {
             this.data_ = key;
-            widgetEvent.emit('bindVar', key, this.key, this.$refs.content, this);
-            this.$emit('bindVar', key, this.key, this.$refs.content, this);
+            widgetEvent.emit('bindVar', key, this.item.id, this.$refs.content, this);
+            this.$emit('bindVar', key, this.item.id, this.$refs.content, this);
         },
         deleteWidget() {
-            this.$emit('delete');
+            widgetEvent.emit('destroy', this.item.id);
         },
         setInnerVueObj(funcObj) {
             // console.log('=========');
@@ -153,14 +152,20 @@ export default {
         }
     },
     destroyed() {
-        this.deleteWidgetIdToVar(this.key);
-        widgetEvent.emit('destroy', this.key);
+        this.deleteWidgetIdToVar(this.item.id);
     },
     computed: {
         ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing'])
     },
     components: {
         appButton, dropList, tempVueClass
+    },
+    watch: {
+        // 需要保存的样式
+        'item.style'(val) {
+            console.log(val);
+            widgetEvent.emit('setStyle', this.item.id, val);
+        }
     }
 }
 </script>
@@ -172,8 +177,8 @@ export default {
         }
 
         .widget_content {
-            min-width: 20px;
-            min-height: 20px;
+            min-width: 40px;
+            min-height: 40px;
             /*display: inline-block;*/
         }
         .head_tool {
@@ -183,7 +188,7 @@ export default {
             width: 100%;
             min-width: 220px;
             height: 30px;
-            top: -30px;
+            top: -33px;
             left: -1px;
             background-color: rgb(228, 228, 228);
             border: solid 1px #a6a6a6;

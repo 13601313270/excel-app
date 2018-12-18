@@ -2,32 +2,39 @@
     <div
         @dragover.self="dragover"
         @drop="ondrop"
-        :style="{minWidth: minWidth + 'px'}"
+        :style="{appMinWidth: appMinWidth + 'px'}"
     >
         <div>文件保存</div>
         <div :style="style" v-show="dragDomFunc" class="droging-seat"></div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
         <widget data="$bbb"></widget>
-        <div v-for="(item,key) in fileData.widget" :style="getStyle(item.style)">
-            <widget :key="item.id" class="widget" :class="{light:dragDomFunc}" @delete="deleteWidget(key)"></widget>
-            <!--<div @click="deleteWidget(key)" class="delete_button" v-if="isEditing">delete</div>-->
+        <div class="widget_content" v-for="(item,key) in fileData.widget" :style="getStyle(item.style)">
+            <div class="drag_tip" v-if="isEditing" @mousedown="moveStart(item.id)">&#xe656;</div>
+            <widget
+                :key="item.id"
+                :item="item"
+                class="widget"
+                :class="{light:dragDomFunc}"
+            ></widget>
         </div>
-        <!--<button @click="add" v-if="isEditing">click</button>-->
+        <div v-if="moveId" class="move" @mousemove="mousemove" @mouseup="mouseup"
+             style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
     </div>
 </template>
 <script>
 import cloneUtils from '../clone.utils';
 export default {
-    props: ['fileData', 'isEditing', 'dragDomFunc', 'dragDomFuncInfo'],
+    props: ['fileData', 'isEditing', 'dragDomFunc', 'dragDomFuncInfo', 'isFullScreen'],
     data() {
         return {
             style: {
                 left: 0,
                 top: 0
             },
-            minWidth: 0,
-            dragPos: ''
+            appMinWidth: 0,
+            dragPos: '',
+            moveId: null
         }
     },
     created() {
@@ -39,8 +46,8 @@ export default {
     },
     methods: {
         getStyle(item) {
-            console.log(parseInt(item.left) + 500);
-            this.minWidth = Math.max(parseInt(item.left) + 500, this.minWidth);
+            // console.log(item);
+            this.appMinWidth = Math.max(parseInt(item.left) + 500, this.appMinWidth);
             return Object.assign({
                 position: 'absolute'
             }, item);
@@ -73,6 +80,23 @@ export default {
             this.$nextTick(() => {
                 this.$emit('addWidgetContent', widgetKey);
             });
+        },
+        moveStart(id) {
+            this.moveId = id;
+        },
+        mousemove(e) {
+            let widget = this.fileData.widget.find(item => {
+                return item.id === this.moveId;
+            });
+            if(widget) {
+                this.$set(widget, 'style', Object.assign({}, widget.style, {
+                    left: e.offsetX + 'px',
+                    top: e.offsetY + 'px'
+                }));
+            }
+        },
+        mouseup() {
+            this.moveId = null;
         }
     }
 }
@@ -81,21 +105,44 @@ export default {
     .droging-seat {
         position: absolute;
         z-index: 9999999;
-        width: 100px;
-        height: 100px;
+        min-width: 100px;
+        min-height: 100px;
         background-color: rgba(255, 0, 0, 0.41);
         pointer-events: none
     }
 
-    .widget {
-        border: solid 1px black;
-        display: inline-block;
-        &.light {
-            border: solid 1px red;
+    .widget_content {
+        position: relative;
+        .drag_tip {
+            position: absolute;
+            font-family: 'iconfont';
+            display: none;
+            z-index: 999999;
+            font-size: 30px;
+            border: solid 1px grey;
+            background-color: #e7e7e7;
+            border-radius: 2px;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            left: 0;
+            top: 0;
+            cursor: move;
+            &:hover {
+                box-shadow: 0 0 8px -1px #a3a3a3;
+            }
         }
-    }
-
-    .delete_button {
-        width: 40px;
+        &:hover {
+            .drag_tip {
+                display: block;
+            }
+        }
+        .widget {
+            border: solid 1px black;
+            display: inline-block;
+            &.light {
+                border: solid 1px red;
+            }
+        }
     }
 </style>

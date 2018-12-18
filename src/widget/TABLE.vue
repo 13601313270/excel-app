@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="table">
         <table>
             <thead>
             <tr>
@@ -38,19 +38,45 @@ export default {
 }
 </script>
 <style scoped lang="less">
-    td {
-        border: solid 1px #616161;
-    }
+    .table {
+        padding: 10px;
+        table {
+            border-spacing: 0;
+            thead {
+                font-weight: bold;
+            }
+            tr {
+                td {
+                    border-bottom: solid 1px #c7c7c7;
+                    padding: 2px 10px;
+                }
+            }
+        }
 
-    .page {
-        > * {
-            float: left;
-            border: solid 1px black;
-            padding: 1px 3px;
-            cursor: pointer;
-            &.active {
-                background-color: darkslategrey;
-                color: white;
+        .page {
+            margin-top: 10px;
+            > * {
+                float: left;
+                height: 26px;
+                min-width: 16px;
+                border-radius: 2px;
+                border: solid 1px #c7c7c7;
+                padding: 1px 3px;
+                cursor: pointer;
+                margin-left: 2px;
+                text-align: center;
+                line-height: 26px;
+                &.active {
+                    border: solid 1px black;
+                    font-weight: bold;
+                    background-color: darkslategrey;
+                    color: white;
+                }
+            }
+            &:after {
+                content: '';
+                display: block;
+                clear: both;
             }
         }
     }
