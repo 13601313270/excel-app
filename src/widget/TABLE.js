@@ -29,7 +29,7 @@ class TABLE extends FuncObj {
         // let self = this;
         let model = this.props[0];
         if(model instanceof Var) {
-            model = model.value_;
+            model = model.value;
         }
         if(model === '') {
             handle(false);

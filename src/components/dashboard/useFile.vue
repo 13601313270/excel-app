@@ -8,7 +8,7 @@
         <div :style="style" v-show="dragDomFunc" class="droging-seat"></div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
-        <widget data="$bbb"></widget>
+        <widget data="$bbb" style="left: 10px;"></widget>
         <div class="widget_content" v-for="(item,key) in fileData.widget" :style="getStyle(item.style)">
             <div class="drag_tip" v-if="isEditing" @mousedown="moveStart(item.id)">&#xe656;</div>
             <widget

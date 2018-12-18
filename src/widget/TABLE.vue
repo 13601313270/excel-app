@@ -7,7 +7,7 @@
                 <td v-for="item in value.dataColumn" v-html="item"></td>
             </tr>
             </thead>
-            <tbody>
+            <tbody v-if="value.dataValue">
             <tr v-for="data in value.dataValue.slice(pageSize * page, pageSize * (page + 1) )">
                 <td v-for="item in data" v-html="item"></td>
             </tr>
@@ -34,7 +34,14 @@ export default {
             page: 0
         };
     },
-    methods: {}
+    methods: {},
+    watch: {
+        value(val) {
+            console.log('-----this.value-----');
+            console.log(JSON.stringify(val));
+            console.log(val);
+        }
+    }
 }
 </script>
 <style scoped lang="less">

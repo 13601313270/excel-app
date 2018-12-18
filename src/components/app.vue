@@ -81,7 +81,7 @@
                      @click="rightToolSelect=(rightToolSelect==='var'?'':'var')">已添加对象
                 </div>
                 <div :class="{active:rightToolSelect=='connection'}"
-                     @click="rightToolSelect=(rightToolSelect==='connection'?'':'connection')">链接
+                     @click="rightToolSelect=(rightToolSelect==='connection'?'':'connection')">数据源
                 </div>
                 <div :class="{active:rightToolSelect=='data'}"
                      @click="rightToolSelect=(rightToolSelect==='data'?'':'data')">数据
@@ -739,7 +739,7 @@ export default {
     .content {
         width: 100%;
         height: 100%;
-        min-width: 930px;
+        min-width: 130px;
         display: flex;
         flex-direction: column;
         .head {
@@ -812,6 +812,7 @@ export default {
                 .used-dashboard {
                     position: relative;
                     min-height: 100%;
+                    overflow: hidden;
                 }
                 > div {
                     /*flex-grow: 1;*/
