@@ -4,6 +4,7 @@ export default {
     state: {
         varHighlight: {},
         connections: [],
+        dataSource: [],
         editObjArr: [],
         widgetIdToVar: {},
         dragDomFunc: null,
@@ -36,6 +37,9 @@ export default {
         },
         setIsEditing(state, data) {
             state.isEditing = data;
+        },
+        dataSourceSet(state, data) {
+            state.dataSource = data;
         }
     },
     actions: {
@@ -65,6 +69,9 @@ export default {
         },
         setIsEditing({commit}, data) {
             return commit('setIsEditing', data);
+        },
+        setDataSourceSet({commit}, data) {
+            return commit('dataSourceSet', data);
         }
     },
     getters: {
@@ -73,6 +80,7 @@ export default {
         editObjArr: state => state.editObjArr,
         dragDomFunc: state => state.dragDomFunc,
         widgetIdToVar: state => state.widgetIdToVar,
-        isEditing: state => state.isEditing
+        isEditing: state => state.isEditing,
+        dataSource: state => state.dataSource
     }
 };

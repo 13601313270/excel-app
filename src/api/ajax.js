@@ -122,12 +122,12 @@ export default function(config) {
 /*
 ajax({
     type: 'POST',
-    url: 'http://www.tablehub.cn/action/mysql.html',
+    url: 'http://www.tablehub.cn/action/connection.html',
     data: {
         type: 'getConnections'
     }
 }).then((data) => {
-    this.connections = data;
-    this.$store.commit('setConnections', data);
+    this.connections = data.connection;
+    this.$store.commit('setConnections', data.connection);
 });
 */

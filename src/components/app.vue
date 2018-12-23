@@ -189,6 +189,8 @@ import widget from './widget.vue';
 
 import dynamicVueObject from './dynamicVueObject/dynamicVueObject.vue';
 import UiButton from './ui/button';
+import axios from 'axios';
+axios.defaults.withCredentials = true;
 Vue.component(widget.name, widget);
 export default {
     data() {
@@ -246,7 +248,9 @@ export default {
         }
     },
     methods: {
-        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc', 'clearWidgetIdToVar', 'setIsEditing']),
+        ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc',
+            'clearWidgetIdToVar', 'setIsEditing', 'setDataSourceSet'
+        ]),
         cancelDragDomFunc() {
             this.$nextTick(() => {
                 this.setDragDomFunc(null);
@@ -602,14 +606,30 @@ export default {
     mounted() {
         ajax({
             type: 'POST',
-            url: 'http://www.tablehub.cn/action/mysql.html',
+            url: 'http://www.tablehub.cn/action/connection.html',
             data: {
                 type: 'getConnections'
             }
         }).then((data) => {
-            console.log(data);
-            this.connections = data;
-            this.setConnections(data);
+            console.log(data.connection);
+            this.connections = data.connection;
+            this.setConnections(data.connection);
+            data.dataSource.forEach((item, key) => {
+                item.column.forEach((item2, key2) => {
+                    console.log();
+                    if(item2.type) {
+                        data.dataSource[key].column[key2].type = ((type) => {
+                            if(type === 'Number') {
+                                return Number;
+                            } else if(type === 'File') {
+                                return File;
+                            }
+                        })(item2.type);
+                    }
+
+                })
+            })
+            this.setDataSourceSet(data.dataSource);
         });
         /**
          ajax({

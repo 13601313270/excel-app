@@ -1,13 +1,14 @@
 <template>
     <div class="input_content" :class="{mini:size==='mini'}">
-        <input v-model="currentValue" :type="type"/>
+        <input ref="file" v-if="type==='file'" @change="changeFile" :type="type"/>
+        <input v-else v-model="currentValue" :type="type"/>
     </div>
 </template>
 <script>
 export default {
     name: 'uiInput',
     props: {
-        value: [String, Number],
+        value: [String, Number, File, FileList],
         size: String,
         type: String
     },
@@ -23,6 +24,11 @@ export default {
         currentValue(value) {
             this.$emit('input', value);
             this.$emit('change', value)
+        }
+    },
+    methods: {
+        changeFile() {
+            this.currentValue = this.$refs.file.files;
         }
     }
 }

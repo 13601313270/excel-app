@@ -2,13 +2,18 @@
     <popupBackground class="center">
         <ui-window @close="cancel">
             <div>
-                <div v-for="item in inputProps" class="item">
+                <div v-for="item in inputProps" class="item" :key="item.name">
                     <h3 v-html="item.title"></h3>
                     <select v-if="item.enum" v-model="saveData[item.name]">
                         <option :value="key2" v-for="(item2,key2) in item.enum" v-html="item2"></option>
                     </select>
-                    <ui-input size="mini" v-else-if="item.type===Number" v-model.number="saveData[item.name]" type="number"/>
-                    <ui-input size="mini" v-else-if="item.type===Boolean" v-model="saveData[item.name]" type="checkbox"/>
+                    <ui-input size="mini" v-else-if="item.type===File" v-model="saveData[item.name]"
+                              type="file"/>
+                    <ui-input size="mini" v-else-if="item.type===Number"
+                              v-model.number="saveData[item.name]"
+                              type="number"/>
+                    <ui-input size="mini" v-else-if="item.type===Boolean" v-model="saveData[item.name]"
+                              type="checkbox"/>
                     <ui-input size="mini" v-else v-model="saveData[item.name]"/>
                 </div>
                 <div style="display: flex;margin-top: 20px;">
@@ -35,16 +40,20 @@ export default {
     data() {
         let saveData = {};
         this.inputProps.forEach(item => {
+            console.log(item.type);
             if(item.type === Number) {
                 saveData[item.name] = this.initData[item.name] || item.default || NaN;
             } else if(item.type === Boolean) {
                 saveData[item.name] = this.initData[item.name] || item.default || false;
+            } else if(item.type === File) {
+                saveData[item.name] = null;
             } else {
                 saveData[item.name] = this.initData[item.name] || item.default || '';
             }
         });
         return {
-            saveData: saveData
+            saveData: saveData,
+            File: File
         };
     },
     methods: {

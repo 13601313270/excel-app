@@ -1,7 +1,12 @@
 <template>
     <div class="connection">
         <div class="tools">
-            <ui-button @click="addConnection" size="mini">添加连接</ui-button>
+            <div style="position: relative">
+                <ui-button @click="isChooseExist = !isChooseExist" size="mini">添加连接</ui-button>
+                <ui-drop-list v-if="isChooseExist" style="position: absolute;top:30px;right: 0;">
+                    <div v-for="item in dataSource" v-html="item.name" @click="addConnection(item.id)"></div>
+                </ui-drop-list>
+            </div>
         </div>
         <div class="list">
             <div class="header">
@@ -23,8 +28,19 @@ import ptWindow from '../ui/window.vue';
 import popup from '../ui/popup.vue';
 import dynamicForm from '../dynamicForm/form';
 import ajax from '../../api/ajax';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import { alert } from '../alert/alert';
+import axios from 'axios';
+// 读取文件内容
+function getFile(file) {
+    return new Promise((resolve, reject) => {
+        var reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = function(evt) {
+            resolve(evt.target.result);
+        }
+    })
+}
 export default {
     props: {
         connections: {}
@@ -32,79 +48,92 @@ export default {
     data() {
         return {
             allConn: this.connections,
-            connectionConfig: {
-                mysql: [
-                    {
-                        title: '名称',
-                        name: 'name'
-                    },
-                    {
-                        title: '类型',
-                        name: 'type',
-                        enum: {
-                            '2': 'mysql'
-                        }
-                    },
-                    {
-                        title: 'host',
-                        name: 'host'
-                    },
-                    {
-                        title: '端口',
-                        type: Number,
-                        name: 'port',
-                        default: 3306
-                    },
-                    {
-                        title: '用户名',
-                        name: 'username'
-                    },
-                    {
-                        title: '密码',
-                        name: 'password'
-                    },
-                    {
-                        title: 'db',
-                        name: 'db'
-                    }
-                ]
-            }
+            isChooseExist: false
         }
+    },
+    computed: {
+        ...mapGetters('main', ['dataSource'])
     },
     methods: {
         ...mapActions('main', ['setConnections']),
         initList() {
             ajax({
                 type: 'POST',
-                url: 'http://www.tablehub.cn/action/mysql.html',
+                url: 'http://www.tablehub.cn/action/connection.html',
                 data: {
                     type: 'getConnections'
                 }
             }).then((data) => {
-                this.allConn = data;
-                this.setConnections(data);
+                this.allConn = data.connection;
+                this.setConnections(data.connection);
             });
         },
-        addConnection() {
-            dynamicForm(this.connectionConfig.mysql).then((data) => {
-                console.log('=======');
-                console.log(data);
-                ajax({
-                    type: 'PUT',
-                    url: 'http://www.tablehub.cn/action/mysql.html',
-                    data: data
-                }).then((data) => {
+        async addConnection(dbTypeId) {
+            let column = this.dataSource.find(item => {
+                return item.id === dbTypeId;
+            });
+            let defaultColumn = [{
+                title: '名称',
+                name: 'name'
+            }];
+            let connId = column.id;
+            column = [...defaultColumn, ...column.column];
+            let data = await dynamicForm(column);
+
+            data.type = connId;
+            console.log('+++++++');
+            console.log(data);
+            let config = {
+                headers: {'Content-Type': 'multipart/form-data'}
+            };
+            let param = new FormData();
+            for (let i in data) {
+                if(data[i] instanceof FileList) {
+                    param.append(i, data[i][0], data[i][0].name);
+                    var fileString = await getFile(data[i][0]);
+                    fileString = fileString.replace(/\r\n/g, '\n').split('\n')[0].split(',');
+
+                    fileString = fileString.filter(item => item !== '').map(item => {
+                        return {
+                            title: item,
+                            name: item,
+                            type: String,
+                            enum: {
+                                'number': '数字',
+                                'string': '字符串'
+                            },
+                            default: 'string'
+                        }
+                    });
+                    let dataTypeInfo = await dynamicForm(fileString);
+                    param.append('dataTypeInfo', JSON.stringify(dataTypeInfo));
+                } else {
+                    param.append(i, data[i]);
+                }
+            }
+            console.log('sent');
+            axios.put('http://www.tablehub.cn/action/mysql.html', param, config)
+                .then(data => {
                     console.log('++++++');
                     console.log(data);
                     this.initList();
                 });
-            });
         },
         change(item) {
+            let typeId = parseInt(item.type);
             let update = Object.assign({}, item, item.info);
-            dynamicForm(this.connectionConfig.mysql, update).then((data) => {
-                console.log('=======');
-                console.log(data);
+            console.log(item);
+            let column = this.dataSource.find(item => {
+                return item.id === typeId;
+            });
+            let defaultColumn = [{
+                title: '名称',
+                name: 'name'
+            }];
+            let connId = column.id;
+            column = [...defaultColumn, ...column.column];
+            dynamicForm(column, update).then((data) => {
+                data.type = connId;
                 ajax({
                     type: 'POST',
                     url: 'http://www.tablehub.cn/action/connection.html',
