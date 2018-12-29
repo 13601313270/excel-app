@@ -18,11 +18,15 @@ export default {
 
     .drop_list {
         .ui_panel_weight;
+        color: #434343;
         padding-left: 0;
         padding-right: 0;
         min-width: 100px;
         > * {
             .ui_can_be_click;
+            &:hover {
+                background-color: #fbfbfb;
+            }
             padding: 0 10px;
             text-align: center;
             line-height: @ui_min_click_height;

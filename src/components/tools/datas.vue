@@ -26,7 +26,8 @@
                     </td>
                     <td>
                         <ui-button @click="change(key)" size="mini">修改</ui-button>
-                        <ui-button v-if="isCanDelete(key,item)===true" size="mini" @click="deleteItem(key)">删除</ui-button>
+                        <ui-button v-if="isCanDelete(key,item)===true" size="mini" @click="deleteItem(key)">删除
+                        </ui-button>
                         <span v-else v-html="isCanDelete(key,item)"></span>
                     </td>
                 </tr>
@@ -61,6 +62,7 @@ import popup from '../ui/popup.vue';
 import { mapActions } from 'vuex';
 import widgetEvent from '../widgetChange';
 import { prompt } from '../alert/prompt';
+import { alert } from '../alert/alert';
 import allMatch from '../../languageParser/allMatch';
 export default {
     props: {
@@ -131,9 +133,11 @@ export default {
             this.$emit('change', key);
         },
         deleteItem(key) {
-            AllVarClass.deleteVar(key);
-            this.$delete(this.datas, key);
-            this.$emit('delete', key);
+            alert('是否删除?').then(() => {
+                AllVarClass.deleteVar(key);
+                this.$delete(this.datas, key);
+                this.$emit('delete', key);
+            });
         },
         addData() {
             prompt('请输入数据变量名称', 'data1').then((varName) => {

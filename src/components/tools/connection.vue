@@ -69,6 +69,7 @@ export default {
             });
         },
         async addConnection(dbTypeId) {
+            this.isChooseExist = false;
             let column = this.dataSource.find(item => {
                 return item.id === dbTypeId;
             });
@@ -81,8 +82,6 @@ export default {
             let data = await dynamicForm(column);
 
             data.type = connId;
-            console.log('+++++++');
-            console.log(data);
             let config = {
                 headers: {'Content-Type': 'multipart/form-data'}
             };
@@ -111,11 +110,8 @@ export default {
                     param.append(i, data[i]);
                 }
             }
-            console.log('sent');
             axios.put('http://www.tablehub.cn/action/mysql.html', param, config)
                 .then(data => {
-                    console.log('++++++');
-                    console.log(data);
                     this.initList();
                 });
         },
@@ -149,7 +145,7 @@ export default {
             });
         },
         deleteItem(id) {
-            alert('是否删除').then(() => {
+            alert('是否删除?').then(() => {
                 ajax({
                     type: 'DELETE',
                     url: 'http://www.tablehub.cn/action/mysql.html',

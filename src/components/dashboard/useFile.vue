@@ -138,7 +138,8 @@ export default {
             }
         }
         .widget {
-            border: solid 1px black;
+            border: solid 1px #404040;
+            border-radius: 2px;
             display: inline-block;
             &.light {
                 border: solid 1px red;

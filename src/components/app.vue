@@ -473,7 +473,7 @@ export default {
         },
         // app内部可以调用 代码识别
         eval(evalContent) {
-            console.log(evalContent);
+            // console.log(evalContent);
             getEvalObj(1, evalContent);
         },
         editVar(key) {
@@ -549,7 +549,6 @@ export default {
 
             // let insertObj = getEvalObj(1, code);
             // allVar.setVar(varName, insertObj[0]);
-            console.log(file.var_data);
             this.fileData = file;
         },
         save() {
@@ -611,12 +610,10 @@ export default {
                 type: 'getConnections'
             }
         }).then((data) => {
-            console.log(data.connection);
             this.connections = data.connection;
             this.setConnections(data.connection);
             data.dataSource.forEach((item, key) => {
                 item.column.forEach((item2, key2) => {
-                    console.log();
                     if(item2.type) {
                         data.dataSource[key].column[key2].type = ((type) => {
                             if(type === 'Number') {
@@ -626,8 +623,7 @@ export default {
                             }
                         })(item2.type);
                     }
-
-                })
+                });
             })
             this.setDataSourceSet(data.dataSource);
         });
@@ -651,8 +647,6 @@ export default {
                 id: this.$route.params.fileId
             }
         }).then((data) => {
-            console.log('----文件信息----');
-            console.log(data);
             this.appType = parseInt(this.$route.params.appType);
             this.selectFile(data);
         });
