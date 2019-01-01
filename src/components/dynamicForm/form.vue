@@ -40,7 +40,6 @@ export default {
     data() {
         let saveData = {};
         this.inputProps.forEach(item => {
-            console.log(item.type);
             if(item.type === Number) {
                 saveData[item.name] = this.initData[item.name] || item.default || NaN;
             } else if(item.type === Boolean) {

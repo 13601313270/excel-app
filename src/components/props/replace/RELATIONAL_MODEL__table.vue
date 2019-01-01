@@ -5,7 +5,7 @@
             @change="change"
             v-model="data"
         >
-            <option v-for="item in tableList" :value="item.name">
+            <option v-for="item in tableList" :value="item.id">
                 {{item.name}}
             </option>
         </select>

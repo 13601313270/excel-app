@@ -621,6 +621,7 @@ export default {
                             } else if(type === 'File') {
                                 return File;
                             }
+                            return type;
                         })(item2.type);
                     }
                 });

@@ -6,7 +6,9 @@ class obj {
     constructor() {
         this.dep = new Dep();
         this.dep.eventEmitter.on('ready', (handle) => {
-            this.render(handle);
+            if(this.check()) {
+                this.render(handle);
+            }
         });
         this.value_ = null;
     }
@@ -20,6 +22,10 @@ class obj {
 
     destory() {
         this.dep.destory();
+    }
+
+    check() {
+        return true;
     }
 }
 export default obj;

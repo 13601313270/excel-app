@@ -78,42 +78,46 @@ export default {
                 name: 'name'
             }];
             let connId = column.id;
-            column = [...defaultColumn, ...column.column];
-            let data = await dynamicForm(column);
+            if(column.column.length === 1 && column.column[0].type === 'token') {
+                window.open(column.column[0].tokenUrl);
+            } else {
+                column = [...defaultColumn, ...column.column];
+                let data = await dynamicForm(column);
 
-            data.type = connId;
-            let config = {
-                headers: {'Content-Type': 'multipart/form-data'}
-            };
-            let param = new FormData();
-            for (let i in data) {
-                if(data[i] instanceof FileList) {
-                    param.append(i, data[i][0], data[i][0].name);
-                    var fileString = await getFile(data[i][0]);
-                    fileString = fileString.replace(/\r\n/g, '\n').split('\n')[0].split(',');
+                data.type = connId;
+                let config = {
+                    headers: {'Content-Type': 'multipart/form-data'}
+                };
+                let param = new FormData();
+                for (let i in data) {
+                    if(data[i] instanceof FileList) {
+                        param.append(i, data[i][0], data[i][0].name);
+                        var fileString = await getFile(data[i][0]);
+                        fileString = fileString.replace(/\r\n/g, '\n').split('\n')[0].split(',');
 
-                    fileString = fileString.filter(item => item !== '').map(item => {
-                        return {
-                            title: item,
-                            name: item,
-                            type: String,
-                            enum: {
-                                'number': '数字',
-                                'string': '字符串'
-                            },
-                            default: 'string'
-                        }
-                    });
-                    let dataTypeInfo = await dynamicForm(fileString);
-                    param.append('dataTypeInfo', JSON.stringify(dataTypeInfo));
-                } else {
-                    param.append(i, data[i]);
+                        fileString = fileString.filter(item => item !== '').map(item => {
+                            return {
+                                title: item,
+                                name: item,
+                                type: String,
+                                enum: {
+                                    'number': '数字',
+                                    'string': '字符串'
+                                },
+                                default: 'string'
+                            }
+                        });
+                        let dataTypeInfo = await dynamicForm(fileString);
+                        param.append('dataTypeInfo', JSON.stringify(dataTypeInfo));
+                    } else {
+                        param.append(i, data[i]);
+                    }
                 }
+                axios.put('http://www.tablehub.cn/action/mysql.html', param, config)
+                    .then(data => {
+                        this.initList();
+                    });
             }
-            axios.put('http://www.tablehub.cn/action/mysql.html', param, config)
-                .then(data => {
-                    this.initList();
-                });
         },
         change(item) {
             let typeId = parseInt(item.type);
