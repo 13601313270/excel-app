@@ -25,6 +25,10 @@ class TABLE extends FuncObj {
         return model.value;
     }
 
+    check() {
+        return (typeof this.value === 'object' && this.value.type === 'relationalModel');
+    }
+
     render(handle) {
         // let self = this;
         let model = this.props[0];

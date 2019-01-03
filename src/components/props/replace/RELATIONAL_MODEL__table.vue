@@ -42,12 +42,24 @@ export default {
             });
         },
         change() {
-            this.$emit('input', this.data);
-            this.$emit('change');
+            ajax({
+                type: 'POST',
+                url: 'http://www.tablehub.cn/action/mysql.html',
+                data: {
+                    type: 'selectTable',
+                    connection: this.sourceId,
+                    table: this.data
+                }
+            }).then((data) => {
+                this.$emit('input', this.data);
+                this.$emit('change');
+            });
         }
     },
     watch: {
         sourceId() {
+            this.data = '';
+            this.change();
             this.init();
         },
         value(val) {
