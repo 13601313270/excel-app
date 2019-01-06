@@ -8,7 +8,7 @@
 export default {
     name: 'uiInput',
     props: {
-        value: [String, Number, File, FileList],
+        value: [String, Number, File, FileList, Boolean],
         size: String,
         type: String
     },

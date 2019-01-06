@@ -1,7 +1,9 @@
 <template>
     <div class="button_content" :class="{mini:size==='mini'}" @click="$emit('click')">
-        <div class="icon" v-html="icon" v-if="icon"></div>
-        <slot></slot>
+        <div>
+            <div class="icon" v-html="icon" v-if="icon"></div>
+            <slot></slot>
+        </div>
     </div>
 </template>
 <script>
@@ -28,14 +30,17 @@ export default {
     }
 
     .button_content {
-        display: inline-flex;
         .ui_panel;
         .ui_can_be_click;
+        display: inline-block;
         color: black;
-        .icon {
-            font-family: iconfont;
-            margin-left: -7px;
-            margin-right: 6px;
+        > div {
+            display: inline-flex;
+            .icon {
+                font-family: iconfont;
+                margin-left: -7px;
+                margin-right: 6px;
+            }
         }
     }
 </style>

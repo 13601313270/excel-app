@@ -4,8 +4,10 @@
 import button from './button.vue';
 import window from './window.vue';
 import input from './input.vue';
+import select from './select.vue';
+import option from './option.vue';
 import dropList from './dropList.vue';
-const ptUI = [button, window, input, dropList];
+const ptUI = [button, window, input, select, option, dropList];
 export default {
     install(Vue) {
         ptUI.forEach(component => {

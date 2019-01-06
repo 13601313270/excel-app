@@ -9,6 +9,14 @@
                     :src="isEditing?'https://n4-q.mafengwo.net/s10/M00/18/A2/wKgBZ1jc3R6AYhi_AAB-2Jyz1WU027.png':'https://c2-q.mafengwo.net/s10/M00/18/1D/wKgBZ1jc3A-AKDulAABm0wptOh4037.png'"/>
             </div>
             <ui-button @click="fullScreen" size="mini" icon="&#xe657;">全屏</ui-button>
+            <div v-if="writeColumnList.length>0" class="write_column">
+                <span style="line-height: 28px;">手填数据：</span>
+                <ui-button
+                    v-for="item in writeColumnList"
+                    @click="insertWrite(item)"
+                    v-html="item.name"
+                    size="mini"></ui-button>
+            </div>
         </div>
         <!--<header-nav></header-nav>-->
         <div class="app_page">
@@ -190,6 +198,7 @@ import widget from './widget.vue';
 import dynamicVueObject from './dynamicVueObject/dynamicVueObject.vue';
 import UiButton from './ui/button';
 import axios from 'axios';
+import dynamicForm from './dynamicForm/form';
 axios.defaults.withCredentials = true;
 Vue.component(widget.name, widget);
 export default {
@@ -228,7 +237,6 @@ export default {
                     width: 300
                 }
             },
-            connections: [],
             html: '',
             varToDom: {},
             // 选择的app类型
@@ -242,9 +250,11 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('main', ['editObjArr', 'dragDomFunc', 'widgetIdToVar']),
-        saveHtml() {
-            return this.html.replace(/ random-id="r(\d+)"/g, '');
+        ...mapGetters('main', ['editObjArr', 'dragDomFunc', 'widgetIdToVar', 'connections']),
+        writeColumnList() {
+            return this.connections.filter(item => {
+                return item.type === '5';
+            })
         }
     },
     methods: {
@@ -600,6 +610,35 @@ export default {
                 document.msFullscreenElement ||
                 document.mozFullScreenElement ||
                 document.webkitFullscreenElement || false;
+        },
+        insertWrite(column) {
+            let formData = JSON.parse(column.info.column);
+            formData.forEach(item => {
+                if(item.type === 'number') {
+                    item.type = Number;
+                } else if(item.type === 'string') {
+                    item.type = String;
+                } else if(item.type === 'date') {
+                    item.type = Date;
+                } else if(item.type === 'bool') {
+                    item.type = Boolean;
+                }
+                item.title = item.name;
+            });
+            dynamicForm(formData).then(data => {
+                let config = {
+                    headers: {'Content-Type': 'multipart/form-data'}
+                };
+                let param = new FormData();
+                param.append('id', column.id);
+                param.append('action', 'insertData');
+                param.append('type', 5);
+                param.append('data', JSON.stringify(data));
+                axios.put('http://www.tablehub.cn/action/mysql.html', param, config)
+                    .then(data => {
+
+                    });
+            });
         }
     },
     mounted() {
@@ -610,7 +649,6 @@ export default {
                 type: 'getConnections'
             }
         }).then((data) => {
-            this.connections = data.connection;
             this.setConnections(data.connection);
             data.dataSource.forEach((item, key) => {
                 item.column.forEach((item2, key2) => {
@@ -764,6 +802,12 @@ export default {
             align-items: center;
             > * {
                 margin-right: 10px;
+            }
+            .write_column {
+                display: inherit;
+                > * {
+                    margin-right: 5px;
+                }
             }
         }
         .app_page {

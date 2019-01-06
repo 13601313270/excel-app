@@ -12,6 +12,9 @@
                     <ui-input size="mini" v-else-if="item.type===Number"
                               v-model.number="saveData[item.name]"
                               type="number"/>
+                    <ui-input size="mini" v-else-if="item.type===Date"
+                              v-model.number="saveData[item.name]"
+                              type="date"/>
                     <ui-input size="mini" v-else-if="item.type===Boolean" v-model="saveData[item.name]"
                               type="checkbox"/>
                     <ui-input size="mini" v-else v-model="saveData[item.name]"/>
