@@ -69,7 +69,7 @@ class Dep {
         // 当有多个上级的时候，会收到多个render，所以只捕捉最后一次
         if (this.__allBeforeIsState0() && this.state === 1) {
             let result = [];
-            this.eventEmitter.emit(actionType, function(listenResult) {
+            this.eventEmitter.emit(actionType, (listenResult) => {
                 result.push(listenResult);
             });
             let allPromise = [];
@@ -125,4 +125,5 @@ class Dep {
         }
     }
 }
+
 export default Dep;

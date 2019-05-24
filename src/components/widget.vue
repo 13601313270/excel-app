@@ -146,13 +146,13 @@ export default {
             widgetEvent.emit('destroy', this.item.id);
         },
         setInnerVueObj(funcObj) {
-            // console.log('=========');
-            // console.log(funcObj);
             this.vueShow = funcObj;
         }
     },
     destroyed() {
-        this.deleteWidgetIdToVar(this.item.id);
+        if (this.item) {
+            this.deleteWidgetIdToVar(this.item.id);
+        }
     },
     computed: {
         ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing'])
@@ -163,7 +163,6 @@ export default {
     watch: {
         // 需要保存的样式
         'item.style'(val) {
-            // console.log(val);
             widgetEvent.emit('setStyle', this.item.id, val);
         }
     }
