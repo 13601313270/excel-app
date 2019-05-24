@@ -3,6 +3,7 @@
  */
 import FuncObj from './FuncObj';
 import __allMatch__ from '../languageParser/allMatch';
+import Obj from "../observer/obj";
 class INPUT extends FuncObj {
     constructor(type, value) {
         super(...Array.from(arguments));
@@ -22,11 +23,15 @@ class INPUT extends FuncObj {
     }
 
     get value() {
-        return this.valueee;
+        if (this.valueee instanceof Obj) {
+            return this.valueee.value;
+        } else {
+            return this.valueee;
+        }
     }
 
     render() {
-        this.dom.value = this.valueee;
+        this.dom.value = this.value;
     }
 }
 __allMatch__.push({

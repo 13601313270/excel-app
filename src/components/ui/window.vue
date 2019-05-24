@@ -3,7 +3,7 @@
         <div class="panel-heading">
             <div class="name" v-html="title"></div>
             <div class="tools">
-                <ui-button size="mini" @click.native.stop="closeWindow">X</ui-button>
+                <ui-button @click.native.stop="closeWindow">X</ui-button>
             </div>
         </div>
         <div class="body">
@@ -12,18 +12,18 @@
     </div>
 </template>
 <script>
-export default {
-    name: 'uiWindow',
-    props: ['title', 'isCanClose'],
-    data() {
-        return {};
-    },
-    methods: {
-        closeWindow() {
-            this.$emit('close');
+    export default {
+        name: 'uiWindow',
+        props: ['title', 'isCanClose'],
+        data() {
+            return {};
+        },
+        methods: {
+            closeWindow() {
+                this.$emit('close');
+            }
         }
     }
-}
 </script>
 <style scoped lang="less">
     @import "basic";
@@ -35,6 +35,7 @@ export default {
         display: flex;
         flex-direction: column;
         box-shadow: 0 0 100px -20px #ffffff30;
+
         .panel-heading {
             .ui_panel;
             border: none;
@@ -45,19 +46,23 @@ export default {
             display: flex;
             padding-top: 5px;
             padding-bottom: 5px;
-            height: @form_mini_height + 10px;
+
             .name {
                 .ui_single_text;
                 flex-grow: 1;
                 line-height: 28px;
             }
+
             .tools {
                 flex-grow: 0;
+
                 > * {
                     .ui_can_be_click;
+                    float: left;
                 }
             }
         }
+
         .body {
             .ui_panel;
             flex-grow: 1;

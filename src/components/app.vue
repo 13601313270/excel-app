@@ -488,8 +488,6 @@ export default {
         },
         editVar(key) {
             let Var = allVar.getVar(key);
-            console.log('---------');
-            console.log(Var);
             let self = this;
             let pushEditObj = {
                 name: key,

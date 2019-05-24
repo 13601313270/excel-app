@@ -7,35 +7,32 @@
     </div>
 </template>
 <script>
-export default {
-    name: 'uiButton',
-    props: {
-        size: String,
-        icon: String
-    },
-    data() {
-        return {};
-    },
-    methods: {}
-}
+    export default {
+        name: 'uiButton',
+        props: {
+            size: String,
+            icon: String
+        },
+        data() {
+            return {};
+        },
+        methods: {}
+    }
 </script>
 <style scoped lang="less">
     @import "basic";
 
-    .mini {
-        height: @form_mini_height;
-        padding: 7px 15px !important;
-        font-size: 12px;
-        line-height: 12px;
-    }
-
     .button_content {
         .ui_panel;
         .ui_can_be_click;
+        .form_size;
+        // .ao(1);
         display: inline-block;
         color: black;
+
         > div {
             display: inline-flex;
+
             .icon {
                 font-family: iconfont;
                 margin-left: -7px;

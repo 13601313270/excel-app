@@ -113,6 +113,7 @@
                     </template>
                     <template v-else-if="innerOption.type === 'var'">
                         <td :style="tdStyle">
+                            <!--<div v-html="dataType"></div>-->
                             <select-type
                                 :value="innerOption.type"
                                 @change="changeType"
@@ -120,7 +121,7 @@
                             ></select-type>
                             <select :value="innerOption.name"
                                     @change="changeVar($event.target.value)">
-                                <option v-for="item,key in allVar" :value="key">
+                                <option v-for="item,key in allVar" :value="key" v-if="(dataType.includes('relationalModel') && item.value.type === 'relationalModel') || !dataType.includes('relationalModel')">
                                     【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
                                 </option>
                             </select>
@@ -291,8 +292,6 @@ export default {
             }
         },
         emitChange() {
-            console.log('---this.innerOption---');
-            console.log(this.innerOption);
             this.$emit('input', this.innerOption);// 根目录不用，但是子元素修改完修改影响父层
             this.$emit('change');
         },

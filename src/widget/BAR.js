@@ -138,7 +138,7 @@ __allMatch__.push({
     props: [{
         name: 'source',
         title: '关系模型',
-        dataType: 'var,relationalModel'
+        dataType: 'relationalModel'
     }],
     returnType: 'dom'
 });

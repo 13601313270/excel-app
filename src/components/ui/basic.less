@@ -1,7 +1,11 @@
+* {
+  box-sizing: border-box;
+}
+
 // =======================
 // 带界限的封闭区域
 @ui_panel_padding_y: 10px;
-@ui_panel_padding_x: 15px;
+@ui_panel_padding_x: 10px;
 @ui_panel_padding: @ui_panel_padding_y @ui_panel_padding_x;
 @ui_panel_borderColor: #ddd;
 @ui_panel_borderWidth: 1px;
@@ -36,9 +40,15 @@
   user-select: none;
   min-width: @ui_min_click_width;
   min-height: @ui_min_click_height;
+  transition: box-shadow 0.5s;
   &:hover {
-    .shaow(1, 100);
-    .weight();
+     .shaow(2, 100);
+     //.weight();
+  }
+
+  &:active {
+    .ao(2);
+    font-weight: bold;
   }
 }
 
@@ -50,7 +60,7 @@
 .shaow(@zIndex,@width) {
   @blur: @zIndex*0.8;
   @spread: ((@lightHeight*@width/(@lightHeight - @zIndex) - @width)/2);
-  box-shadow+: 0 unit(tan(@lightAngle)*@zIndex, px) unit(@blur, px) unit(@spread, px) rgba(0, 0, 0, 0.40);
+  box-shadow+: 0 unit(tan(@lightAngle)*@zIndex, px) unit(@blur, px) unit(@spread, px) rgba(0, 0, 0, 0.10);
 }
 
 /*增加厚度*/
@@ -63,7 +73,9 @@
 .ao(@deep) {
   box-shadow+: inset 0 unit(tan(@lightAngle)*@deep, px) unit(@deep*0.5, px) 0 rgba(0, 0, 0, 0.56),
   0 1px 2px 0 white,
-  inset 0 unit(@deep*2*-1, px) 8px -1px rgba(255, 255, 255, 0.45);
+  inset 0 unit(@deep*2*-1, px) 8px -1px rgba(255, 255, 255, 0.45),
+  inset 0 1px @deep*4px 0px rgb(226, 226, 226);
+
 }
 
 // 单行文字
@@ -85,5 +97,17 @@
 
 // =======================
 // 表单尺寸
-@form_default_height: 44px;
+@form_default_height: 40px;
 @form_mini_height: 28px;
+
+.form_size {
+  height: @form_default_height;
+  line-height: 18px;
+
+  &.mini {
+    height: @form_mini_height !important;
+    padding: 7px 15px !important;
+    font-size: 12px;
+    line-height: 12px;
+  }
+}
