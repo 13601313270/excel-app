@@ -3,23 +3,29 @@
  */
 import FuncObj from './FuncObj';
 import __allMatch__ from '../languageParser/allMatch';
-import Obj from "../observer/obj";
+import Obj from '../observer/obj';
+import uInput from '../components/ui/input';
+
 class INPUT extends FuncObj {
     constructor(type, value) {
         super(...Array.from(arguments));
         this.name = 'INPUT';
-        this.dom = document.createElement('input');
-        // this.dom.type = type;
         let self = this;
-        this.dom.addEventListener('change', function() {
-            if(type === 'number') {
-                self.valueee = parseFloat(this.value);
-            } else {
-                self.valueee = this.value.toString();
-            }
-            self.dep.update();// release
-        });
         this.valueee = value;// 0正常,1锁定
+        this.dom = [
+            uInput, {
+                value: this.value
+            }, {
+                change(val) {
+                    if (type === 'number') {
+                        self.valueee = parseFloat(val);
+                    } else {
+                        self.valueee = val;
+                    }
+                    self.dep.update();// release
+                }
+            }
+        ];
     }
 
     get value() {
@@ -31,9 +37,9 @@ class INPUT extends FuncObj {
     }
 
     render() {
-        this.dom.value = this.value;
     }
 }
+
 __allMatch__.push({
     match: /^INPUT$/,
     type: 'function',
@@ -53,7 +59,7 @@ __allMatch__.push({
         {
             name: 'value:',
             title: '默认值',
-            dataType: function(props) {
+            dataType: (props) => {
                 return props[0];
             },
             default: ''

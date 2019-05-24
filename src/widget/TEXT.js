@@ -4,6 +4,7 @@
 import FuncObj from './FuncObj';
 import Obj from '../observer/obj';
 import __allMatch__ from '../languageParser/allMatch';
+
 class TEXT extends FuncObj {
     constructor(value) {
         super(...Array.from(arguments));
@@ -12,8 +13,8 @@ class TEXT extends FuncObj {
     }
 
     get value() {
-        if(this.text instanceof Obj) {
-            if(this.text.value !== null) {
+        if (this.text instanceof Obj) {
+            if (this.text.value !== null && this.text.value !== undefined) {
                 return this.text.value.toString();
             } else {
                 return '';
@@ -23,6 +24,7 @@ class TEXT extends FuncObj {
         }
     }
 }
+
 __allMatch__.push({
     match: /^TEXT$/,
     title: '文本',

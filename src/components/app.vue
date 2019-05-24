@@ -431,8 +431,6 @@ export default {
                         if(value_.dom) {
                             if(value_.dom instanceof Array) {
                                 // widgePanel.appendChild(value_.dom);
-                                console.log(1111);
-                                console.log(1111);
                                 widgePanel.setInnerVueObj(value_);
                             } else {
                                 widgePanel.appendChild(value_.dom);

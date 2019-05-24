@@ -47,9 +47,7 @@ class Dep {
         this.state = 1;
         if (this.sentEvent instanceof Array && this.sentEvent.length > 0) {
             for (let i = 0; i < this.sentEvent.length; i++) {
-                if (this.state === 0) {
-                    this.sentEvent[i].lock();
-                }
+                this.sentEvent[i].lock();
             }
         }
     }
