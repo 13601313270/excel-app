@@ -45,8 +45,6 @@ let tempVueClass = {
             let innerDom = this.initProps;
             return createElement({
                 mounted() {
-                    console.log(2);
-                    console.log(this);
                     this.$refs.inner.innerHTML = '';
                     this.$refs.inner.appendChild(innerDom);
                 },
@@ -159,7 +157,6 @@ export default {
         },
         setInnerVueObj(funcObj) {
             this.vueShow = funcObj;
-            console.log('hear');
             this.$nextTick(() => {
                 this.vueShow.reRender();
             });

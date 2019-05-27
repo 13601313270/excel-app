@@ -258,7 +258,7 @@ export default {
     },
     methods: {
         ...mapActions('main', ['setConnections', 'varHighlightSet', 'editObjArrPush', 'editObjArrPop', 'setDragDomFunc',
-            'clearWidgetIdToVar', 'setIsEditing', 'setDataSourceSet'
+            'clearWidgetIdToVar', 'setIsEditing', 'setDataSourceSet', 'deleteWidgetIdToVar'
         ]),
         cancelDragDomFunc() {
             this.$nextTick(() => {
@@ -366,46 +366,23 @@ export default {
             this.bindVar(varName, widgetId, dom, vueDom);
         },
         bindVar(varName, widgetId, dom, vueDom) {
-            if(varName === '') {
+            if (varName === '') {
                 console.log(this.varToDom);
-                // this.varToDom[this.widgetIdToVar[widgetId]].innerHTML = '';
                 delete this.varToDom[varName];
-                delete this.widgetIdToVar[widgetId];
+                this.deleteWidgetIdToVar(widgetId);
             } else {
                 let newVar = allVar.getVar(varName);
-
-
-
-
-
-
-
-                // if(initVar.value_.dom instanceof Array) {
-                //     // vue 对象
-                //     this.varToDom[varName] = vueDom;
-                // } else {
-                //     // 原声dom 对象
-                //     this.varToDom[varName] = dom;
-                // }
-
-
-
-
                 vueDom.setInnerVueObj(newVar.value_);
-                if(newVar.value_.dom instanceof Array) {
-                    // 用来映射widgetId对应存放的变量
-                    if(widgetId !== undefined) {
-                        this.widgetIdToVar[widgetId] = varName;
-                    }
+                if (newVar.value_.dom instanceof Array) {
                 } else {
                     // 用来设置变量映射dom
-                    if(dom !== undefined) {
+                    if (dom !== undefined) {
                         this.varToDom[varName] = dom;
                     }
-                    // 用来映射widgetId对应存放的变量
-                    if(widgetId !== undefined) {
-                        this.widgetIdToVar[widgetId] = varName;
-                    }
+                }
+                // 用来映射widgetId对应存放的变量
+                if (widgetId !== undefined) {
+                    this.widgetIdToVar[widgetId] = varName;
                 }
             }
         },
@@ -524,6 +501,7 @@ export default {
             if(deleteWidgetIndex > -1) {
                 this.fileData.file_data.widget.splice(deleteWidgetIndex, 1);
             }
+            this.deleteWidgetIdToVar(widgetId);
             this.save();
         },
         varHover(key, messageType) {
@@ -583,7 +561,16 @@ export default {
                 if(actionTime > this.lastSaveTime) {
                     this.lastSaveTime = actionTime;
                 }
-                console.trace('保存1');
+                // console.log('保存1');
+                // 去除不存在的 widget ，解决数据一致性问题
+                for(let i in this.widgetIdToVar) {
+                    let hasExist = this.fileData.file_data.widget.findIndex(item => {
+                        return item.id === i;
+                    }) > -1;
+                    if(hasExist === false) {
+                        this.deleteWidgetIdToVar(i);
+                    }
+                }
                 setTimeout(() => {
                     if(this.lastSaveTime === actionTime) {
                         ajax({
