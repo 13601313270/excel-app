@@ -41,10 +41,6 @@ import { mapGetters } from 'vuex';
 import allMatch from '../languageParser/allMatch';
 export default {
     props: {
-        varToDom: {
-            type: Object,
-            required: true
-        },
         useCreateVar: {
             type: Array
         }
@@ -71,6 +67,8 @@ export default {
                 }
             }
         });
+        console.log('----this.widgetIdToVar----');
+        console.log(this.widgetIdToVar);
     },
     methods: {
         getCodeByVal(val) {

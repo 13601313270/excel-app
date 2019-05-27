@@ -1,14 +1,14 @@
 <template>
     <div class="widget">
         <div class="head_tool" v-if="isEditing">
-            <template v-if="data_!==undefined">
+            <template v-if="data_!==undefined && data_!==''">
                 <app-button size="mini" @click="editVar">编辑</app-button>
                 <app-button size="mini" @click="chooseExistItem('')">清空</app-button>
             </template>
             <template v-else>
                 <app-button size="mini" @click="clickAdd">新增</app-button>
                 <app-button size="mini" @click="chooseExist">绑定现有的</app-button>
-                <drop-list v-if="isChooseExist" style="position: absolute;top:30px;left: 55px;">
+                <drop-list class="select_val" v-if="isChooseExist">
                     <div v-for="item in allVars" v-html="item" @click="chooseExistItem(item)"></div>
                 </drop-list>
             </template>
@@ -16,15 +16,13 @@
         </div>
         <div
             class="widget_content"
-            :class="{warning:getHighlightState(data_)=='info'}"
+            :class="{warning:getHighlightState(data_)==='info'}"
             ref="content"
             @dragover="allowDrop($event)"
             @drop.stop="ondrop($event)"
             @click="clickAdd"
         >
-            <div v-if="vueShow">
-                <tempVueClass :initProps="vueShow.dom"></tempVueClass>
-            </div>
+            <tempVueClass v-if="vueShow" :initProps="vueShow.dom"></tempVueClass>
         </div>
     </div>
 </template>
@@ -40,15 +38,29 @@ import allMatch from '../languageParser/allMatch';
 
 let tempVueClass = {
     props: {
-        initProps: Array
+        initProps: [Array, HTMLDivElement]
     },
     render(createElement) {
-        return createElement(this.initProps[0], {
-            props: this.initProps[1],
-            on: this.initProps[2]
-        })
+        if(this.initProps instanceof HTMLDivElement) {
+            let innerDom = this.initProps;
+            return createElement({
+                mounted() {
+                    console.log(2);
+                    console.log(this);
+                    this.$refs.inner.innerHTML = '';
+                    this.$refs.inner.appendChild(innerDom);
+                },
+                template: `<div ref="inner" style="height:100%">111</div>`
+            });
+        } else {
+            return createElement(this.initProps[0], {
+                props: this.initProps[1],
+                on: this.initProps[2]
+            })
+        }
     }
-}
+};
+
 export default {
     name: 'widget',
     props: ['data', 'item'],
@@ -67,7 +79,6 @@ export default {
             this.$emit('init', this.data, this.key, this.$refs.content);
         } else {
             this.data_ = this.widgetIdToVar[this.key];
-
             widgetEvent.emit('init', this.data_, this.key, this.$refs.content, this);
             this.$emit('init', this.data_, this.key, this.$refs.content);
         }
@@ -120,9 +131,9 @@ export default {
             this.isChooseExist = !this.isChooseExist;
             if(this.isChooseExist) {
                 let keys = [];
-                let aaa = allVar.getAllData();
-                for (let key in aaa) {
-                    let val = aaa[key];
+                let allData_ = allVar.getAllData();
+                for (let key in allData_) {
+                    let val = allData_[key];
                     if(val.value_ !== undefined) {
                         let matchItem = allMatch.find(item => {
                             return item.match.test(val.value_.name);
@@ -139,6 +150,7 @@ export default {
         },
         chooseExistItem(key) {
             this.data_ = key;
+            this.vueShow = null;
             widgetEvent.emit('bindVar', key, this.item.id, this.$refs.content, this);
             this.$emit('bindVar', key, this.item.id, this.$refs.content, this);
         },
@@ -147,6 +159,10 @@ export default {
         },
         setInnerVueObj(funcObj) {
             this.vueShow = funcObj;
+            console.log('hear');
+            this.$nextTick(() => {
+                this.vueShow.reRender();
+            });
         }
     },
     destroyed() {
@@ -163,6 +179,9 @@ export default {
     watch: {
         // 需要保存的样式
         'item.style'(val) {
+            if (this.vueShow) {
+                this.vueShow.reRender();
+            }
             widgetEvent.emit('setStyle', this.item.id, val);
         }
     }
@@ -176,6 +195,8 @@ export default {
         }
 
         .widget_content {
+            width: 100%;
+            height: 100%;
             min-width: 40px;
             min-height: 40px;
             /*display: inline-block;*/
@@ -196,7 +217,14 @@ export default {
                 margin-left: 2px;
             }
         }
+        .select_val {
+            position: absolute;
+            z-index: 1;
+            top: 30px;
+            left: 55px;
+        }
         &:hover {
+            overflow: visible!important;
             .head_tool {
                 display: block;
             }

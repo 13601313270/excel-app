@@ -17,9 +17,9 @@
                 class="widget"
                 :class="{light:dragDomFunc}"
             ></widget>
+            <div class="drag_size" v-if="isEditing" @mousedown="sizeId = item.id"></div>
         </div>
-        <div v-if="moveId" class="move" @mousemove="mousemove" @mouseup="mouseup"
-             style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+        <div v-if="moveId || sizeId" class="move" @mousemove="mousemove" @mouseup="mouseup"></div>
     </div>
 </template>
 <script>
@@ -34,7 +34,8 @@ export default {
             },
             appMinWidth: 0,
             dragPos: '',
-            moveId: null
+            moveId: null,
+            sizeId: null
         }
     },
     created() {
@@ -83,20 +84,37 @@ export default {
         },
         moveStart(id) {
             this.moveId = id;
+            let allStyle = this.fileData.widget.map(item => {
+                return item.style;
+            });
+            console.log(allStyle);
         },
         mousemove(e) {
-            let widget = this.fileData.widget.find(item => {
-                return item.id === this.moveId;
-            });
-            if(widget) {
-                this.$set(widget, 'style', Object.assign({}, widget.style, {
-                    left: e.offsetX + 'px',
-                    top: e.offsetY + 'px'
-                }));
+            if (this.moveId !== null) {
+                let widget = this.fileData.widget.find(item => {
+                    return item.id === this.moveId;
+                });
+                if(widget) {
+                    this.$set(widget, 'style', Object.assign({}, widget.style, {
+                        left: parseInt(e.offsetX / 10) * 10 + 'px',
+                        top: parseInt(e.offsetY / 10) * 10 + 'px'
+                    }));
+                }
+            } else if (this.sizeId !== null) {
+                let widget = this.fileData.widget.find(item => {
+                    return item.id === this.sizeId;
+                });
+                if(widget) {
+                    this.$set(widget, 'style', Object.assign({}, widget.style, {
+                        width: parseInt(e.offsetX / 10) * 10 - parseInt(widget.style.left) + 'px',
+                        height: parseInt(e.offsetY / 10) * 10 - parseInt(widget.style.top) + 'px'
+                    }));
+                }
             }
         },
         mouseup() {
             this.moveId = null;
+            this.sizeId = null;
         }
     }
 }
@@ -113,6 +131,8 @@ export default {
 
     .widget_content {
         position: relative;
+        border: solid 1px #404040;
+        border-radius: 5px;
         .drag_tip {
             position: absolute;
             font-family: 'iconfont';
@@ -132,18 +152,48 @@ export default {
                 box-shadow: 0 0 8px -1px #a3a3a3;
             }
         }
+
+        .drag_size {
+            width: 0;
+            height: 0;
+            border-right: solid 10px black;
+            border-top: solid 10px white;
+            position: absolute;
+            background: black;
+            cursor: nwse-resize;
+            right: 0;
+            bottom: 0;
+            display: none;
+            &:hover {
+                background: red;
+            }
+        }
+
         &:hover {
             .drag_tip {
                 display: block;
             }
+            .drag_size {
+                display: block;
+            }
         }
+
         .widget {
-            border: solid 1px #404040;
-            border-radius: 2px;
             display: inline-block;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+
             &.light {
                 border: solid 1px red;
             }
         }
+    }
+    .move {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
     }
 </style>

@@ -76,7 +76,6 @@
                     <div style="flex-grow: 1;padding: 3px 3px;overflow: auto">
                         <all-vars
                             @change="editVar"
-                            :varToDom="varToDom"
                             :useCreateVar="useCreateVar"
                             @hover="varHover"
                             @delete="deleteVar"
@@ -369,13 +368,31 @@ export default {
         bindVar(varName, widgetId, dom, vueDom) {
             if(varName === '') {
                 console.log(this.varToDom);
-                this.varToDom[this.widgetIdToVar[widgetId]].innerHTML = '';
+                // this.varToDom[this.widgetIdToVar[widgetId]].innerHTML = '';
                 delete this.varToDom[varName];
                 delete this.widgetIdToVar[widgetId];
             } else {
                 let newVar = allVar.getVar(varName);
+
+
+
+
+
+
+
+                // if(initVar.value_.dom instanceof Array) {
+                //     // vue 对象
+                //     this.varToDom[varName] = vueDom;
+                // } else {
+                //     // 原声dom 对象
+                //     this.varToDom[varName] = dom;
+                // }
+
+
+
+
+                vueDom.setInnerVueObj(newVar.value_);
                 if(newVar.value_.dom instanceof Array) {
-                    vueDom.setInnerVueObj(newVar.value_);
                     // 用来映射widgetId对应存放的变量
                     if(widgetId !== undefined) {
                         this.widgetIdToVar[widgetId] = varName;
@@ -389,11 +406,6 @@ export default {
                     if(widgetId !== undefined) {
                         this.widgetIdToVar[widgetId] = varName;
                     }
-                    if(dom !== undefined) {
-                        this.varToDom[varName].innerHTML = '';
-                        console.log(newVar);
-                        this.varToDom[varName].appendChild(newVar.value_.dom);
-                    }
                 }
             }
         },
@@ -401,13 +413,13 @@ export default {
             let initVar = allVar.getVar(varName);
             if(initVar) {
                 if(initVar.value_.dom instanceof Array) {
+                    // vue 对象
                     this.varToDom[varName] = vueDom;
-                    vueDom.setInnerVueObj(initVar.value_);
                 } else {
+                    // 原声dom 对象
                     this.varToDom[varName] = dom;
-                    this.varToDom[varName].innerHTML = '';
-                    this.varToDom[varName].appendChild(initVar.value_.dom);
                 }
+                vueDom.setInnerVueObj(initVar.value_);
             } else {
                 this.save();
             }
@@ -571,6 +583,7 @@ export default {
                 if(actionTime > this.lastSaveTime) {
                     this.lastSaveTime = actionTime;
                 }
+                console.trace('保存1');
                 setTimeout(() => {
                     if(this.lastSaveTime === actionTime) {
                         ajax({

@@ -55,6 +55,7 @@
                     if (typeof item.value === 'object') {
                         return this.dataType.includes(item.value.type);
                     } else {
+                        // return this.dataType.includes(typeof item.value);// 是不是应该是这样，没找到怎么测试
                         return this.dataType.includes(item.value);
                     }
                 }) > -1;
@@ -70,7 +71,7 @@
         },
         methods: {
             changeType(val) {
-                this.$emit('change', val);
+                this.$emit('change', val, this.dataType);
             }
         }
     }

@@ -14,6 +14,8 @@ export default class extends Obj {
     render() {
         this.dom.innerHTML = this.value;
     }
+    reRender() {
+    }
 
     getCodeByObj() {
         let code = this.name + '(';

@@ -117,10 +117,14 @@ class LINE extends FuncObj {
         }
         this.myChart.setOption(option, true);
         setTimeout(() => {
-            this.dom.style.width = '500px';
-            this.dom.style.height = '300px';
+            this.dom.style.width = '100%';
+            this.dom.style.height = '100%';
             this.myChart.resize();
         }, 0);
+    }
+
+    reRender() {
+        this.myChart.resize();
     }
 }
 __allMatch__.push({
