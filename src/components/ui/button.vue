@@ -1,9 +1,7 @@
 <template>
     <div class="button_content" :class="{mini:size==='mini'}" @click="$emit('click')">
-        <div>
-            <div class="icon" v-html="icon" v-if="icon"></div>
-            <slot></slot>
-        </div>
+        <div class="icon" v-html="icon" v-if="icon"></div>
+        <div><slot></slot></div>
     </div>
 </template>
 <script>
@@ -26,18 +24,22 @@
         .ui_panel;
         .ui_can_be_click;
         .form_size;
+        padding: 0 10px;
+
         // .ao(1);
-        display: inline-block;
         color: black;
+        white-space: nowrap;
+        text-align: center;
 
-        > div {
-            display: inline-flex;
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        align-items: center;
 
-            .icon {
-                font-family: iconfont;
-                margin-left: -7px;
-                margin-right: 6px;
-            }
+
+        .icon {
+            font-family: iconfont;
+            margin-right: 6px;
         }
     }
 </style>

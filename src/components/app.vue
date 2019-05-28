@@ -14,8 +14,7 @@
                 <ui-button
                     v-for="item in writeColumnList"
                     @click="insertWrite(item)"
-                    v-html="item.name"
-                    size="mini"></ui-button>
+                    size="mini">{{item.name}}</ui-button>
             </div>
         </div>
         <!--<header-nav></header-nav>-->
@@ -198,6 +197,7 @@ import dynamicVueObject from './dynamicVueObject/dynamicVueObject.vue';
 import UiButton from './ui/button';
 import axios from 'axios';
 import dynamicForm from './dynamicForm/form';
+import UiInput from "./ui/input";
 axios.defaults.withCredentials = true;
 Vue.component(widget.name, widget);
 export default {
@@ -750,6 +750,7 @@ export default {
         }
     },
     components: {
+        UiInput,
         UiButton,
         'all-vars': allPageVars,
         'props-com': propsCom,

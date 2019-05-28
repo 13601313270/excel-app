@@ -37,24 +37,19 @@ export default {
     @import "basic";
 
     .input_content {
-        height: @form_default_height;
-        display: inline-block;
         .ui_panel;
+        .form_size;
+        display: inline-block;
         padding: 0;
         color: black;
+        border-radius: 1px;
         input {
-            height: @form_default_height - @ui_panel_borderWidth*2;
+            height: 100%;
+            width: 100%;
             padding: 0 3px;
             border: none;
             &:focus {
                 outline: none;
-            }
-        }
-
-        &.mini {
-            height: @form_mini_height;
-            input {
-                height: @form_mini_height - @ui_panel_borderWidth*2;
             }
         }
     }
