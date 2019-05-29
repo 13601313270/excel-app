@@ -120,7 +120,7 @@
                             ></select-type>
                             <select :value="innerOption.name"
                                     @change="changeVar($event.target.value)">
-                                <option v-for="item,key in allVar" :value="key">
+                                <option v-for="item,key in allVar" :value="key" v-if="(dataType.includes('relationalModel') && item.value.type === 'relationalModel') || !dataType.includes('relationalModel')">
                                     【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
                                 </option>
                             </select>
@@ -291,8 +291,6 @@ export default {
             }
         },
         emitChange() {
-            console.log('---this.innerOption---');
-            console.log(this.innerOption);
             this.$emit('input', this.innerOption);// 根目录不用，但是子元素修改完修改影响父层
             this.$emit('change');
         },
@@ -396,18 +394,25 @@ export default {
                 }
             }
         },
-        getDefaultOption(name) {
-            // codeOption.props
+        getDefaultOption(name, dataType) {
             let returnVal;
             if(name === 'var') {
                 returnVal = 1;
                 // 需要增加保证i不等于自己的逻辑
                 for (let i in this.allVar) {
-                    returnVal = {
-                        type: 'var',
-                        name: i
-                    };
-                    break;
+                    let varType;
+                    if (typeof this.allVar[i].value === 'object') {
+                        varType = this.allVar[i].value.type;
+                    } else {
+                        varType = typeof this.allVar[i].value;
+                    }
+                    if (dataType.split(',').includes(varType)) {
+                        returnVal = {
+                            type: 'var',
+                            name: i
+                        };
+                        break;
+                    }
                 }
             } else if(['TRUE', 'FALSE'].includes(name)) {
                 returnVal = (name === 'TRUE');
@@ -459,13 +464,14 @@ export default {
             }
             return returnVal;
         },
-        changeType(name) {
+        changeType(name, dataType) {
+            console.log(dataType);
             this.allMatch.filter(item => {
                 return name.match(item.match);
             }).forEach(item => {
                 this.codeOption = item;
             });
-            this.innerOption = this.getDefaultOption(name);
+            this.innerOption = this.getDefaultOption(name, dataType);
             if(this.innerOption.type === 'var') {
                 // 如果变量值是字典，则展开下一级选择
                 this.changeVar(this.innerOption.name);
@@ -474,7 +480,14 @@ export default {
         },
         changeVar(val) {
             let map = this.allVar[val].value;
-            if(!(map instanceof Array) && map instanceof Object) {
+            if(map.type === 'relationalModel') {
+                let item = {
+                    type: 'var',
+                    name: val
+                };
+                this.setInnerOption(item);
+            }
+            else if(!(map instanceof Array) && map instanceof Object) {
                 let item = {
                     type: 'dictionaryGet',
                     dictionary: getOptionByObj(this.allVar[val]),

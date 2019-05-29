@@ -2,7 +2,7 @@
     <div>
         <div v-if="type==='RELATIONAL_MODEL=>source'">
             <select @change="change" v-model="data">
-                <option v-for="item in connections" :value="item.id">
+                <option v-for="item in connections" :value="parseInt(item.id)">
                     {{item.name}}
                 </option>
             </select>

@@ -2,7 +2,7 @@
     <div
         @dragover.self="dragover"
         @drop="ondrop"
-        :style="{minWidth: appMinWidth + 'px'}"
+        :style="{width: (appMinWidth+20) + 'px',height: (appMinHeight+20) + 'px'}"
     >
         <div>文件保存</div>
         <div :style="style" v-show="dragDomFunc" class="droging-seat"></div>
@@ -32,7 +32,8 @@ export default {
                 left: 0,
                 top: 0
             },
-            appMinWidth: 0,
+            appMinWidth: 200,
+            appMinHeight: 200,
             dragPos: '',
             moveId: null,
             sizeId: null
@@ -47,8 +48,8 @@ export default {
     },
     methods: {
         getStyle(item) {
-            // console.log(item);
-            this.appMinWidth = Math.max(parseInt(item.left) + 500, this.appMinWidth);
+            this.appMinWidth = Math.max(parseInt(item.left) + parseInt(item.width), this.appMinWidth);
+            this.appMinHeight = Math.max(parseInt(item.top) + parseInt(item.height), this.appMinHeight);
             return Object.assign({
                 position: 'absolute'
             }, item);

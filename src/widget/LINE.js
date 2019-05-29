@@ -24,6 +24,8 @@ class LINE extends FuncObj {
         super(...Array.from(arguments));
         this.name = 'LINE';
         this.dom = document.createElement('div');
+        this.dom.style.width = '100%';
+        this.dom.style.height = '100%';
         this.myChart = echarts.init(this.dom);
         this.selectBar = -1;
         let xColumn = new Temp();
@@ -117,8 +119,6 @@ class LINE extends FuncObj {
         }
         this.myChart.setOption(option, true);
         setTimeout(() => {
-            this.dom.style.width = '100%';
-            this.dom.style.height = '100%';
             this.myChart.resize();
         }, 0);
     }

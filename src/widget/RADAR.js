@@ -24,6 +24,8 @@ class RADAR extends FuncObj {
         super(...Array.from(arguments));
         this.name = 'RADAR';
         this.dom = document.createElement('div');
+        this.dom.style.width = '100%';
+        this.dom.style.height = '100%';
         this.myChart = echarts.init(this.dom);
         this.selectBar = -1;
         let xColumn = new Temp();
@@ -110,10 +112,11 @@ class RADAR extends FuncObj {
         }
         this.myChart.setOption(option, true);
         setTimeout(() => {
-            this.dom.style.width = '500px';
-            this.dom.style.height = '300px';
             this.myChart.resize();
         }, 0);
+    }
+    reRender() {
+        this.myChart.resize();
     }
 }
 __allMatch__.push({

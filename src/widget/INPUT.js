@@ -39,7 +39,6 @@ class INPUT extends FuncObj {
     render() {
     }
     reRender() {
-        console.log(111);
     }
 }
 

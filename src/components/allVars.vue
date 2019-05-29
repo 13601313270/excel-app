@@ -67,8 +67,6 @@ export default {
                 }
             }
         });
-        console.log('----this.widgetIdToVar----');
-        console.log(this.widgetIdToVar);
     },
     methods: {
         getCodeByVal(val) {

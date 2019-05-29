@@ -197,7 +197,7 @@ import dynamicVueObject from './dynamicVueObject/dynamicVueObject.vue';
 import UiButton from './ui/button';
 import axios from 'axios';
 import dynamicForm from './dynamicForm/form';
-import UiInput from "./ui/input";
+import UiInput from './ui/input';
 axios.defaults.withCredentials = true;
 Vue.component(widget.name, widget);
 export default {
@@ -372,7 +372,9 @@ export default {
                 this.deleteWidgetIdToVar(widgetId);
             } else {
                 let newVar = allVar.getVar(varName);
-                vueDom.setInnerVueObj(newVar.value_);
+                if (vueDom !== undefined) {
+                    vueDom.setInnerVueObj(newVar.value_);
+                }
                 if (newVar.value_.dom instanceof Array) {
                 } else {
                     // 用来设置变量映射dom
@@ -632,7 +634,15 @@ export default {
                 param.append('data', JSON.stringify(data));
                 axios.put('http://www.tablehub.cn/action/mysql.html', param, config)
                     .then(data => {
-
+                        if (data.data === 1) {
+                            Object.values(allVar.allData).forEach(item => {
+                                if (item.value_ instanceof relationalModel) {
+                                    if (parseInt(item.value_.props[0]) === parseInt(column.id)) {
+                                        item.value_.dep.update();
+                                    }
+                                }
+                            });
+                        }
                     });
             });
         }
@@ -860,8 +870,8 @@ export default {
                 overflow: scroll;
                 background-color: grey;
                 &.edit {
+                    padding: 32px;
                     > div {
-                        margin: 32px 16px;
                         box-shadow: 0 0 20px 0 #4f4f4f;
                     }
                 }

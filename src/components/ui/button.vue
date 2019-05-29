@@ -31,7 +31,7 @@
         white-space: nowrap;
         text-align: center;
 
-        display: flex;
+        display: inline-flex;
         justify-content: center;
         flex-direction: row;
         align-items: center;
