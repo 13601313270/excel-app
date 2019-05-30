@@ -4,7 +4,7 @@
         @drop="ondrop"
         :style="{width: (appMinWidth+20) + 'px',height: (appMinHeight+20) + 'px'}"
     >
-        <div>文件保存</div>
+        <div @click="ddd">文件保存</div>
         <div :style="style" v-show="dragDomFunc" class="droging-seat"></div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
@@ -13,6 +13,7 @@
             <div class="drag_tip" v-if="isEditing" @mousedown="moveStart(item.id)">&#xe656;</div>
             <widget
                 :key="item.id"
+                :data="item.data"
                 :item="item"
                 class="widget"
                 :class="{light:dragDomFunc}"
@@ -60,17 +61,19 @@ export default {
         dragover(e) {
             this.style.left = (e.offsetX) + 'px';
             this.style.top = (e.offsetY) + 'px';
+            let defaultWidth;
+            let defaultHeight;
             if(this.dragDomFuncInfo && this.dragDomFuncInfo.defaultSize && this.dragDomFuncInfo.defaultSize.width && this.dragDomFuncInfo.defaultSize.height) {
-                this.style.left = (e.offsetX - this.dragDomFuncInfo.defaultSize.width / 2) + 'px';
-                this.style.top = (e.offsetY - this.dragDomFuncInfo.defaultSize.height / 2) + 'px';
-                this.style.width = this.dragDomFuncInfo.defaultSize.width + 'px';
-                this.style.height = this.dragDomFuncInfo.defaultSize.height + 'px';
+                defaultWidth = this.dragDomFuncInfo.defaultSize.width;
+                defaultHeight = this.dragDomFuncInfo.defaultSize.height;
             } else {
-                this.style.left = (e.offsetX - 50) + 'px';
-                this.style.top = (e.offsetY - 50) + 'px';
-                this.style.width = '100px';
-                this.style.height = '100px';
+                defaultWidth = 100;
+                defaultHeight = 100;
             }
+            this.style.left = parseInt((e.offsetX - defaultWidth / 2) / 10) * 10 + 'px';
+            this.style.width = parseInt(defaultWidth / 10) * 10 + 'px';
+            this.style.top = parseInt((e.offsetY - defaultHeight / 2) / 10) * 10 + 'px';
+            this.style.height = parseInt(defaultHeight / 10) * 10 + 'px';
             e.preventDefault();
         },
         ondrop() {
@@ -85,10 +88,6 @@ export default {
         },
         moveStart(id) {
             this.moveId = id;
-            let allStyle = this.fileData.widget.map(item => {
-                return item.style;
-            });
-            console.log(allStyle);
         },
         mousemove(e) {
             if (this.moveId !== null) {
@@ -116,6 +115,16 @@ export default {
         mouseup() {
             this.moveId = null;
             this.sizeId = null;
+        },
+        ddd() {
+            // // this.$emit('eval', "$a711 = INPUT('string','10')");
+            // this.$emit('saveVal', '$a711', "INPUT('string', '10')");
+            // this.fileData.widget.push({
+            //     data: '$a711',
+            //     style: cloneUtils.deep({
+            //         left: 200
+            //     })
+            // });
         }
     }
 }

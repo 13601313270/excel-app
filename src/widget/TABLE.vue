@@ -1,18 +1,20 @@
 <template>
     <div class="table">
-        <table>
-            <thead>
-            <tr>
-                <td v-for="item in value.groupColumn" v-html="item"></td>
-                <td v-for="item in value.dataColumn" v-html="item"></td>
-            </tr>
-            </thead>
-            <tbody v-if="value.dataValue">
-            <tr v-for="data in value.dataValue.slice(pageSize * page, pageSize * (page + 1) )">
-                <td v-for="item in data" v-html="item"></td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="content">
+            <table>
+                <thead>
+                <tr>
+                    <td v-for="item in value.groupColumn" v-html="item"></td>
+                    <td v-for="item in value.dataColumn" v-html="item"></td>
+                </tr>
+                </thead>
+                <tbody v-if="value.dataValue">
+                <tr v-for="data in value.dataValue.slice(pageSize * page, pageSize * (page + 1) )">
+                    <td v-for="item in data" v-html="item"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="page" v-if="value && value.dataValue && value.dataValue.length">
             <div
                 :class="{active:page===key}"
@@ -47,15 +49,25 @@ export default {
 <style scoped lang="less">
     .table {
         padding: 10px;
-        table {
-            border-spacing: 0;
-            thead {
-                font-weight: bold;
-            }
-            tr {
-                td {
-                    border-bottom: solid 1px #c7c7c7;
-                    padding: 2px 10px;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        .content {
+            flex-grow: 1;
+            table {
+                width: 100%;
+                border-spacing: 0;
+                flex-grow: 1;
+                thead {
+                    font-weight: bold;
+                }
+                tr {
+                    td {
+                        border-bottom: solid 1px #c7c7c7;
+                        padding: 2px 10px;
+                    }
                 }
             }
         }

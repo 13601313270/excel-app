@@ -144,7 +144,11 @@ __allMatch__.push({
         title: '关系模型',
         dataType: 'relationalModel'
     }],
-    returnType: 'dom'
+    returnType: 'dom',
+    defaultSize: {
+        width: 300,
+        height: 200
+    }
 });
 class STACK_BAR extends BAR {
     constructor(source, table, x, y, where) {

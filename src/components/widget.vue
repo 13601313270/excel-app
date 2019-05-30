@@ -1,9 +1,9 @@
 <template>
     <div class="widget">
         <div class="head_tool" v-if="isEditing">
-            <template v-if="data_!==undefined && data_!==''">
+            <template v-if="varName!==undefined && varName!==null">
                 <app-button size="mini" @click="editVar">编辑</app-button>
-                <app-button size="mini" @click="chooseExistItem('')">清空</app-button>
+                <app-button size="mini" @click="chooseExistItem(null)">清空</app-button>
             </template>
             <template v-else>
                 <app-button size="mini" @click="clickAdd">新增</app-button>
@@ -16,7 +16,7 @@
         </div>
         <div
             class="widget_content"
-            :class="{warning:getHighlightState(data_)==='info'}"
+            :class="{warning:getHighlightState(varName)==='info'}"
             ref="content"
             @dragover="allowDrop($event)"
             @drop.stop="ondrop($event)"
@@ -28,7 +28,6 @@
 </template>
 <script>
 import widgetEvent from './widgetChange';
-// import widgetIdToVar from './widgetIdToVar';
 import appButton from './ui/button.vue';
 import dropList from './ui/dropList.vue';
 import { mapGetters, mapActions } from 'vuex';
@@ -64,7 +63,7 @@ export default {
     props: ['data', 'item'],
     data() {
         return {
-            data_: this.data,
+            varName: this.data,
             key: this.$vnode.key,
             isChooseExist: false,
             allVars: [],
@@ -72,16 +71,18 @@ export default {
         };
     },
     mounted() {
-        if(this.data !== undefined) {
-            widgetEvent.emit('init', this.data, this.key, this.$refs.content, this);
-            this.$emit('init', this.data, this.key, this.$refs.content);
-        } else {
-            this.data_ = this.widgetIdToVar[this.key];
-            widgetEvent.emit('init', this.data_, this.key, this.$refs.content, this);
-            this.$emit('init', this.data_, this.key, this.$refs.content);
+        if (this.data === undefined) {
+            this.varName = this.widgetIdToVar[this.key];
         }
+        widgetEvent.emit('init', this.varName, this);
+
+        let initVar = allVar.getVar(this.varName);
+        if (initVar) {
+            this.setInnerVueObj(initVar.value_);
+        }
+        this.$emit('init', this.varName, this); // 暴露给开发者的，系统没有用到
         widgetEvent.on('addWidgetContent', (key) => {
-            if(this.key === key) {
+            if (this.key === key) {
                 this.ondrop();
             }
         });
@@ -97,14 +98,15 @@ export default {
         allowDrop(e) {
             e.preventDefault();
         },
-        addFunction(dragDomFunc) {
+        setFunction(dragDomFunc) {
             if(this.isEditing) {
-                prompt('请输入名称', 'a7').then((varName) => {
+                prompt('请输入名称', dragDomFunc + '7').then((varName) => {
                     if(varName !== null && varName !== '') {
                         this.setDragDomFunc(dragDomFunc);
                         varName = '$' + varName.replace(/^\$/, '');
-                        this.data_ = varName;
+                        this.varName = varName;
                         widgetEvent.emit('change', varName, this.item.id, this.$refs.content, this);
+                        widgetEvent.emit('bindVar', varName, this.item.id, this.$refs.content, this);
                         this.$emit('change', varName, this.item.id, this.$refs.content);
                     }
                 });
@@ -114,16 +116,17 @@ export default {
             // 如果没有设置key，则不允许拖拽widget，用来定义不可修改组件。反过来说，所有添加了key的widget可以拖拽组件
             if(this.item.id !== undefined) {
                 // 抬起鼠标dragDomFunc就会释放为null，这里弹窗将值保留住
-                this.addFunction(this.dragDomFunc);
+                this.setFunction(this.dragDomFunc);
             }
         },
         clickAdd() {
-            if(this.data_ === undefined) {
-                this.addFunction('TEXT');
+            if(this.varName === undefined || this.varName === null) {
+                console.log(this.varName);
+                this.setFunction('TEXT');
             }
         },
         editVar() {
-            widgetEvent.emit('editVar', this.data_);
+            widgetEvent.emit('editVar', this.varName); // this.varName被修改的变量名称
         },
         chooseExist() {
             this.isChooseExist = !this.isChooseExist;
@@ -147,10 +150,15 @@ export default {
             }
         },
         chooseExistItem(key) {
-            this.data_ = key;
+            this.varName = key;
             this.vueShow = null;
-            widgetEvent.emit('bindVar', key, this.item.id, this.$refs.content, this);
-            this.$emit('bindVar', key, this.item.id, this.$refs.content, this);
+            if(key === null) {
+                widgetEvent.emit('clearVar', key, this.item.id);
+                this.$emit('clearVar', key, this.item.id);
+            } else {
+                widgetEvent.emit('bindVar', key, this.item.id, this.$refs.content, this);
+                this.$emit('bindVar', key, this.item.id, this.$refs.content, this);
+            }
         },
         deleteWidget() {
             widgetEvent.emit('destroy', this.item.id);

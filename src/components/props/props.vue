@@ -121,7 +121,7 @@
                             ></select-type>
                             <select :value="innerOption.name"
                                     @change="changeVar($event.target.value)">
-                                <option v-for="item,key in allVar" :value="key" v-if="(dataType.includes('relationalModel') && item.value.type === 'relationalModel') || !dataType.includes('relationalModel')">
+                                <option v-for="item,key in allVar" :value="key" v-if="(dataType.includes('relationalModel') && item.value && item.value.type === 'relationalModel') || !dataType.includes('relationalModel')">
                                     【{{key}}】{{typeof item.value == 'object' ? '' : ('---' + item.value)}}
                                 </option>
                             </select>
@@ -467,7 +467,6 @@ export default {
             return returnVal;
         },
         changeType(name, dataType) {
-            console.log(dataType);
             this.allMatch.filter(item => {
                 return name.match(item.match);
             }).forEach(item => {

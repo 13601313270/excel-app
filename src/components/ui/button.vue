@@ -1,5 +1,5 @@
 <template>
-    <div class="button_content" :class="{mini:size==='mini'}" @click="$emit('click')">
+    <div class="button_content" :class="button_class" @click="$emit('click')">
         <div class="icon" v-html="icon" v-if="icon"></div>
         <div><slot></slot></div>
     </div>
@@ -13,6 +13,13 @@
         },
         data() {
             return {};
+        },
+        computed: {
+            button_class() {
+                let obj = {};
+                obj[this.size] = true;
+                return obj;
+            }
         },
         methods: {}
     }

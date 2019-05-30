@@ -1,7 +1,7 @@
 <template>
-    <div class="input_content" :class="{mini:size==='mini'}">
+    <div class="input_content" :class="input_class">
         <input ref="file" v-if="type==='file'" @change="changeFile" :type="type"/>
-        <input v-else v-model="currentValue" :type="type"/>
+        <input v-else v-model="currentValue" :type="type" @focus="inputFocus" @blur="inputBlue"/>
     </div>
 </template>
 <script>
@@ -14,7 +14,8 @@ export default {
     },
     data() {
         return {
-            currentValue: this.value
+            currentValue: this.value,
+            focus: false
         };
     },
     watch: {
@@ -26,9 +27,22 @@ export default {
             this.$emit('change', value)
         }
     },
+    computed: {
+        input_class() {
+            let obj = {focus: this.focus};
+            obj[this.size] = true;
+            return obj;
+        }
+    },
     methods: {
         changeFile() {
             this.currentValue = this.$refs.file.files;
+        },
+        inputFocus() {
+            this.focus = true;
+        },
+        inputBlue() {
+            this.focus = false;
         }
     }
 }
@@ -43,6 +57,7 @@ export default {
         padding: 0;
         color: black;
         border-radius: 1px;
+        transition: border-color .3s;
         input {
             height: 100%;
             width: 100%;
@@ -51,6 +66,9 @@ export default {
             &:focus {
                 outline: none;
             }
+        }
+        &.focus {
+            border-color: @form_focus_color;
         }
     }
 </style>

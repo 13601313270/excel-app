@@ -48,6 +48,7 @@
                         class="used-dashboard"
                         @save="save"
                         @eval="eval"
+                        @saveVal="saveVal"
                         @addWidgetContent="addWidgetContent"
                     ></use-file>
                     <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
@@ -237,13 +238,13 @@ export default {
                 }
             },
             html: '',
-            varToDom: {},
+            varToWidget: {}, // 变量，正在绑定的widget映射
             // 选择的app类型
             appType: '',
             fileList: [],
             // 保存的文件
             fileData: {},
-            useCreateVar: [],
+            useCreateVar: [], // 用户创建的变量，需要保存的
             isFullScreen: false,
             lastSaveTime: (new Date()).getTime()
         }
@@ -336,21 +337,19 @@ export default {
         addData(varName, widgetId, dom, vueDom) {
             let dragDomFunc = this.dragDomFunc;
             if(dragDomFunc === null) {
-                dragDomFunc = allMatch.find(item => {
-                    return item.func;
-                }).name;
                 dragDomFunc = 'INPUT';
             }
-            console.log(1);
-            console.log(dragDomFunc);
-            let matchItem = allMatch.find(item => {
+            let matchFunction = allMatch.find(item => {
                 return item.func !== undefined && dragDomFunc.match(item.match);
             });
-            console.log(matchItem);
-            if(matchItem !== undefined) {
-                let code = this.getCodeByMatchItem(matchItem);
+            if(matchFunction !== undefined) {
+                let code = this.getCodeByMatchItem(matchFunction);
                 // 新加变量
-                this.addData_(varName, widgetId, dom, code, vueDom);
+                let insertObj = getEvalObj(1, code);
+                allVar.setVar(varName, insertObj[0]);
+                // if (widgetId !== undefined || dom !== undefined || vueDom !== undefined) {
+                //     this.bindVar(varName, widgetId, dom, vueDom);
+                // }
                 // 弹出编辑变量的窗口
                 this.editVar(varName);
                 if(!this.useCreateVar.includes(varName)) {
@@ -360,46 +359,29 @@ export default {
             this.cancelDragDomFunc();
             this.save();
         },
-        addData_(varName, widgetId, dom, code, vueDom) {
-            let insertObj = getEvalObj(1, code);
-            allVar.setVar(varName, insertObj[0]);
-            this.bindVar(varName, widgetId, dom, vueDom);
-        },
+        // 给某个widget绑定数据
         bindVar(varName, widgetId, dom, vueDom) {
-            if (varName === '') {
-                console.log(this.varToDom);
-                delete this.varToDom[varName];
-                this.deleteWidgetIdToVar(widgetId);
+            let newVar = allVar.getVar(varName);
+            vueDom.setInnerVueObj(newVar.value_);
+            if (newVar.value_.dom instanceof Array) {
             } else {
-                let newVar = allVar.getVar(varName);
-                if (vueDom !== undefined) {
-                    vueDom.setInnerVueObj(newVar.value_);
-                }
-                if (newVar.value_.dom instanceof Array) {
-                } else {
-                    // 用来设置变量映射dom
-                    if (dom !== undefined) {
-                        this.varToDom[varName] = dom;
-                    }
-                }
-                // 用来映射widgetId对应存放的变量
-                if (widgetId !== undefined) {
-                    this.widgetIdToVar[widgetId] = varName;
-                }
+                // 用来设置变量映射dom
+                this.varToWidget[varName] = vueDom;
             }
+            // 用来映射widgetId对应存放的变量
+            this.widgetIdToVar[widgetId] = varName;
         },
-        dataInit(varName, widgetId, dom, vueDom) {
-            let initVar = allVar.getVar(varName);
-            if(initVar) {
-                if(initVar.value_.dom instanceof Array) {
-                    // vue 对象
-                    this.varToDom[varName] = vueDom;
-                } else {
-                    // 原声dom 对象
-                    this.varToDom[varName] = dom;
-                }
-                vueDom.setInnerVueObj(initVar.value_);
-            } else {
+        // 清除某个widget绑定的数据
+        clearVar(varName, widgetId) {
+            delete this.varToWidget[varName];
+            this.deleteWidgetIdToVar(widgetId);
+            this.save();
+        },
+        // widget实例被创建，完成了数据初始化
+        widgetInit(varName, widget) {
+            if (allVar.getVar(varName)) { // 创建了一个widget，并且绑定了变量
+                this.varToWidget[varName] = widget;
+            } else { // 创建了一个widget，但是widget里面没有内容
                 this.save();
             }
         },
@@ -409,7 +391,7 @@ export default {
             editObj.code = createCodeText(editObj.obj);
             if(editVarName !== undefined) {
                 let updateVar = allVar.getVar(editVarName);
-                let widgePanel = this.varToDom[editVarName];
+                let widgePanel = this.varToWidget[editVarName];
                 if(widgePanel !== undefined) {
                     widgePanel.innerHTML = '';
                 }
@@ -420,12 +402,7 @@ export default {
                 if(widgePanel !== undefined) {
                     if(value_ instanceof Obj) {
                         if(value_.dom) {
-                            if(value_.dom instanceof Array) {
-                                // widgePanel.appendChild(value_.dom);
-                                widgePanel.setInnerVueObj(value_);
-                            } else {
-                                widgePanel.appendChild(value_.dom);
-                            }
+                            widgePanel.setInnerVueObj(value_);
                         } else {
                             widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
                         }
@@ -436,6 +413,7 @@ export default {
             }
             this.save();
         },
+        // 开始拖拽左侧的图表
         dragWidget(func) {
             this.setDragDomFunc(func);
         },
@@ -454,28 +432,32 @@ export default {
             });
         },
         changeCode(obj, code) {
-            console.log('========');
-            console.log(code);
-            console.log(getEvalObj(1, code)[0]);
             let newObj = getOptionByObj(getEvalObj(1, code)[0]);
-            console.log(newObj);
             // MIN(1,MIN(2,4),1)
             // 不能直接覆盖obj.obj，因为js是引用赋值
             obj.obj.type = newObj.type;
             obj.obj.props = newObj.props;
             this.codeUpdate(obj);
             if(obj.parent !== undefined) {
-                console.log(obj.parent.emitChange);
                 obj.parent.emitChange();
             }
             this.save();
         },
-        // app内部可以调用 代码识别
+        // dashboard内部可以调用 代码识别
         eval(evalContent) {
-            // console.log(evalContent);
             getEvalObj(1, evalContent);
         },
+        saveVal(varName, code) {
+            console.log(varName, code);
+            let insertObj = getEvalObj(1, code);
+            allVar.setVar(varName, insertObj[0]);
+            if(!this.useCreateVar.includes(varName)) {
+                this.useCreateVar.push(varName);
+            }
+            // this.bindVar(varName, widgetId, dom, vueDom);
+        },
         editVar(key) {
+            // Key，被修改的变量名称
             let Var = allVar.getVar(key);
             let self = this;
             let pushEditObj = {
@@ -504,7 +486,6 @@ export default {
                 this.fileData.file_data.widget.splice(deleteWidgetIndex, 1);
             }
             this.deleteWidgetIdToVar(widgetId);
-            this.save();
         },
         varHover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
@@ -519,7 +500,6 @@ export default {
             if(deleteWidgetIndex > -1) {
                 this.$set(this.fileData.file_data.widget, 'style', style);
             }
-            this.save();
         },
         selectFile(file) {
             file.file_data = JSON.parse(file.file_data);
@@ -539,7 +519,6 @@ export default {
                 }
             });
 
-            // console.log('-----file.widget_id_to_var-----');
             for (let i in file.widget_id_to_var) {
                 this.widgetIdToVar[i] = file.widget_id_to_var[i];
                 // this.widgetIdToVar = widgetIdToVar;
@@ -558,12 +537,10 @@ export default {
                         saveData[i] = getStrByObj(allData[i].value_);
                     }
                 }
-                // console.log(JSON.stringify(saveData));
                 let actionTime = (new Date()).getTime();
                 if(actionTime > this.lastSaveTime) {
                     this.lastSaveTime = actionTime;
                 }
-                // console.log('保存1');
                 // 去除不存在的 widget ，解决数据一致性问题
                 for(let i in this.widgetIdToVar) {
                     let hasExist = this.fileData.file_data.widget.findIndex(item => {
@@ -731,14 +708,20 @@ export default {
         this.currentView = newDash;
 
         console.log(widgetEvent);
-        widgetEvent.on('insertByCode', this.addData_);
-        widgetEvent.on('init', this.dataInit);
+
+        widgetEvent.on('insertByCode', (varName, widgetId, dom, code, vueDom) => {
+            let insertObj = getEvalObj(1, code);
+            allVar.setVar(varName, insertObj[0]);
+            this.bindVar(varName, widgetId, dom, vueDom);
+        });
+        widgetEvent.on('init', this.widgetInit);
         widgetEvent.on('change', this.addData);
         widgetEvent.on('editVar', this.editVar);
         widgetEvent.on('bindVar', (varName, widgetId, dom, vueDom) => {
             this.bindVar(varName, widgetId, dom, vueDom);
             this.save();
         });
+        widgetEvent.on('clearVar', this.clearVar);
         widgetEvent.on('setStyle', this.setWidgetStyle);
         widgetEvent.on('destroy', this.destroyWidget);
 
@@ -757,6 +740,9 @@ export default {
     watch: {
         isEditing(val) {
             this.setIsEditing(val);
+        },
+        'fileData.file_data.widget'(val) {
+            this.save();
         }
     },
     components: {
