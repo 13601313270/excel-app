@@ -57,7 +57,7 @@ class BAR extends FuncObj {
             model = model.value_;
         }
         if(model === '') {
-            handle(false);
+            // handle(false);
             return;
         }
         if(model.value) {

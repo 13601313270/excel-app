@@ -43,6 +43,7 @@ module.exports = {
         'semi': ['off', 'always'],
         'no-eval': ['off'],
         'prefer-promise-reject-errors': ["error", {"allowEmptyReject": true}],
-        'allowEmptyReject': true
+        'allowEmptyReject': true,
+        'valid-typeof': 'off'
     }
 };

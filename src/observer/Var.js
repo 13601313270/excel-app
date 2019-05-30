@@ -19,7 +19,6 @@ class Var extends Obj {
     }
 
     set value(varObj) {
-        // console.log(varObj);
         this.dep.lock();
         // 释放原有的监听
         if (this.value_ instanceof Obj) {

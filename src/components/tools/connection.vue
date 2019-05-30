@@ -33,7 +33,7 @@
                     <ui-select size="mini" v-model="item.type" style="width: 70px">
                         <option value="number">数字</option>
                         <option value="string">文字</option>
-                        <option value="bool">布尔</option>
+                        <option value="boolean">布尔</option>
                         <option value="date">日期</option>
                         <option value="time">时间</option>
                         <option value="datetime">日期+时间</option>

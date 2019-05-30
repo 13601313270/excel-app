@@ -57,7 +57,7 @@ class COLUMN_BAR extends FuncObj {
             model = model.value_;
         }
         if(model === '') {
-            handle(false);
+            // handle(false);
             return;
         }
         let data = model.value.dataValue;

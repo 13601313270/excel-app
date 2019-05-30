@@ -44,7 +44,7 @@ var __allMatch__ = [
     },
     {
         match: /^TRUE|true$/,
-        type: 'bool',
+        type: 'boolean',
         name: 'TRUE',
         title: '真(是)',
         value: function(tableNum, word) {
@@ -53,7 +53,7 @@ var __allMatch__ = [
     },
     {
         match: /^FALSE|false/,
-        type: 'bool',
+        type: 'boolean',
         name: 'FALSE',
         title: '假(否)',
         value: function(tableNum, word) {

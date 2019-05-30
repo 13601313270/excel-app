@@ -56,7 +56,7 @@ class LINE extends FuncObj {
             model = model.value_;
         }
         if(model === '') {
-            handle(false);
+            // handle(false);
             return;
         }
         let data = model.value.dataValue;

@@ -49,13 +49,13 @@ class RADAR extends FuncObj {
         return this.dict.value;
     }
 
-    render(handle) {
+    render() {
         let model = this.props[0];
         if(model instanceof Var) {
             model = model.value_;
         }
         if(model === '') {
-            handle(false);
+            // handle(false);
             return;
         }
         let data = model.value.dataValue;

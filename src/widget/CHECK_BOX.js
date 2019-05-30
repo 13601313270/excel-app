@@ -42,7 +42,7 @@ __allMatch__.push({
         {
             name: 'value:',
             title: '默认值',
-            dataType: 'bool',
+            dataType: 'boolean',
             default: ''
         }
     ],

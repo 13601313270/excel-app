@@ -35,5 +35,5 @@ __allMatch__.push({
         title: '比较项',
         dataType: ['number,var,function']
     }],
-    returnType: 'bool'
+    returnType: 'boolean'
 });

@@ -14,6 +14,7 @@
                 <ui-button
                     v-for="item in writeColumnList"
                     @click="insertWrite(item)"
+                    :key="item.id"
                     size="mini">{{item.name}}</ui-button>
             </div>
         </div>
@@ -289,7 +290,7 @@ export default {
                     pushProp = 1;
                 } else if(dataType.split(',').includes('string')) {
                     pushProp = '""';
-                } else if(dataType.split(',').includes('bool')) {
+                } else if(dataType.split(',').includes('boolean')) {
                     pushProp = 'TRUE';
                 } else if(dataType.match(/array\((.*)\)/)) {
                     pushProp = '[]';
@@ -317,7 +318,7 @@ export default {
                         propsArr[j] = 1;
                     } else if(propsArr[j].split(',').includes('string')) {
                         propsArr[j] = '""';
-                    } else if(propsArr[j].split(',').includes('bool')) {
+                    } else if(propsArr[j].split(',').includes('boolean')) {
                         propsArr[j] = 'TRUE';
                     } else if(propsArr[j].split(',').includes('array')) {
                         propsArr[j] = '[]';
@@ -512,7 +513,7 @@ export default {
             });
             // 先后重新赋值正确的对象
             Object.keys(file.var_data).forEach(item => {
-                let insertObj = getEvalObj(1, file.var_data[item]);
+                let insertObj = getEvalObj(1, file.var_data[item].toString());
                 allVar.setVar(item, insertObj[0]);
                 if(!this.useCreateVar.includes(item)) {
                     this.useCreateVar.push(item);
@@ -595,7 +596,7 @@ export default {
                     item.type = String;
                 } else if(item.type === 'date') {
                     item.type = Date;
-                } else if(item.type === 'bool') {
+                } else if(item.type === 'boolean') {
                     item.type = Boolean;
                 }
                 item.title = item.name;
@@ -699,15 +700,12 @@ export default {
 </div>`;
 
         getEvalObj(1, fileContent);
-        console.log(allVar);
         let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {
             return '<widget random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
         });
         newDash.template = this.html;
         this.currentView = newDash;
-
-        console.log(widgetEvent);
 
         widgetEvent.on('insertByCode', (varName, widgetId, dom, code, vueDom) => {
             let insertObj = getEvalObj(1, code);
@@ -741,8 +739,11 @@ export default {
         isEditing(val) {
             this.setIsEditing(val);
         },
-        'fileData.file_data.widget'(val) {
-            this.save();
+        'fileData.file_data.widget': {
+            handler(val) {
+                this.save();
+            },
+            deep: true
         }
     },
     components: {

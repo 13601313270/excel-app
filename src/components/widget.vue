@@ -217,6 +217,7 @@ export default {
             background-color: rgb(228, 228, 228);
             border: solid 1px #a6a6a6;
             display: none;
+            z-index: 1;
 
             > * {
                 margin-left: 2px;

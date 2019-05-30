@@ -5,7 +5,7 @@ import Dep from './dep';
 class obj {
     constructor() {
         this.dep = new Dep();
-        this.dep.eventEmitter.on('ready', (handle) => {
+        this.dep.on('ready', (handle) => {
             if(this.check()) {
                 this.render(handle);
             }

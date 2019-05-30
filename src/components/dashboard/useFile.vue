@@ -1,16 +1,17 @@
 <template>
     <div
-        @dragover.self="dragover"
+        @dragover.prevent.self="dragover"
         @drop="ondrop"
+        @dragleave="isDragover = false"
         :style="{width: (appMinWidth+20) + 'px',height: (appMinHeight+20) + 'px'}"
     >
-        <div @click="ddd">文件保存</div>
-        <div :style="style" v-show="dragDomFunc" class="droging-seat"></div>
+        <div>文件保存</div>
+        <div :style="seatStyle" v-show="isDragover" class="droging-seat"></div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
         <widget data="$bbb" style="margin-left: 10px;"></widget>
-        <div class="widget_content" v-for="(item,key) in fileData.widget" :style="getStyle(item.style)">
-            <div class="drag_tip" v-if="isEditing" @mousedown="moveStart(item.id)">&#xe656;</div>
+        <div class="widget_content" v-for="(item) in fileData.widget" :style="item.style">
+            <div class="drag_tip" v-if="isEditing" @mousedown.prevent="moveId = item.id">&#xe656;</div>
             <widget
                 :key="item.id"
                 :data="item.data"
@@ -20,7 +21,7 @@
             ></widget>
             <div class="drag_size" v-if="isEditing" @mousedown="sizeId = item.id"></div>
         </div>
-        <div v-if="moveId || sizeId" class="move" @mousemove="mousemove" @mouseup="mouseup"></div>
+        <div v-if="moveId || sizeId" class="move_back" @mousemove="mousemove" @mouseup="mouseup"></div>
     </div>
 </template>
 <script>
@@ -29,13 +30,16 @@ export default {
     props: ['fileData', 'isEditing', 'dragDomFunc', 'dragDomFuncInfo', 'isFullScreen'],
     data() {
         return {
-            style: {
+            // 拖拽占位尺寸
+            seatStyle: {
                 left: 0,
-                top: 0
+                top: 0,
+                width: 10,
+                height: 10
             },
+            isDragover: false, // 正在拖拽函数进入dashboard
             appMinWidth: 200,
             appMinHeight: 200,
-            dragPos: '',
             moveId: null,
             sizeId: null
         }
@@ -46,85 +50,83 @@ export default {
         }
         this.$emit('eval', `$a111 = INPUT('string',"10")
         $bbb = INPUT('number',100)`);
+        this.initDashboardSize();
     },
     methods: {
-        getStyle(item) {
-            this.appMinWidth = Math.max(parseInt(item.left) + parseInt(item.width), this.appMinWidth);
-            this.appMinHeight = Math.max(parseInt(item.top) + parseInt(item.height), this.appMinHeight);
-            return Object.assign({
-                position: 'absolute'
-            }, item);
-        },
-        deleteWidget(key) {
-            this.fileData.widget.splice(key, 1);
-        },
+        // 拖拽函数过程中
         dragover(e) {
-            this.style.left = (e.offsetX) + 'px';
-            this.style.top = (e.offsetY) + 'px';
-            let defaultWidth;
-            let defaultHeight;
-            if(this.dragDomFuncInfo && this.dragDomFuncInfo.defaultSize && this.dragDomFuncInfo.defaultSize.width && this.dragDomFuncInfo.defaultSize.height) {
-                defaultWidth = this.dragDomFuncInfo.defaultSize.width;
-                defaultHeight = this.dragDomFuncInfo.defaultSize.height;
-            } else {
-                defaultWidth = 100;
-                defaultHeight = 100;
+            if (this.dragDomFuncInfo) {
+                this.isDragover = true;
+                let defaultWidth = this.dragDomFuncInfo.defaultSize ? this.dragDomFuncInfo.defaultSize.width : 100;
+                let defaultHeight = this.dragDomFuncInfo.defaultSize ? this.dragDomFuncInfo.defaultSize.height : 100;
+                this.seatStyle.left = parseInt(Math.max(e.offsetX - defaultWidth / 2, 10) / 10) * 10 + 'px';
+                this.seatStyle.width = parseInt(defaultWidth / 10) * 10 + 'px';
+                this.seatStyle.top = parseInt(Math.max(e.offsetY - defaultHeight / 2, 10) / 10) * 10 + 'px';
+                this.seatStyle.height = parseInt(defaultHeight / 10) * 10 + 'px';
             }
-            this.style.left = parseInt((e.offsetX - defaultWidth / 2) / 10) * 10 + 'px';
-            this.style.width = parseInt(defaultWidth / 10) * 10 + 'px';
-            this.style.top = parseInt((e.offsetY - defaultHeight / 2) / 10) * 10 + 'px';
-            this.style.height = parseInt(defaultHeight / 10) * 10 + 'px';
-            e.preventDefault();
         },
+        // 拖拽函数松鼠标
         ondrop() {
+            this.isDragover = false;
             let widgetKey = 'widget_' + parseInt(Math.random() * 100000);
             this.fileData.widget.push({
                 id: widgetKey,
-                style: cloneUtils.deep(this.style)
+                style: cloneUtils.deep(this.seatStyle)
             });
             this.$nextTick(() => {
+                // 出发填充widget内容事件
                 this.$emit('addWidgetContent', widgetKey);
             });
         },
-        moveStart(id) {
-            this.moveId = id;
-        },
+        // 拖拽widge尺寸或大小
         mousemove(e) {
+            let widget = this.fileData.widget.find(item => {
+                return item.id === (this.moveId || this.sizeId);
+            });
+            this.isDragover = true;
             if (this.moveId !== null) {
-                let widget = this.fileData.widget.find(item => {
-                    return item.id === this.moveId;
-                });
-                if(widget) {
-                    this.$set(widget, 'style', Object.assign({}, widget.style, {
-                        left: parseInt(e.offsetX / 10) * 10 + 'px',
-                        top: parseInt(e.offsetY / 10) * 10 + 'px'
-                    }));
-                }
+                this.seatStyle.left = parseInt(Math.max(e.offsetX, 10) / 10) * 10 + 'px';
+                this.seatStyle.width = parseInt(parseInt(widget.style.width) / 10) * 10 + 'px';
+                this.seatStyle.top = parseInt(Math.max(e.offsetY, 10) / 10) * 10 + 'px';
+                this.seatStyle.height = parseInt(parseInt(widget.style.height) / 10) * 10 + 'px';
             } else if (this.sizeId !== null) {
-                let widget = this.fileData.widget.find(item => {
-                    return item.id === this.sizeId;
-                });
-                if(widget) {
-                    this.$set(widget, 'style', Object.assign({}, widget.style, {
-                        width: parseInt(e.offsetX / 10) * 10 - parseInt(widget.style.left) + 'px',
-                        height: parseInt(e.offsetY / 10) * 10 - parseInt(widget.style.top) + 'px'
-                    }));
-                }
+                this.seatStyle.left = widget.style.left;
+                this.seatStyle.width = parseInt(e.offsetX / 10) * 10 - parseInt(widget.style.left) + 'px';
+                this.seatStyle.top = widget.style.top;
+                this.seatStyle.height = parseInt(e.offsetY / 10) * 10 - parseInt(widget.style.top) + 'px';
             }
+            this.initDashboardSize();
         },
+        // 拖拽widge尺寸或大小结束
         mouseup() {
+            let widget = this.fileData.widget.find(item => {
+                return item.id === (this.moveId || this.sizeId);
+            });
+            if (widget) {
+                this.$set(widget, 'style', Object.assign({}, this.seatStyle));
+            }
+            this.isDragover = false;
             this.moveId = null;
             this.sizeId = null;
         },
-        ddd() {
-            // // this.$emit('eval', "$a711 = INPUT('string','10')");
-            // this.$emit('saveVal', '$a711', "INPUT('string', '10')");
-            // this.fileData.widget.push({
-            //     data: '$a711',
-            //     style: cloneUtils.deep({
-            //         left: 200
-            //     })
-            // });
+        // 重新计算dashboard大小
+        initDashboardSize() {
+            let maxWidth = 0;
+            let maxHeight = 0;
+
+            function getItemSize(item) {
+                return [parseInt(item.style.left) + parseInt(item.style.width), parseInt(item.style.top) + parseInt(item.style.height)];
+            }
+
+            this.fileData.widget.forEach(item => {
+                let temp = getItemSize(item);
+                maxWidth = Math.max(temp[0], maxWidth);
+                maxHeight = Math.max(temp[1], maxHeight);
+            });
+            maxWidth = Math.max(parseInt(this.seatStyle.left) + parseInt(this.seatStyle.width), maxWidth);
+            maxHeight = Math.max(parseInt(this.seatStyle.top) + parseInt(this.seatStyle.height), maxHeight);
+            this.appMinWidth = maxWidth;
+            this.appMinHeight = maxHeight;
         }
     }
 }
@@ -133,15 +135,16 @@ export default {
     .droging-seat {
         position: absolute;
         z-index: 9999999;
-        min-width: 100px;
-        min-height: 100px;
-        background-color: rgba(255, 0, 0, 0.41);
+        min-width: 10px;
+        min-height: 10px;
+        background-color: rgba(186, 255, 56, 0.41);
         pointer-events: none
     }
 
     .widget_content {
-        position: relative;
-        border: solid 1px #404040;
+        position: absolute;
+        border: solid 1px #5d5d5d;
+        box-shadow: 0 0 8px -2px #d0d0d0;
         border-radius: 5px;
         .drag_tip {
             position: absolute;
@@ -199,7 +202,7 @@ export default {
             }
         }
     }
-    .move {
+    .move_back {
         position: absolute;
         top: 0;
         left: 0;

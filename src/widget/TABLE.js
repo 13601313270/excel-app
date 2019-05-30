@@ -37,7 +37,7 @@ class TABLE extends FuncObj {
         }
         model = model.value;
         if(model === '') {
-            handle(false);
+            // handle(false);
             return;
         }
         this.model.groupColumn = model.groupColumn;

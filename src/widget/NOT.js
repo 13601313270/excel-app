@@ -28,7 +28,7 @@ __allMatch__.push({
     props: [{
         name: 'value',
         title: '比较项',
-        dataType: 'bool'
+        dataType: 'boolean'
     }],
-    returnType: 'bool'
+    returnType: 'boolean'
 });

@@ -30,5 +30,5 @@ __allMatch__.push({
         title: '判断值',
         dataType: ''
     }],
-    returnType: 'bool'
+    returnType: 'boolean'
 });

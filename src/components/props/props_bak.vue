@@ -310,7 +310,7 @@ export default {
                 return 0;
             } else if(type === 'string') {
                 return '';
-            } else if(type === 'bool') {
+            } else if(type === 'boolean') {
                 return true;
             } else if(type === 'dict') {
                 return {
@@ -349,7 +349,7 @@ export default {
                 this.innerOption.props.push(1);
             } else if(dataTypeNew === 'string') {
                 this.innerOption.props.push('');
-            } else if(dataTypeNew === 'bool') {
+            } else if(dataTypeNew === 'boolean') {
                 this.innerOption.props.push(true);
             } else if(dataTypeNew === 'array') {
                 this.innerOption.props.push([]);
@@ -373,7 +373,7 @@ export default {
                                     replace = true;
                                 }
                             } else if(this.innerOption.props[key] instanceof Array) {
-                                if(!dataType.split(',').includes('bool')) {
+                                if(!dataType.split(',').includes('boolean')) {
                                     replace = true;
                                 }
                             }
@@ -382,7 +382,7 @@ export default {
                                     this.innerOption.props[key] = 1;
                                 } else if(dataType.split(',').includes('string')) {
                                     this.innerOption.props[key] = '';
-                                } else if(dataType.split(',').includes('bool')) {
+                                } else if(dataType.split(',').includes('boolean')) {
                                     this.innerOption.props[key] = true;
                                 } else if(dataType.split(',').includes('array')) {
                                     this.innerOption.props[key] = [];

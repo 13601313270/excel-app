@@ -12,7 +12,7 @@
             <tbody>
             <tr v-for="(item,key) in datas"
                 v-if="item!==undefined && item.type!=='relationalModel'"
-                @mouseover="hover(key,item)"
+                @mouseover="hover(key)"
                 @mouseout="leave(key)">
                 <td v-html="key"></td>
                 <td v-html="getCodeByVal(item)"></td>
@@ -26,8 +26,8 @@
                 </td>
                 <td class="tool">
                     <ui-button size="mini" @click="change(key)">修改</ui-button>
-                    <ui-button size="mini" v-if="isCanDelete(key,item)===true" @click="deleteItem(key)">删除</ui-button>
-                    <span v-else v-html="isCanDelete(key,item)"></span>
+                    <ui-button size="mini" v-if="varUseState(key)===false" @click="deleteItem(key)">删除</ui-button>
+                    <span v-else v-html="varUseState(key)"></span>
                 </td>
             </tr>
             </tbody>
@@ -39,6 +39,7 @@ import AllVarClass from '../observer/allVar.js';
 import getStrByObj from '../languageParser/getStrByObj';
 import { mapGetters } from 'vuex';
 import allMatch from '../languageParser/allMatch';
+import Obj from '../observer/obj';
 export default {
     props: {
         useCreateVar: {
@@ -58,7 +59,12 @@ export default {
         AllVarClass.on('valChange', function(key, val) {
             if(val.value_ !== undefined) {
                 let matchItem = allMatch.find(item => {
-                    return item.match.test(val.value_.name);
+                    if (val.value_ instanceof Obj) {
+                        return item.match.test(val.value_.name);
+                    } else {
+                        // let type = item.type;
+                        return typeof val.value_ === item.type;
+                    }
                 });
                 if(matchItem) {
                     if(matchItem.returnType !== 'relationalModel') {
@@ -75,32 +81,22 @@ export default {
         change(key) {
             this.$emit('change', key);
         },
-        hover(key, item) {
+        hover(key) {
             this.$emit('hover', key, 'info');
         },
-        isCanDelete(key, item) {
+        varUseState(key) {
             // item.dep.sentEvent 指向 变量对应的计算公式的Dep
             // 所有VarSentDep需要通知的对象
-            /*
-             console.log('**********');
-             console.log(this.useCreateVar, key);
-             console.log(this.useCreateVar.has(key));
-             */
-            if(!this.useCreateVar.includes(key)) {
+            if (!this.useCreateVar.includes(key)) {
                 return '系统变量';
             }
-            // console.log('---重新计算---');
-            if(Object.values(this.widgetIdToVar).includes(key)) {
+            if (Object.values(this.widgetIdToVar).includes(key)) {
                 return '已渲染';
             }
-            if(item && item.dep.sentEvent.length > 0) {
-                let VarSentDep = item.dep.sentEvent[0].sentEvent.filter(item => {
-                    return !(item instanceof AllVarClass.constructor);
-                });
-                return VarSentDep.length === 0;
-            } else {
-                return '被使用';
-            }
+            let hasUsed = AllVarClass.getVar(key).dep.sentEvent.findIndex(item => {
+                return !(item instanceof AllVarClass.constructor);
+            }) > -1;
+            return hasUsed ? '被使用' : false;
         },
         deleteItem(key) {
             AllVarClass.deleteVar(key);
