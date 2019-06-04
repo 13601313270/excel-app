@@ -188,7 +188,7 @@ import word from './dashboard/word.vue';
 import excel from './dashboard/excel.vue';
 import freePanel from './dashboard/freePanel.vue';
 import ppt from './dashboard/ppt.vue';
-import useFile from './dashboard/useFile.vue';
+// import useFile from './dashboard/useFile.vue';
 
 import { mapActions, mapGetters } from 'vuex';
 
@@ -758,7 +758,7 @@ export default {
         'excel': excel,
         'free-panel': freePanel,
         'ppt': ppt,
-        'useFile': useFile,
+        'useFile': () => import(/* webpackChunkName: "login" */ './dashboard/useFile.vue'),
         'dynamic-vue': dynamicVueObject,
         connectionVue
     }

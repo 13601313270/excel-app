@@ -52,7 +52,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('main', ['widgetIdToVar'])
+        ...mapGetters('main', ['widgetIdToVar', 'varHighlight'])
     },
     mounted() {
         let self = this;
@@ -105,6 +105,12 @@ export default {
         },
         leave(key) {
             this.$emit('hover', key, 'none');
+        },
+        getHighlightState(varName) {
+            if (this.varHighlight.key === varName) {
+                return this.varHighlight.info;
+            }
+            return 'none';
         }
     }
 }

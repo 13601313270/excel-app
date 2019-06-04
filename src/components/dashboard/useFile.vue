@@ -137,8 +137,12 @@ export default {
         z-index: 9999999;
         min-width: 10px;
         min-height: 10px;
-        background-color: rgba(186, 255, 56, 0.41);
-        pointer-events: none
+        background-color: rgba(75, 129, 148, 0.25);
+        pointer-events: none;
+        border: dashed 1px #4a6679;
+        -webkit-box-shadow: 0 5px 5px 3px #bfbfbf;
+        box-shadow: 0 5px 5px 0px #50505069;
+        border-radius: 4px;
     }
 
     .widget_content {

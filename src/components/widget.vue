@@ -16,7 +16,7 @@
         </div>
         <div
             class="widget_content"
-            :class="{warning:getHighlightState(varName)==='info'}"
+            :class="{warning:getHighlightState==='info'}"
             ref="content"
             @dragover="allowDrop($event)"
             @drop.stop="ondrop($event)"
@@ -89,12 +89,6 @@ export default {
     },
     methods: {
         ...mapActions('main', ['setDragDomFunc', 'deleteWidgetIdToVar']),
-        getHighlightState(type) {
-            if(this.varHighlight.key === type) {
-                return this.varHighlight.info;
-            }
-            return 'none';
-        },
         allowDrop(e) {
             e.preventDefault();
         },
@@ -176,7 +170,13 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing'])
+        ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing']),
+        getHighlightState() {
+            if (this.varHighlight.key === this.varName) {
+                return this.varHighlight.info;
+            }
+            return 'none';
+        }
     },
     components: {
         appButton, dropList, tempVueClass
@@ -196,7 +196,8 @@ export default {
     .widget {
         position: relative;
         .warning {
-            background-color: rgba(193, 42, 12, 0.71);
+            background-color: rgb(241, 124, 101);
+            box-shadow: inset 0 0 3px 1px #ffffff;
         }
 
         .widget_content {
