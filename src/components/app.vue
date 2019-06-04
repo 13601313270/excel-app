@@ -35,12 +35,9 @@
             </div>
             <div id="app_content" :class="{edit:isEditing}">
                 <div>
-                    <word v-if="appType==='word'" :dragDomFunc="dragDomFunc"></word>
-                    <excel v-else-if="appType==='excel'" :dragDomFunc="dragDomFunc"></excel>
-                    <free-panel v-else-if="appType==='freePanel'" :dragDomFunc="dragDomFunc"></free-panel>
-                    <ppt v-else-if="appType==='ppt'" :dragDomFunc="dragDomFunc"></ppt>
-                    <use-file
-                        v-else-if="appType===1 && fileData.file_data"
+                    <div
+                        v-if="appType && fileData.file_data"
+                        :is="appType"
                         :dragDomFunc="dragDomFunc"
                         :isFullScreen="isFullScreen"
                         :dragDomFuncInfo="getWidgetInfoByName(dragDomFunc)"
@@ -51,8 +48,7 @@
                         @eval="eval"
                         @saveVal="saveVal"
                         @addWidgetContent="addWidgetContent"
-                    ></use-file>
-                    <component v-else-if="appType==='test'" :is="currentView" style="wifcondth: 100%;"></component>
+                    ></div>
                 </div>
             </div>
             <div
@@ -171,7 +167,6 @@ import '../widget/relationalModelDelete';
 import relationalModel from '../widget/relationalModel';
 
 import allVar from '../observer/allVar';
-import dashboard from './dashboard';
 import allPageVars from './allVars.vue';
 import propsCom from './props/props.vue';
 import Obj from '../observer/obj';
@@ -184,11 +179,7 @@ import { createCodeText } from './props/createCodeText';
 import ajax from '../api/ajax';
 import widgetEvent from './widgetChange';
 
-import word from './dashboard/word.vue';
-import excel from './dashboard/excel.vue';
-import freePanel from './dashboard/freePanel.vue';
-import ppt from './dashboard/ppt.vue';
-// import useFile from './dashboard/useFile.vue';
+import dashboardList from './dashboardList';
 
 import { mapActions, mapGetters } from 'vuex';
 
@@ -199,6 +190,7 @@ import dynamicVueObject from './dynamicVueObject/dynamicVueObject.vue';
 import UiButton from './ui/button';
 import axios from 'axios';
 import dynamicForm from './dynamicForm/form';
+import { prompt } from './alert/prompt';
 import UiInput from './ui/input';
 axios.defaults.withCredentials = true;
 Vue.component(widget.name, widget);
@@ -213,7 +205,6 @@ export default {
                     title: '保存测试'
                 }
             ],
-            currentView: dashboard(),
             leftToolSelect: '',
             leftToolInfo: {
                 widget: {
@@ -267,6 +258,7 @@ export default {
                 this.setDragDomFunc(null);
             });
         },
+        // 根据一个函数，生成这个函数的默认字符串，（填充默认参数）
         getCodeByMatchItem(item) {
             let code = item.name + '(';
             let propsArr = [];
@@ -335,9 +327,13 @@ export default {
                 return item.name === name;
             });
         },
-        addData(varName, widgetId, dom, vueDom) {
-            let dragDomFunc = this.dragDomFunc;
-            if(dragDomFunc === null) {
+        // 弹出修改某个变量的弹窗,changeDragDomFunc要修改成的变量
+        addData(varName, changeDragDomFunc) {
+            let dragDomFunc;
+            if (changeDragDomFunc) {
+                dragDomFunc = changeDragDomFunc;
+            }
+            if(dragDomFunc === undefined) {
                 dragDomFunc = 'INPUT';
             }
             let matchFunction = allMatch.find(item => {
@@ -349,7 +345,7 @@ export default {
                 let insertObj = getEvalObj(1, code);
                 allVar.setVar(varName, insertObj[0]);
                 // if (widgetId !== undefined || dom !== undefined || vueDom !== undefined) {
-                //     this.bindVar(varName, widgetId, dom, vueDom);
+                //     this.bindVar(varName, widgetId, vueDom);
                 // }
                 // 弹出编辑变量的窗口
                 this.editVar(varName);
@@ -361,13 +357,13 @@ export default {
             this.save();
         },
         // 给某个widget绑定数据
-        bindVar(varName, widgetId, dom, vueDom) {
+        bindVar(varName, widgetId, widget) {
             let newVar = allVar.getVar(varName);
-            vueDom.setInnerVueObj(newVar.value_);
+            widget.setInnerVueObj(newVar.value_);
             if (newVar.value_.dom instanceof Array) {
             } else {
                 // 用来设置变量映射dom
-                this.varToWidget[varName] = vueDom;
+                this.varToWidget[varName] = widget;
             }
             // 用来映射widgetId对应存放的变量
             this.widgetIdToVar[widgetId] = varName;
@@ -386,23 +382,20 @@ export default {
                 this.save();
             }
         },
-        // 通过变量对象，修改生成的code
+        // 通过变量对象，修改生成的code，并且修改对应的widget内容
         codeUpdate(editObj) {
             let editVarName = editObj.name;
             editObj.code = createCodeText(editObj.obj);
             if(editVarName !== undefined) {
                 let updateVar = allVar.getVar(editVarName);
-                let widgePanel = this.varToWidget[editVarName];
-                if(widgePanel !== undefined) {
-                    widgePanel.innerHTML = '';
-                }
-                // allVar.getVar(editVarName).value_.dom.remove();
                 let insertObj = getEvalObj(1, editObj.code);
                 allVar.setVar(editVarName, insertObj[0]);
-                let value_ = updateVar.value_;
+                let widgePanel = this.varToWidget[editVarName];
                 if(widgePanel !== undefined) {
+                    let value_ = updateVar.value_;
                     if(value_ instanceof Obj) {
                         if(value_.dom) {
+                            widgePanel.innerHTML = '';
                             widgePanel.setInnerVueObj(value_);
                         } else {
                             widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
@@ -421,18 +414,9 @@ export default {
         allowDrop(e) {
             e.preventDefault();
         },
-        ondrop(e) {
-            Array.from(e.dataTransfer.files).forEach((item) => {
-                let reader = new FileReader();
-                reader.readAsText(item);
-                reader.onload = function() {
-                    let newDash = dashboard();
-                    newDash.template = reader.result.match(/<body>([\S|\s]+)<\/body>/)[1];
-                    this.currentView = newDash;
-                }
-            });
-        },
+        // 修改代码输入框的内容
         changeCode(obj, code) {
+            // 修改完的代码，生成obj，再生成回来，可以保证上面的可视化编辑也被修改，而且再次生成的code，格式会更好
             let newObj = getOptionByObj(getEvalObj(1, code)[0]);
             // MIN(1,MIN(2,4),1)
             // 不能直接覆盖obj.obj，因为js是引用赋值
@@ -455,8 +439,9 @@ export default {
             if(!this.useCreateVar.includes(varName)) {
                 this.useCreateVar.push(varName);
             }
-            // this.bindVar(varName, widgetId, dom, vueDom);
+            // this.bindVar(varName, widgetId, vueDom);
         },
+        // 点击修改某个变量
         editVar(key) {
             // Key，被修改的变量名称
             let Var = allVar.getVar(key);
@@ -492,6 +477,21 @@ export default {
             this.varHighlightSet({key, 'info': messageType});
         },
         addWidgetContent(widgetKey) {
+            // if (this.isEditing) {
+            //     prompt('请输入名称', this.dragDomFunc + '3').then((varName) => {
+            //         if(varName !== null && varName !== '') {
+            //             this.setDragDomFunc(this.dragDomFunc);
+            //             varName = '$' + varName.replace(/^\$/, '');
+            //             this.varName = varName;
+            //             this.addData(varName, this.dragDomFunc);
+            //             // widgetEvent.emit('bindVar', varName, this.item.id, this);
+            //              widgetEvent.on('bindVar', (varName, widgetId, vueDom) => {
+            //                  this.bindVar(varName, widgetKey, vueDom);
+            //                  this.save();
+            //              });
+            //         }
+            //     });
+            // }
             widgetEvent.emit('addWidgetContent', widgetKey);
         },
         setWidgetStyle(id, style) {
@@ -670,7 +670,13 @@ export default {
                 id: this.$route.params.fileId
             }
         }).then((data) => {
-            this.appType = parseInt(this.$route.params.appType);
+            console.log(this.$route.params);
+            let appType = dashboardList.find(item => {
+                return item.id === parseInt(this.$route.params.appType);
+            });
+            appType.components().then(app => {
+                this.appType = app.default;
+            });
             this.selectFile(data);
         });
         // let fileContent = `$a1 = INPUT('number',9999)`;
@@ -700,23 +706,15 @@ export default {
 </div>`;
 
         getEvalObj(1, fileContent);
-        let newDash = dashboard();
         this.html = this.html.replace(/<widget([ |>])/g, function(a, b) {
             return '<widget random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
         });
-        newDash.template = this.html;
-        this.currentView = newDash;
 
-        widgetEvent.on('insertByCode', (varName, widgetId, dom, code, vueDom) => {
-            let insertObj = getEvalObj(1, code);
-            allVar.setVar(varName, insertObj[0]);
-            this.bindVar(varName, widgetId, dom, vueDom);
-        });
         widgetEvent.on('init', this.widgetInit);
         widgetEvent.on('change', this.addData);
         widgetEvent.on('editVar', this.editVar);
-        widgetEvent.on('bindVar', (varName, widgetId, dom, vueDom) => {
-            this.bindVar(varName, widgetId, dom, vueDom);
+        widgetEvent.on('bindVar', (varName, widgetId, vueDom) => {
+            this.bindVar(varName, widgetId, vueDom);
             this.save();
         });
         widgetEvent.on('clearVar', this.clearVar);
@@ -754,11 +752,6 @@ export default {
         'datas-vue': datasVue,
         'header-nav': headerNav,
         'tools_widget': toolsWidget,
-        'word': word,
-        'excel': excel,
-        'free-panel': freePanel,
-        'ppt': ppt,
-        'useFile': () => import(/* webpackChunkName: "login" */ './dashboard/useFile.vue'),
         'dynamic-vue': dynamicVueObject,
         connectionVue
     }

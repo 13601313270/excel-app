@@ -4,21 +4,6 @@
         <div class="app_list">
             <h1>数据软件列表</h1>
             <div class="list">
-                <div @click="chooseApp('word')">
-                    <div class="panel-heading">文稿</div>
-                </div>
-                <div @click="chooseApp('excel')">
-                    <div class="panel-heading">表格</div>
-                </div>
-                <div @click="chooseApp('freePanel')">
-                    <div class="panel-heading">黑板</div>
-                </div>
-                <div @click="chooseApp('ppt')">
-                    <div class="panel-heading">演示文稿</div>
-                </div>
-                <div @click="chooseApp('test')">
-                    <div class="panel-heading">测试</div>
-                </div>
                 <div v-for="item in dashboardTemplate" @click="chooseApp(item.id)">
                     <div class="panel-heading" v-html="item.title"></div>
                 </div>
@@ -50,17 +35,12 @@
 import headerNav from './head.vue';
 import ajax from '../api/ajax';
 import { mapActions } from 'vuex';
+import dashboardList from './dashboardList';
 
 export default {
     data() {
         return {
-            dashboardTemplate: [
-                {
-                    id: 1,
-                    name: 'useFile',
-                    title: '保存测试'
-                }
-            ],
+            dashboardTemplate: Array.from(dashboardList),
             connections: [],
             // 是否弹出选择文件界面
             isChooseFile: false,

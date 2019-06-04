@@ -45,7 +45,6 @@ class __runObj__ extends Obj {
             }
         } else {
             try {
-                // console.log(runParams);
                 return eval(runParams.join(''));
             } catch (e) {
                 return '';

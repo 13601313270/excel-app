@@ -46,7 +46,7 @@
                     <tr v-for="i in tableObj.hang" :hang="i">
                         <td v-for="j in tableObj.lie"
                             @click.stop="selectTd_temp(i,j)"
-                            @dblclick.stop="dbselectTd_temp(i,j,$event)"
+                            @dblclick.stop="dbselectTd(i,j,$event)"
                             :key="(i)+','+(j)"
                             :hang="i"
                             :lie="j"
@@ -58,8 +58,7 @@
                             <widget
                                 v-if="hasWidget(i,j)"
                                 :data="hasWidget(i,j).data"
-                                :random-id="hasWidget(i,j).randomId"
-                                :ref="'$' + getCellTemp2(i, j)"></widget>
+                            ></widget>
                         </td>
                     </tr>
                     </tbody>
@@ -142,7 +141,6 @@ export default {
         }).then((data) => {
             console.log(data.data[0].tableValue);
             for (let key in data.data[0].tableValue) {
-                let randomId = 'r' + parseInt(Math.random() * 1000000);
                 let varName = '$' + key;
                 let pos = getCellTemp(key);
                 if(pos[1] >= self.tableObj.lie) {
@@ -160,16 +158,10 @@ export default {
                 this.data.push({
                     type: 'widget',
                     data: varName,
-                    randomId: randomId,
                     code: code
                 });
-                this.$nextTick(() => {
-                    this.data.forEach(item => {
-                        widgetEvent.emit('insertByCode', item.data, item.randomId, this.$refs[item.data][0].$refs.content, item.code, this);
-                    });
-                });
+                this.$emit('eval', varName + ` = ` + code);
             }
-            console.log(data.data[0]);
         });
     },
     methods: {
@@ -180,7 +172,7 @@ export default {
         },
         selectTd_temp() {
         },
-        dbselectTd_temp(hang, lie) {
+        dbselectTd(hang, lie) {
             let randomId = 'r' + parseInt(Math.random() * 1000000);
             let varName = '$' + getCellTemp2(hang, lie);
             if(this.data.find(item => { return item.data === varName; })) {
@@ -193,8 +185,7 @@ export default {
                 });
                 if(varName !== null) {
                     this.$nextTick(() => {
-                        console.log(this.$refs[varName][0].$refs.content);
-                        widgetEvent.emit('change', varName, randomId, this.$refs[varName][0].$refs.content, this.$refs[varName][0]);
+                        widgetEvent.emit('change', varName);
                     });
                 }
             }

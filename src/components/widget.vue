@@ -99,9 +99,11 @@ export default {
                         this.setDragDomFunc(dragDomFunc);
                         varName = '$' + varName.replace(/^\$/, '');
                         this.varName = varName;
-                        widgetEvent.emit('change', varName, this.item.id, this.$refs.content, this);
-                        widgetEvent.emit('bindVar', varName, this.item.id, this.$refs.content, this);
-                        this.$emit('change', varName, this.item.id, this.$refs.content);
+                        // 创建变量
+                        widgetEvent.emit('change', varName, dragDomFunc);
+                        // 绑定变量到本widget
+                        widgetEvent.emit('bindVar', varName, this.item.id, this);
+                        // this.$emit('change', varName, this.item.id, this.$refs.content);
                     }
                 });
             }
@@ -150,7 +152,7 @@ export default {
                 widgetEvent.emit('clearVar', key, this.item.id);
                 this.$emit('clearVar', key, this.item.id);
             } else {
-                widgetEvent.emit('bindVar', key, this.item.id, this.$refs.content, this);
+                widgetEvent.emit('bindVar', key, this.item.id, this);
                 this.$emit('bindVar', key, this.item.id, this.$refs.content, this);
             }
         },

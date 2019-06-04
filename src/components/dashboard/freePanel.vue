@@ -71,7 +71,7 @@ export default {
                 });
                 if(varName !== null) {
                     this.$nextTick(() => {
-                        widgetEvent.emit('change', varName, randomId, this.$refs[randomId][0].$refs.content);
+                        widgetEvent.emit('change', varName);
                     });
                 }
             }

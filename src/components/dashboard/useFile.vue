@@ -74,7 +74,7 @@ export default {
                 style: cloneUtils.deep(this.seatStyle)
             });
             this.$nextTick(() => {
-                // 出发填充widget内容事件
+                // 触发填充widget内容事件
                 this.$emit('addWidgetContent', widgetKey);
             });
         },

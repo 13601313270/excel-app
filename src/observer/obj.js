@@ -19,6 +19,8 @@ class obj {
 
     render() {
     }
+    reRender() {
+    }
 
     destory() {
         this.dep.destory();

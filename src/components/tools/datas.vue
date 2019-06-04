@@ -143,9 +143,8 @@ export default {
             prompt('请输入数据变量名称', 'data1').then((varName) => {
                 if(varName !== null) {
                     this.setDragDomFunc('RELATIONAL_MODEL');
-                    // this.setDragDomFunc('MIN');
                     varName = '$' + varName.replace(/^\$/, '');
-                    widgetEvent.emit('change', varName);
+                    widgetEvent.emit('change', varName, 'RELATIONAL_MODEL');
                 }
             });
         },
