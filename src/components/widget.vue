@@ -1,9 +1,9 @@
 <template>
     <div class="widget">
         <div class="head_tool" v-if="isEditing">
-            <template v-if="varName!==undefined && varName!==null">
+            <template v-if="bindVar!==null">
                 <app-button size="mini" @click="editVar">编辑</app-button>
-                <app-button size="mini" @click="chooseExistItem(null)">清空</app-button>
+                <app-button size="mini" @click="clearVar(null)">清空</app-button>
             </template>
             <template v-else>
                 <app-button size="mini" @click="clickAdd">新增</app-button>
@@ -22,7 +22,10 @@
             @drop.stop="ondrop($event)"
             @click="clickAdd"
         >
-            <tempVueClass v-if="vueShow" :initProps="vueShow.dom"></tempVueClass>
+            <template v-if="bindVar">
+                <tempVueClass v-if="bindVar.value_.dom" :initProps="bindVar.value_.dom"></tempVueClass>
+                <div v-else v-html="bindVar.value_"></div>
+            </template>
         </div>
     </div>
 </template>
@@ -67,20 +70,18 @@ export default {
             key: this.$vnode.key,
             isChooseExist: false,
             allVars: [],
-            vueShow: null
+            bindVar: null
         };
     },
     mounted() {
-        if (this.data === undefined) {
-            this.varName = this.widgetIdToVar[this.key];
-        }
-        widgetEvent.emit('init', this.varName, this);
+        let varName = this.data || this.widgetIdToVar[this.key];
+        widgetEvent.emit('init', varName, this);
 
-        let initVar = allVar.getVar(this.varName);
+        let initVar = allVar.getVar(varName);
         if (initVar) {
-            this.setInnerVueObj(initVar.value_);
+            this.setBindVar(initVar);
         }
-        this.$emit('init', this.varName, this); // 暴露给开发者的，系统没有用到
+        // this.$emit('init', varName, this); // 暴露给开发者的，系统没有用到
         widgetEvent.on('addWidgetContent', (key) => {
             if (this.key === key) {
                 this.ondrop();
@@ -98,7 +99,6 @@ export default {
                     if(varName !== null && varName !== '') {
                         this.setDragDomFunc(dragDomFunc);
                         varName = '$' + varName.replace(/^\$/, '');
-                        this.varName = varName;
                         // 创建变量
                         widgetEvent.emit('change', varName, dragDomFunc);
                         // 绑定变量到本widget
@@ -116,13 +116,12 @@ export default {
             }
         },
         clickAdd() {
-            if(this.varName === undefined || this.varName === null) {
-                console.log(this.varName);
+            if(this.bindVar === null) {
                 this.setFunction('TEXT');
             }
         },
         editVar() {
-            widgetEvent.emit('editVar', this.varName); // this.varName被修改的变量名称
+            widgetEvent.emit('editVar', this.bindVar.name); // 被修改的变量名称
         },
         chooseExist() {
             this.isChooseExist = !this.isChooseExist;
@@ -133,7 +132,7 @@ export default {
                     let val = allData_[key];
                     if(val.value_ !== undefined) {
                         let matchItem = allMatch.find(item => {
-                            return item.match.test(val.value_.name);
+                            return item.match.test(val.value_.name) || item.match.test(val.value_);
                         });
                         if(matchItem) {
                             if(matchItem.returnType !== 'relationalModel') {
@@ -146,23 +145,26 @@ export default {
             }
         },
         chooseExistItem(key) {
-            this.varName = key;
-            this.vueShow = null;
-            if(key === null) {
-                widgetEvent.emit('clearVar', key, this.item.id);
-                this.$emit('clearVar', key, this.item.id);
-            } else {
-                widgetEvent.emit('bindVar', key, this.item.id, this);
-                this.$emit('bindVar', key, this.item.id, this.$refs.content, this);
-            }
+            this.bindVar = null;
+            widgetEvent.emit('bindVar', key, this.item.id, this);
+            this.$emit('bindVar', key, this.item.id, this.$refs.content, this);
+        },
+        clearVar(key) {
+            this.bindVar = null;
+            widgetEvent.emit('clearVar', key, this.item.id);
+            this.$emit('clearVar', key, this.item.id);
         },
         deleteWidget() {
             widgetEvent.emit('destroy', this.item.id);
         },
-        setInnerVueObj(funcObj) {
-            this.vueShow = funcObj;
+        // 绑定变量
+        setBindVar(VarObj) {
+            this.bindVar = VarObj;
             this.$nextTick(() => {
-                this.vueShow.reRender();
+                // 有一些变量绑定的是数字，字符串等基础类型，没有reRender
+                if (this.bindVar.value_.reRender) {
+                    this.bindVar.value_.reRender();
+                }
             });
         }
     },
@@ -174,7 +176,7 @@ export default {
     computed: {
         ...mapGetters('main', ['varHighlight', 'dragDomFunc', 'widgetIdToVar', 'isEditing']),
         getHighlightState() {
-            if (this.varHighlight.key === this.varName) {
+            if (this.bindVar && this.varHighlight.key === this.bindVar.name) {
                 return this.varHighlight.info;
             }
             return 'none';
@@ -186,8 +188,9 @@ export default {
     watch: {
         // 需要保存的样式
         'item.style'(val) {
-            if (this.vueShow) {
-                this.vueShow.reRender();
+            if (this.bindVar.value_ && this.bindVar.value_.reRender) {
+                // 有一些变量绑定的是数字，字符串等基础类型，没有reRender
+                this.bindVar.value_.reRender();
             }
             widgetEvent.emit('setStyle', this.item.id, val);
         }

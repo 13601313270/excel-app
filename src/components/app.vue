@@ -359,7 +359,7 @@ export default {
         // 给某个widget绑定数据
         bindVar(varName, widgetId, widget) {
             let newVar = allVar.getVar(varName);
-            widget.setInnerVueObj(newVar.value_);
+            widget.setBindVar(newVar);
             if (newVar.value_.dom instanceof Array) {
             } else {
                 // 用来设置变量映射dom
@@ -396,7 +396,7 @@ export default {
                     if(value_ instanceof Obj) {
                         if(value_.dom) {
                             widgePanel.innerHTML = '';
-                            widgePanel.setInnerVueObj(value_);
+                            widgePanel.setBindVar(updateVar);
                         } else {
                             widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
                         }
