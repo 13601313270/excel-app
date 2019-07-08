@@ -1,7 +1,7 @@
 <template>
     <div class="button_content" :class="button_class" @click="$emit('click')">
         <div class="icon" v-html="icon" v-if="icon"></div>
-        <div><slot></slot></div>
+        <div class="inner"><slot></slot></div>
     </div>
 </template>
 <script>
@@ -42,6 +42,9 @@
         justify-content: center;
         flex-direction: row;
         align-items: center;
+        .inner {
+            height: 100%;
+        }
 
 
         .icon {

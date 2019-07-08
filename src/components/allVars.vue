@@ -44,6 +44,9 @@ export default {
     props: {
         useCreateVar: {
             type: Array
+        },
+        varToWidget: {
+            type: Object
         }
     },
     data() {
@@ -52,7 +55,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('main', ['widgetIdToVar', 'varHighlight'])
+        ...mapGetters('main', ['varHighlight'])
     },
     mounted() {
         let self = this;
@@ -87,11 +90,11 @@ export default {
         varUseState(key) {
             // item.dep.sentEvent 指向 变量对应的计算公式的Dep
             // 所有VarSentDep需要通知的对象
+            if (Object.keys(this.varToWidget).includes(key)) {
+                return '已渲染';
+            }
             if (!this.useCreateVar.includes(key)) {
                 return '系统变量';
-            }
-            if (Object.values(this.widgetIdToVar).includes(key)) {
-                return '已渲染';
             }
             let hasUsed = AllVarClass.getVar(key).dep.sentEvent.findIndex(item => {
                 return !(item instanceof AllVarClass.constructor);

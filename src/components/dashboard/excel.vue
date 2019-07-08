@@ -72,7 +72,6 @@
 </template>
 <script>
 import widget from '../widget.vue';
-import widgetEvent from '../widgetChange';
 import ajax from '../../api/ajax';
 function getCellTemp(str) {
     try {
@@ -176,7 +175,7 @@ export default {
             let randomId = 'r' + parseInt(Math.random() * 1000000);
             let varName = '$' + getCellTemp2(hang, lie);
             if(this.data.find(item => { return item.data === varName; })) {
-                widgetEvent.emit('editVar', varName);
+                this.$emit('editVar', varName);
             } else {
                 this.data.push({
                     type: 'widget',
@@ -185,7 +184,7 @@ export default {
                 });
                 if(varName !== null) {
                     this.$nextTick(() => {
-                        widgetEvent.emit('change', varName);
+                        this.$emit('createVar', varName);
                     });
                 }
             }

@@ -60,7 +60,6 @@ import ptWindow from '../ui/window.vue';
 // import getEvalObj from '../../languageParser/evalObjAndStr';
 import popup from '../ui/popup.vue';
 import { mapActions } from 'vuex';
-import widgetEvent from '../widgetChange';
 import { prompt } from '../alert/prompt';
 import { alert } from '../alert/alert';
 import allMatch from '../../languageParser/allMatch';
@@ -144,7 +143,7 @@ export default {
                 if(varName !== null) {
                     this.setDragDomFunc('RELATIONAL_MODEL');
                     varName = '$' + varName.replace(/^\$/, '');
-                    widgetEvent.emit('change', varName, 'RELATIONAL_MODEL');
+                    this.$emit('createVar', varName, 'RELATIONAL_MODEL');
                 }
             });
         },

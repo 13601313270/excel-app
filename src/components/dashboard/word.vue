@@ -37,7 +37,6 @@
 </template>
 <script>
 import widget from '../widget.vue';
-import widgetEvent from '../widgetChange';
 export default {
     props: ['dragDomFunc'],
     data() {
@@ -159,7 +158,7 @@ export default {
             });
             if(varName !== null) {
                 this.$nextTick(() => {
-                    widgetEvent.emit('change', varName);
+                    this.$emit('createVar', varName);
                 });
             }
         },

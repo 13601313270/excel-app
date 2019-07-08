@@ -1,33 +1,42 @@
 <template>
     <div
-        @dragover.prevent.self="dragover"
-        @drop="ondrop"
-        @dragleave="isDragover = false"
-        :style="{width: (appMinWidth+20) + 'px',height: (appMinHeight+20) + 'px'}"
+            @dragover.prevent.self="dragover"
+            @drop="ondrop"
+            @dragleave="isDragover = false"
+            :style="{width: (appMinWidth+20) + 'px',height: (appMinHeight+20) + 'px'}"
     >
         <div>文件保存</div>
         <div :style="seatStyle" v-show="isDragover" class="droging-seat"></div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
         <widget data="$bbb" style="margin-left: 10px;"></widget>
-        <div class="widget_content" v-for="(item) in fileData.widget" :style="item.style">
-            <div class="drag_tip" v-if="isEditing" @mousedown.prevent="moveId = item.id">&#xe656;</div>
+        <div class="widget_content" v-for="(item,key) in fileData.widget" :style="item.style">
+            <div class="drag_tip" v-if="isEditing" @mousedown.prevent="moveId = item">&#xe656;</div>
             <widget
-                :key="item.id"
-                :data="item.data"
-                :item="item"
-                class="widget"
-                :class="{light:dragDomFunc}"
-            ></widget>
-            <div class="drag_size" v-if="isEditing" @mousedown="sizeId = item.id"></div>
+                    :key="item.id"
+                    :data="item.data"
+                    class="widget"
+                    :class="{light:dragDomFunc}"
+                    @bindVar="bindVar(item, ...arguments)"
+                    @clearVar="clearVar(item)"
+                    @destroy="destroyWidget(key)"/>
+            <div class="drag_size" v-if="isEditing" @mousedown="sizeId = item"></div>
         </div>
         <div v-if="moveId || sizeId" class="move_back" @mousemove="mousemove" @mouseup="mouseup"></div>
     </div>
 </template>
 <script>
+import {prompt} from '../alert/prompt';
 import cloneUtils from '../clone.utils';
+
 export default {
-    props: ['fileData', 'isEditing', 'dragDomFunc', 'dragDomFuncInfo', 'isFullScreen'],
+    props: {
+        fileData: Object,
+        isEditing: Boolean,
+        dragDomFunc: Function,
+        dragDomFuncInfo: Object,
+        isFullScreen: Boolean
+    },
     data() {
         return {
             // 拖拽占位尺寸
@@ -55,7 +64,7 @@ export default {
     methods: {
         // 拖拽函数过程中
         dragover(e) {
-            if (this.dragDomFuncInfo) {
+            if(this.dragDomFuncInfo) {
                 this.isDragover = true;
                 let defaultWidth = this.dragDomFuncInfo.defaultSize ? this.dragDomFuncInfo.defaultSize.width : 100;
                 let defaultHeight = this.dragDomFuncInfo.defaultSize ? this.dragDomFuncInfo.defaultSize.height : 100;
@@ -68,28 +77,31 @@ export default {
         // 拖拽函数松鼠标
         ondrop() {
             this.isDragover = false;
-            let widgetKey = 'widget_' + parseInt(Math.random() * 100000);
-            this.fileData.widget.push({
-                id: widgetKey,
-                style: cloneUtils.deep(this.seatStyle)
-            });
-            this.$nextTick(() => {
-                // 触发填充widget内容事件
-                this.$emit('addWidgetContent', widgetKey);
+            let dragDomFunc = this.dragDomFunc;
+            prompt('请输入名称', dragDomFunc + '7').then((varName) => {
+                if(varName !== null && varName !== '') {
+                    varName = '$' + varName.replace(/^\$/, '');
+                    // 创建变量
+                    this.$emit('createVar', varName, dragDomFunc);
+                    this.fileData.widget.push({
+                        data: varName,
+                        style: cloneUtils.deep(this.seatStyle)
+                    });
+                }
             });
         },
         // 拖拽widge尺寸或大小
         mousemove(e) {
             let widget = this.fileData.widget.find(item => {
-                return item.id === (this.moveId || this.sizeId);
+                return item === (this.moveId || this.sizeId);
             });
             this.isDragover = true;
-            if (this.moveId !== null) {
+            if(this.moveId !== null) {
                 this.seatStyle.left = parseInt(Math.max(e.offsetX, 10) / 10) * 10 + 'px';
                 this.seatStyle.width = parseInt(parseInt(widget.style.width) / 10) * 10 + 'px';
                 this.seatStyle.top = parseInt(Math.max(e.offsetY, 10) / 10) * 10 + 'px';
                 this.seatStyle.height = parseInt(parseInt(widget.style.height) / 10) * 10 + 'px';
-            } else if (this.sizeId !== null) {
+            } else if(this.sizeId !== null) {
                 this.seatStyle.left = widget.style.left;
                 this.seatStyle.width = parseInt(e.offsetX / 10) * 10 - parseInt(widget.style.left) + 'px';
                 this.seatStyle.top = widget.style.top;
@@ -100,9 +112,9 @@ export default {
         // 拖拽widge尺寸或大小结束
         mouseup() {
             let widget = this.fileData.widget.find(item => {
-                return item.id === (this.moveId || this.sizeId);
+                return item === (this.moveId || this.sizeId);
             });
-            if (widget) {
+            if(widget) {
                 this.$set(widget, 'style', Object.assign({}, this.seatStyle));
             }
             this.isDragover = false;
@@ -127,6 +139,15 @@ export default {
             maxHeight = Math.max(parseInt(this.seatStyle.top) + parseInt(this.seatStyle.height), maxHeight);
             this.appMinWidth = maxWidth;
             this.appMinHeight = maxHeight;
+        },
+        bindVar(item, varName) {
+            item.data = varName;
+        },
+        clearVar(item) {
+            this.$delete(item, 'data');
+        },
+        destroyWidget(index) {
+            // this.fileData.widget.splice(index, 1);
         }
     }
 }
@@ -150,6 +171,7 @@ export default {
         border: solid 1px #5d5d5d;
         box-shadow: 0 0 8px -2px #d0d0d0;
         border-radius: 5px;
+
         .drag_tip {
             position: absolute;
             font-family: 'iconfont';
@@ -165,6 +187,7 @@ export default {
             left: -31px;
             top: 0;
             cursor: move;
+
             &:hover {
                 box-shadow: 0 0 8px -1px #a3a3a3;
             }
@@ -181,6 +204,7 @@ export default {
             right: 0;
             bottom: 0;
             display: none;
+
             &:hover {
                 background: red;
             }
@@ -190,6 +214,7 @@ export default {
             .drag_tip {
                 display: block;
             }
+
             .drag_size {
                 display: block;
             }
@@ -206,6 +231,7 @@ export default {
             }
         }
     }
+
     .move_back {
         position: absolute;
         top: 0;
