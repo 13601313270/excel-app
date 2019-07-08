@@ -34,22 +34,20 @@
                 <div v-else-if="leftToolSelect=='widget22'"></div>
             </div>
             <div id="app_content" :class="{edit:isEditing}">
-                <div>
-                    <div
-                        v-if="appType && fileData.file_data"
-                        :is="appType"
-                        :dragDomFunc="dragDomFunc"
-                        :isFullScreen="isFullScreen"
-                        :dragDomFuncInfo="getWidgetInfoByName(dragDomFunc)"
-                        :fileData="fileData.file_data"
-                        :isEditing="isEditing"
-                        class="used-dashboard"
-                        @eval="eval"
-                        @saveVar="saveVar"
-                        @createVar="createVar"
-                        @editVar="editVar"
-                    ></div>
-                </div>
+                <div
+                    v-if="appType && fileData.file_data"
+                    :is="appType"
+                    :dragDomFunc="dragDomFunc"
+                    :isFullScreen="isFullScreen"
+                    :dragDomFuncInfo="getWidgetInfoByName(dragDomFunc)"
+                    :fileData="fileData.file_data"
+                    :isEditing="isEditing"
+                    class="used-dashboard"
+                    @eval="eval"
+                    @saveVar="saveVar"
+                    @createVar="createVar"
+                    @editVar="editVar"
+                ></div>
             </div>
             <div
                 class="right_tools_content"
@@ -462,16 +460,6 @@ export default {
             }
             this.save();
         },
-        destroyWidget(widget) {
-            console.log(widget);
-            let deleteWidgetIndex = this.fileData.file_data.widget.findIndex(item => {
-                return item === widget;
-            });
-            console.log(deleteWidgetIndex);
-            if (deleteWidgetIndex > -1) {
-                this.fileData.file_data.widget.splice(deleteWidgetIndex, 1);
-            }
-        },
         varHover(key, messageType) {
             this.varHighlightSet({key, 'info': messageType});
         },
@@ -672,7 +660,6 @@ export default {
         widgetEvent.on('editVar', this.editVar);
         widgetEvent.on('bindVarToWidget', this.bindVarToWidget);
         widgetEvent.on('clearVarOnWidget', this.clearVarOnWidget);
-        widgetEvent.on('destroy', this.destroyWidget);
 
         // 检测全屏
         this.setIntervalObj = setInterval(() => {

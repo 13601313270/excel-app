@@ -73,7 +73,6 @@ export default {
     data() {
         return {
             varName: this.data,
-            key: this.$vnode.key,
             isChooseExist: false,
             allVars: [],
             bindVar: null
@@ -110,25 +109,20 @@ export default {
             }
         },
         ondrop(e) {
-            // 如果没有设置key，则不允许拖拽widget，用来定义不可修改组件。反过来说，所有添加了key的widget可以拖拽组件
-            if(this.isRewrite) {
-                // 抬起鼠标dragDomFunc就会释放为null，这里弹窗将值保留住
-                this.setFunction(this.dragDomFunc);
-            }
+            // 抬起鼠标dragDomFunc就会释放为null，这里弹窗将值保留住
+            this.setFunction(this.dragDomFunc);
         },
         clickAdd() {
-            if(this.isRewrite && this.bindVar === null) {
+            if(this.bindVar === null) {
                 this.setFunction('TEXT');
             }
         },
         editVar() {
-            if(this.isRewrite) {
-                widgetEvent.emit('editVar', this.bindVar.name); // 被修改的变量名称
-            }
+            widgetEvent.emit('editVar', this.bindVar.name); // 被修改的变量名称
         },
         chooseExist() {
             this.isChooseExist = !this.isChooseExist;
-            if(this.isRewrite && this.isChooseExist) {
+            if(this.isChooseExist) {
                 let keys = [];
                 let allData_ = allVar.getAllData();
                 for (let key in allData_) {
@@ -148,25 +142,19 @@ export default {
             }
         },
         chooseExistItem(varName) {
-            if(this.isRewrite) {
-                this.bindVar = null;
-                widgetEvent.emit('bindVarToWidget', varName, this);
-                this.$emit('bindVar', varName);
-            }
+            this.bindVar = null;
+            widgetEvent.emit('bindVarToWidget', varName, this);
+            this.$emit('bindVar', varName);
         },
         clearVar() {
-            if(this.isRewrite) {
-                let varName = this.bindVar;
-                this.bindVar = null;
-                widgetEvent.emit('clearVarOnWidget', varName, this);
-                this.$emit('clearVar');
-            }
+            let varName = this.bindVar;
+            this.bindVar = null;
+            widgetEvent.emit('clearVarOnWidget', varName, this);
+            this.$emit('clearVar');
         },
         deleteWidget() {
-            if(this.isRewrite) {
-                widgetEvent.emit('destroy', this);
-                this.$emit('destroy');
-            }
+            widgetEvent.emit('destroy', this);
+            this.$emit('destroy');
         },
         // 绑定变量
         setBindVar(VarObj) {
@@ -206,7 +194,8 @@ export default {
             width: 100%;
             height: 100%;
             min-width: 40px;
-            min-height: 40px;
+            min-height: 30px;
+            box-sizing: border-box;
             /*display: inline-block;*/
         }
 

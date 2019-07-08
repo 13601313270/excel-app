@@ -145,7 +145,7 @@ __allMatch__.push({
         dataType: 'relationalModel'
     }],
     returnType: 'dom',
-    defaultSize: {
+    minSize: {
         width: 300,
         height: 200
     }

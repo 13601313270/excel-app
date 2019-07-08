@@ -33,7 +33,7 @@ export default {
     props: {
         fileData: Object,
         isEditing: Boolean,
-        dragDomFunc: Function,
+        dragDomFunc: String,
         dragDomFuncInfo: Object,
         isFullScreen: Boolean
     },
@@ -66,12 +66,12 @@ export default {
         dragover(e) {
             if(this.dragDomFuncInfo) {
                 this.isDragover = true;
-                let defaultWidth = this.dragDomFuncInfo.defaultSize ? this.dragDomFuncInfo.defaultSize.width : 100;
-                let defaultHeight = this.dragDomFuncInfo.defaultSize ? this.dragDomFuncInfo.defaultSize.height : 100;
+                let defaultWidth = this.dragDomFuncInfo.minSize ? this.dragDomFuncInfo.minSize.width : 100;
+                let defaultHeight = this.dragDomFuncInfo.minSize ? this.dragDomFuncInfo.minSize.height : 100;
                 this.seatStyle.left = parseInt(Math.max(e.offsetX - defaultWidth / 2, 10) / 10) * 10 + 'px';
-                this.seatStyle.width = parseInt(defaultWidth / 10) * 10 + 'px';
+                this.seatStyle.width = Math.ceil(defaultWidth / 10) * 10 + 'px';
                 this.seatStyle.top = parseInt(Math.max(e.offsetY - defaultHeight / 2, 10) / 10) * 10 + 'px';
-                this.seatStyle.height = parseInt(defaultHeight / 10) * 10 + 'px';
+                this.seatStyle.height = Math.ceil(defaultHeight / 10) * 10 + 'px';
             }
         },
         // 拖拽函数松鼠标
@@ -147,7 +147,7 @@ export default {
             this.$delete(item, 'data');
         },
         destroyWidget(index) {
-            // this.fileData.widget.splice(index, 1);
+            this.fileData.widget.splice(index, 1);
         }
     }
 }

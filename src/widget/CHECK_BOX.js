@@ -47,7 +47,7 @@ __allMatch__.push({
         }
     ],
     returnType: 'dom',
-    defaultSize: {
+    minSize: {
         width: 42,
         height: 26
     }

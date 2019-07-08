@@ -1,5 +1,5 @@
 <template>
-    <div @click="jjj" class="check">
+    <div @click="change" class="check">
         <div class="inner" :class="{active:isCheck}"></div>
     </div>
 </template>
@@ -14,7 +14,7 @@ export default {
         };
     },
     methods: {
-        jjj() {
+        change() {
             this.isCheck = !this.isCheck;
             this.$emit('input', this.isCheck);
             this.$emit('change', this.isCheck);

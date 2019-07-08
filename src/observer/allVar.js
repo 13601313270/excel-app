@@ -1,6 +1,7 @@
 import Dep from './dep';
 import Obj from './obj';
 import Var from './Var';
+
 class AllVarClass extends Dep {
     constructor() {
         super();
@@ -39,8 +40,10 @@ class AllVarClass extends Dep {
             varObj.dep.destory();
             delete varObj.dep;
             delete this.allData[key];
-            varEqualObj.dep.destory();
-            delete varEqualObj.dep;
+            if(varEqualObj.dep) {
+                varEqualObj.dep.destory();
+                delete varEqualObj.dep;
+            }
             return true;
         } else {
             return false;
@@ -51,4 +54,5 @@ class AllVarClass extends Dep {
         this.allData = {};
     }
 }
+
 export default new AllVarClass();
