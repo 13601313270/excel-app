@@ -15,7 +15,9 @@
                     v-for="item in writeColumnList"
                     @click="insertWrite(item)"
                     :key="item.id"
-                    size="mini">{{item.name}}</ui-button>
+                    size="mini"
+                    v-html="item.name"
+                ></ui-button>
             </div>
         </div>
         <!--<header-nav></header-nav>-->
@@ -73,7 +75,7 @@
                         <all-vars
                             @change="editVar"
                             :useCreateVar="useCreateVar"
-                            :varToWidget="varToWidget"
+                            :varToWidget="Object.keys(varToWidget)"
                             @hover="varHover"
                             @delete="deleteVar"
                         ></all-vars>
@@ -192,6 +194,7 @@ import axios from 'axios';
 import dynamicForm from './dynamicForm/form';
 // import { prompt } from './alert/prompt';
 import UiInput from './ui/input';
+
 axios.defaults.withCredentials = true;
 Vue.component(widget.name, widget);
 export default {
@@ -272,7 +275,7 @@ export default {
                 }
                 let pushProp = '';
                 if(item2.enum) {
-                    for (let j in item2.enum) {
+                    for(let j in item2.enum) {
                         pushProp = '"' + j + '"';
                         break;
                     }
@@ -295,14 +298,14 @@ export default {
                 // }
             });
             let temp2 = [];
-            for (let j = 0; j < propsArr.length; j++) {
+            for(let j = 0; j < propsArr.length; j++) {
                 if(typeof propsArr[j] === 'function') {
                     temp2.push(null);
                 } else {
                     temp2.push(getEvalObj(1, propsArr[j])[0]);
                 }
             }
-            for (let j = 0; j < propsArr.length; j++) {
+            for(let j = 0; j < propsArr.length; j++) {
                 if(typeof propsArr[j] === 'function') {
                     propsArr[j] = propsArr[j](temp2);
                     console.log(propsArr[j]);
@@ -330,7 +333,7 @@ export default {
         // 弹出修改某个变量的弹窗,changeDragDomFunc要修改成的变量
         createVar(varName, changeDragDomFunc) {
             let dragDomFunc;
-            if (changeDragDomFunc) {
+            if(changeDragDomFunc) {
                 dragDomFunc = changeDragDomFunc;
             }
             if(dragDomFunc === undefined) {
@@ -344,9 +347,6 @@ export default {
                 // 新加变量
                 let insertObj = getEvalObj(1, code);
                 allVar.setVar(varName, insertObj[0]);
-                // if (widgetId !== undefined || dom !== undefined || vueDom !== undefined) {
-                //     this.bindVarToWidget(varName, vueDom);
-                // }
                 // 弹出编辑变量的窗口
                 this.editVar(varName);
                 if(!this.useCreateVar.includes(varName)) {
@@ -358,48 +358,20 @@ export default {
         },
         // 给某个widget绑定数据
         bindVarToWidget(varName, widget) {
-            let newVar = allVar.getVar(varName);
-            widget.setBindVar(newVar);
-            if (newVar.value_.dom instanceof Array) {
-            } else {
-                // 用来设置变量映射dom
-                this.varToWidget[varName] = widget;
-            }
+            this.$set(this.varToWidget, varName, widget);
         },
         // 清除某个widget绑定的数据
         clearVarOnWidget(varName) {
             this.$delete(this.varToWidget, varName.name);
         },
-        // widget实例被创建，完成了数据初始化
-        widgetInit(varName, widget) {
-            if (allVar.getVar(varName)) { // 创建了一个widget，并且绑定了变量
-                this.varToWidget[varName] = widget;
-            } else { // 创建了一个widget，但是widget里面没有内容
-                this.save();
-            }
-        },
+
         // 通过变量对象，修改生成的code，并且修改对应的widget内容
         codeUpdate(editObj) {
             let editVarName = editObj.name;
             editObj.code = createCodeText(editObj.obj);
             if(editVarName !== undefined) {
-                let updateVar = allVar.getVar(editVarName);
                 let insertObj = getEvalObj(1, editObj.code);
                 allVar.setVar(editVarName, insertObj[0]);
-                let widgePanel = this.varToWidget[editVarName];
-                if(widgePanel !== undefined) {
-                    let value_ = updateVar.value_;
-                    if(value_ instanceof Obj) {
-                        if(value_.dom) {
-                            widgePanel.innerHTML = '';
-                            widgePanel.setBindVar(updateVar);
-                        } else {
-                            widgePanel.innerHTML = value_.value.toString();// 变量值可以直接赋予数字，字符串 布尔值
-                        }
-                    } else {
-                        widgePanel.innerHTML = value_.toString();// 变量值可以直接赋予数字，字符串 布尔值
-                    }
-                }
             }
             this.save();
         },
@@ -416,8 +388,12 @@ export default {
             let newObj = getOptionByObj(getEvalObj(1, code)[0]);
             // MIN(1,MIN(2,4),1)
             // 不能直接覆盖obj.obj，因为js是引用赋值
-            obj.obj.type = newObj.type;
-            obj.obj.props = newObj.props;
+            if(['boolean', 'number', 'string'].includes(typeof newObj)) {
+                obj.obj = newObj
+            } else {
+                obj.obj.type = newObj.type;
+                obj.obj.props = newObj.props;
+            }
             this.codeUpdate(obj);
             if(obj.parent !== undefined) {
                 obj.parent.emitChange();
@@ -487,7 +463,7 @@ export default {
             if(this.isEditing) {
                 let allData = allVar.getAllData();
                 let saveData = {};
-                for (let i in allData) {
+                for(let i in allData) {
                     if(this.useCreateVar.includes(i)) {
                         saveData[i] = getStrByObj(allData[i].value_);
                     }
@@ -556,10 +532,10 @@ export default {
                 param.append('data', JSON.stringify(data));
                 axios.put('http://www.tablehub.cn/action/mysql.html', param, config)
                     .then(data => {
-                        if (data.data === 1) {
+                        if(data.data === 1) {
                             Object.values(allVar.allData).forEach(item => {
-                                if (item.value_ instanceof relationalModel) {
-                                    if (parseInt(item.value_.props[0]) === parseInt(column.id)) {
+                                if(item.value_ instanceof relationalModel) {
+                                    if(parseInt(item.value_.props[0]) === parseInt(column.id)) {
                                         item.value_.dep.update();
                                     }
                                 }
@@ -654,7 +630,6 @@ export default {
             return '<widget random-id="r' + parseInt(Math.random() * 1000000) + '"' + b;
         });
 
-        widgetEvent.on('init', this.widgetInit);
         widgetEvent.on('createVar', this.createVar);
         widgetEvent.on('editVar', this.editVar);
         widgetEvent.on('bindVarToWidget', this.bindVarToWidget);
@@ -720,25 +695,31 @@ export default {
         min-width: 130px;
         display: flex;
         flex-direction: column;
+
         .head {
             background-color: #e6e6e6;
             padding: 3px;
             display: flex;
             align-items: center;
+
             > * {
                 margin-right: 10px;
             }
+
             .write_column {
                 display: inherit;
+
                 > * {
                     margin-right: 5px;
                 }
             }
         }
+
         .app_page {
             display: flex;
             width: 100%;
             flex-grow: 1;
+
             .left_tools {
                 width: 24px;
                 flex-shrink: 0;
@@ -747,6 +728,7 @@ export default {
                 color: #d9d9d9;
                 border-right: solid 1px #4f4f4f;
                 padding-top: 1px;
+
                 > * {
                     word-wrap: break-word;
                     margin: 0 1px 2px 0;
@@ -756,21 +738,25 @@ export default {
                     cursor: default;
                     line-height: 18px;
                     color: #b1b1b1;
+
                     &.active {
                         background: #333333;
                         margin-right: -1px;
                         color: white;
                         border: solid 1px #4f4f4f;
                         border-right: none;
+
                         &:hover {
                             box-shadow: none;
                         }
                     }
+
                     &:hover {
                         box-shadow: inset 2px 0 5px 0 #717171;
                     }
                 }
             }
+
             .left_tools_content {
                 width: 200px;
                 min-width: 100px;
@@ -781,23 +767,28 @@ export default {
                 color: #999;
                 flex-shrink: 0;
             }
+
             #app_content {
                 flex-grow: 1;
                 // display: flex;
                 flex-direction: column;
                 overflow: scroll;
                 background-color: grey;
+
                 &.edit {
                     padding: 32px;
+
                     > div {
                         box-shadow: 0 0 20px 0 #4f4f4f;
                     }
                 }
+
                 .used-dashboard {
                     position: relative;
                     min-height: 100%;
                     // overflow: hidden;一定不能加，悬浮tip无法显示
                 }
+
                 > div {
                     /*flex-grow: 1;*/
                     display: inline-block;
@@ -809,6 +800,7 @@ export default {
                     height: 100%;
                 }
             }
+
             .right_tools_content {
                 width: 200px;
                 min-width: 100px;
@@ -817,6 +809,7 @@ export default {
                 flex-shrink: 0;
                 overflow: auto;
             }
+
             .right_tools {
                 width: 24px;
                 flex-shrink: 0;
@@ -825,6 +818,7 @@ export default {
                 color: #d9d9d9;
                 border-left: solid 1px #4f4f4f;
                 padding-top: 1px;
+
                 > * {
                     word-wrap: break-word;
                     margin: 0 1px 2px 0;
@@ -835,16 +829,19 @@ export default {
                     line-height: 18px;
                     color: #b1b1b1;
                     user-select: none;
+
                     &.active {
                         background: #333333;
                         margin-left: -1px;
                         color: white;
                         border: solid 1px #4f4f4f;
                         border-left: none;
+
                         &:hover {
                             box-shadow: none;
                         }
                     }
+
                     &:hover {
                         box-shadow: inset -2px 0px 5px 0px #717171;
                     }
@@ -863,12 +860,14 @@ export default {
         justify-content: center;
         align-items: center;
         background-color: rgba(103, 103, 103, 0.59);
+
         > div {
             background-color: white;
             border-radius: 5px;
             padding: 5px;
             position: relative;
             overflow: hidden;
+
             .close_button {
                 position: absolute;
                 right: 0;
@@ -879,6 +878,7 @@ export default {
                 border-radius: 0 0 0 4px;
                 width: 30px;
                 cursor: pointer;
+
                 &:hover {
                     background-color: #d76327;
                     color: white;

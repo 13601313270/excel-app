@@ -46,7 +46,7 @@ export default {
             type: Array
         },
         varToWidget: {
-            type: Object
+            type: Array
         }
     },
     data() {
@@ -90,7 +90,7 @@ export default {
         varUseState(key) {
             // item.dep.sentEvent 指向 变量对应的计算公式的Dep
             // 所有VarSentDep需要通知的对象
-            if (Object.keys(this.varToWidget).includes(key)) {
+            if (this.varToWidget.includes(key)) {
                 return '已渲染';
             }
             if (!this.useCreateVar.includes(key)) {

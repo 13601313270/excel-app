@@ -15,12 +15,12 @@
             <app-button size="mini" @click="deleteWidget">删除</app-button>
         </div>
         <div
-                class="widget_content"
-                :class="{warning:getHighlightState==='info'}"
-                ref="content"
-                @dragover="allowDrop($event)"
-                @drop.stop="ondrop($event)"
-                @click="clickAdd"
+            class="widget_content"
+            :class="{warning:getHighlightState==='info'}"
+            ref="content"
+            @dragover="allowDrop($event)"
+            @drop.stop="ondrop($event)"
+            @click="clickAdd"
         >
             <template v-if="bindVar">
                 <tempVueClass v-if="bindVar.value_.dom" :initProps="bindVar.value_.dom"></tempVueClass>
@@ -33,8 +33,8 @@
 import widgetEvent from './widgetChange';
 import appButton from './ui/button.vue';
 import dropList from './ui/dropList.vue';
-import {mapGetters, mapActions} from 'vuex';
-import {prompt} from './alert/prompt';
+import { mapGetters, mapActions } from 'vuex';
+import { prompt } from './alert/prompt';
 import allVar from '../observer/allVar';
 import allMatch from '../languageParser/allMatch';
 
@@ -80,13 +80,7 @@ export default {
     },
     mounted() {
         let varName = this.data;
-        widgetEvent.emit('init', varName, this);
-
-        let initVar = allVar.getVar(varName);
-        if(initVar) {
-            this.setBindVar(initVar);
-        }
-        // this.$emit('init', varName, this); // 暴露给开发者的，系统没有用到
+        this.setBindVar(varName);
     },
     methods: {
         ...mapActions('main', ['setDragDomFunc']),
@@ -109,7 +103,7 @@ export default {
                         // 创建变量
                         widgetEvent.emit('createVar', varName, dragDomFunc);
                         // 绑定变量到本widget
-                        widgetEvent.emit('bindVarToWidget', varName, this);
+                        this.setBindVar(varName);
                         this.$emit('bindVar', varName, this);
                     }
                 });
@@ -132,7 +126,7 @@ export default {
             if(this.isChooseExist) {
                 let keys = [];
                 let allData_ = allVar.getAllData();
-                for (let key in allData_) {
+                for(let key in allData_) {
                     let val = allData_[key];
                     if(val.value_ !== undefined) {
                         let matchItem = allMatch.find(item => {
@@ -150,7 +144,7 @@ export default {
         },
         chooseExistItem(varName) {
             this.bindVar = null;
-            widgetEvent.emit('bindVarToWidget', varName, this);
+            this.setBindVar(varName);
             this.$emit('bindVar', varName);
         },
         clearVar() {
@@ -163,15 +157,18 @@ export default {
             widgetEvent.emit('destroy', this);
             this.$emit('destroy');
         },
-        // 绑定变量，app.vue 会在 bindVarToWidget 的时候调用
-        setBindVar(VarObj) {
-            this.bindVar = VarObj;
-            this.$nextTick(() => {
-                // 有一些变量绑定的是数字，字符串等基础类型，没有reRender
-                if(this.bindVar.value_.reRender) {
-                    this.bindVar.value_.reRender();
-                }
-            });
+        setBindVar(varName) {
+            widgetEvent.emit('bindVarToWidget', varName, this);
+            let VarObj = allVar.getVar(varName);
+            if(VarObj) {
+                this.bindVar = VarObj;
+                this.$nextTick(() => {
+                    // 有一些变量绑定的是数字，字符串等基础类型，没有reRender
+                    if(this.bindVar.value_.reRender) {
+                        this.bindVar.value_.reRender();
+                    }
+                });
+            }
         }
     },
     computed: {
