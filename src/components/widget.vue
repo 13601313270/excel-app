@@ -1,5 +1,5 @@
 <template>
-    <div class="widget">
+    <div class="widget" ref="out">
         <div class="head_tool" v-if="isEditing">
             <template v-if="bindVar!==null">
                 <app-button size="mini" @click="editVar">编辑</app-button>
@@ -23,7 +23,7 @@
             @click="clickAdd"
         >
             <template v-if="bindVar">
-                <tempVueClass v-if="bindVar.value_.dom" :initProps="bindVar.value_.dom"></tempVueClass>
+                <tempVueClass v-if="bindVar.value_.dom" :initProps="bindVar.value_.dom" :size="size"></tempVueClass>
                 <div v-else v-html="bindVar.value_"></div>
             </template>
         </div>
@@ -40,23 +40,44 @@ import allMatch from '../languageParser/allMatch';
 
 let tempVueClass = {
     props: {
-        initProps: [Array, HTMLDivElement]
+        initProps: [Array, HTMLDivElement],
+        size: Object
     },
     render(createElement) {
         if(this.initProps instanceof HTMLDivElement) {
             let innerDom = this.initProps;
             return createElement({
+                props: {size: Object},
                 mounted() {
                     this.$refs.inner.innerHTML = '';
                     this.$refs.inner.appendChild(innerDom);
+                    this.$refs.inner.style.fontSize = this.size.height * 0.5 + 'px';
                 },
-                template: `<div ref="inner" style="height:100%">111</div>`
+                template: `<div ref="inner" class="text" :style="{fontSize:Math.min(size.height,size.width) * 0.5 + 'px'}"></div>`
+            }, {
+                props: {size: this.size}
             });
         } else {
             return createElement(this.initProps[0], {
+                ref: 'inner',
                 props: this.initProps[1],
                 on: this.initProps[2]
             })
+        }
+    },
+    mounted() {
+        if(this.$refs.inner && this.$refs.inner.resize) {
+            this.$refs.inner.resize(this.size);
+        }
+    },
+    watch: {
+        size: {
+            handler(size) {
+                if(this.$refs.inner && this.$refs.inner.resize) {
+                    this.$refs.inner.resize(size);
+                }
+            },
+            deep: true
         }
     }
 };
@@ -75,12 +96,18 @@ export default {
             varName: this.data,
             isChooseExist: false,
             allVars: [],
-            bindVar: null
+            bindVar: null,
+            size: {
+                width: 0,
+                height: 0
+            }
         };
     },
     mounted() {
         let varName = this.data;
         this.setBindVar(varName);
+        this.size.width = this.$refs.out.clientWidth;
+        this.size.height = this.$refs.out.clientHeight;
     },
     methods: {
         ...mapActions('main', ['setDragDomFunc']),
@@ -169,6 +196,12 @@ export default {
                     }
                 });
             }
+        },
+        resize() {
+            this.$nextTick(() => {
+                this.size.width = this.$refs.out.clientWidth;
+                this.size.height = this.$refs.out.clientHeight;
+            });
         }
     },
     computed: {
@@ -192,6 +225,10 @@ export default {
         .warning {
             background-color: rgb(241, 124, 101);
             box-shadow: inset 0 0 3px 1px #ffffff;
+
+            /deep/ input {
+                background-color: rgba(255, 255, 255, 0.21);
+            }
         }
 
         .widget_content {
@@ -200,7 +237,14 @@ export default {
             min-width: 40px;
             min-height: 30px;
             box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             /*display: inline-block;*/
+
+            .text {
+                /*color:red;*/
+            }
         }
 
         .head_tool {
@@ -239,10 +283,5 @@ export default {
                 display: block;
             }
         }
-    }
-</style>
-<style>
-    .warning input {
-        background-color: rgba(255, 255, 255, 0.21);
     }
 </style>

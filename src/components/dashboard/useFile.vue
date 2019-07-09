@@ -1,9 +1,9 @@
 <template>
     <div
-            @dragover.prevent.self="dragover"
-            @drop="ondrop"
-            @dragleave="isDragover = false"
-            :style="{width: (appMinWidth+20) + 'px',height: (appMinHeight+20) + 'px'}"
+        @dragover.prevent.self="dragover"
+        @drop="ondrop"
+        @dragleave="isDragover = false"
+        :style="{width: (appMinWidth+20) + 'px',height: (appMinHeight+20) + 'px'}"
     >
         <div>文件保存</div>
         <div :style="seatStyle" v-show="isDragover" class="droging-seat"></div>
@@ -13,6 +13,7 @@
         <div class="widget_content" v-for="(item,key) in fileData.widget" :style="item.style">
             <div class="drag_tip" v-if="isEditing" @mousedown.prevent="moveId = item">&#xe656;</div>
             <widget
+                ref="widget"
                 :data="item.data"
                 class="widget"
                 :class="{light:dragDomFunc}"
@@ -25,7 +26,7 @@
     </div>
 </template>
 <script>
-import {prompt} from '../alert/prompt';
+import { prompt } from '../alert/prompt';
 import cloneUtils from '../clone.utils';
 
 export default {
@@ -110,11 +111,12 @@ export default {
         },
         // 拖拽widge尺寸或大小结束
         mouseup() {
-            let widget = this.fileData.widget.find(item => {
+            let widgetIndex = this.fileData.widget.findIndex(item => {
                 return item === (this.moveId || this.sizeId);
             });
-            if(widget) {
-                this.$set(widget, 'style', Object.assign({}, this.seatStyle));
+            if(widgetIndex > -1) {
+                this.$set(this.fileData.widget[widgetIndex], 'style', Object.assign({}, this.seatStyle));
+                this.$refs.widget[widgetIndex].resize();
             }
             this.isDragover = false;
             this.moveId = null;
@@ -167,7 +169,7 @@ export default {
 
     .widget_content {
         position: absolute;
-        border: solid 1px #5d5d5d;
+        border: solid 1px #bcbcbc;
         box-shadow: 0 0 8px -2px #d0d0d0;
         border-radius: 5px;
 

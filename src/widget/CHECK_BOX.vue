@@ -1,5 +1,5 @@
 <template>
-    <div @click="change" class="check">
+    <div @click="change" class="check" :style="{width:width+'px',height:width/2+4+'px',borderRadius:width/2+'px'}">
         <div class="inner" :class="{active:isCheck}"></div>
     </div>
 </template>
@@ -10,7 +10,8 @@ export default {
     },
     data() {
         return {
-            isCheck: this.value
+            isCheck: this.value,
+            width: 60
         };
     },
     methods: {
@@ -18,6 +19,9 @@ export default {
             this.isCheck = !this.isCheck;
             this.$emit('input', this.isCheck);
             this.$emit('change', this.isCheck);
+        },
+        resize(size) {
+            this.width = Math.min(size.width, (size.height - 4) * 2) - 8;
         }
     },
     watch: {
@@ -35,17 +39,19 @@ export default {
         display: inline-block;
         height: 24px;
         position: relative;
+
         .inner {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 50%;
+            height: calc(100% - 4px);
             background-color: gray;
             border-radius: 50%;
             top: 2px;
             left: 2px;
             transition: left .3s, background-color .5s;
+
             &.active {
-                left: 18px;
+                left: calc(50% - 2px);
                 background-color: #378070;
             }
         }
