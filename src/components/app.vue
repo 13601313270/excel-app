@@ -365,7 +365,6 @@ export default {
                 // 用来设置变量映射dom
                 this.varToWidget[varName] = widget;
             }
-            this.save();
         },
         // 清除某个widget绑定的数据
         clearVarOnWidget(varName) {

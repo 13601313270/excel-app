@@ -13,13 +13,12 @@
         <div class="widget_content" v-for="(item,key) in fileData.widget" :style="item.style">
             <div class="drag_tip" v-if="isEditing" @mousedown.prevent="moveId = item">&#xe656;</div>
             <widget
-                    :key="item.id"
-                    :data="item.data"
-                    class="widget"
-                    :class="{light:dragDomFunc}"
-                    @bindVar="bindVar(item, ...arguments)"
-                    @clearVar="clearVar(item)"
-                    @destroy="destroyWidget(key)"/>
+                :data="item.data"
+                class="widget"
+                :class="{light:dragDomFunc}"
+                @bindVar="bindVar(item, ...arguments)"
+                @clearVar="clearVar(item)"
+                @destroy="destroyWidget(key)"/>
             <div class="drag_size" v-if="isEditing" @mousedown="sizeId = item"></div>
         </div>
         <div v-if="moveId || sizeId" class="move_back" @mousemove="mousemove" @mouseup="mouseup"></div>

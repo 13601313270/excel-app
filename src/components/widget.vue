@@ -95,7 +95,14 @@ export default {
         },
         setFunction(dragDomFunc) {
             if(this.isEditing) {
-                prompt('请输入名称', dragDomFunc + '7').then((varName) => {
+                prompt('请输入名称', dragDomFunc + '7', (varName) => {
+                    varName = '$' + varName.replace(/^\$/, '');
+                    let initVar = allVar.getVar(varName);
+                    if(initVar) {
+                        return '变量已存在';
+                    }
+                    return true;
+                }).then((varName) => {
                     if(varName !== null && varName !== '') {
                         this.setDragDomFunc(dragDomFunc);
                         varName = '$' + varName.replace(/^\$/, '');
@@ -156,7 +163,7 @@ export default {
             widgetEvent.emit('destroy', this);
             this.$emit('destroy');
         },
-        // 绑定变量
+        // 绑定变量，app.vue 会在 bindVarToWidget 的时候调用
         setBindVar(VarObj) {
             this.bindVar = VarObj;
             this.$nextTick(() => {

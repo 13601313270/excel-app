@@ -43,7 +43,6 @@
         flex-direction: row;
         align-items: center;
         .inner {
-            height: 100%;
         }
 
 
