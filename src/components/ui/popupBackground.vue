@@ -16,6 +16,7 @@ export default {
 <style scoped lang="less">
     .popup_background {
         position: fixed;
+        z-index: 100;
         width: 100%;
         height: 100%;
         left: 0;

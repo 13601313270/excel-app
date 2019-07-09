@@ -2,137 +2,214 @@
     <div
         style="position: relative;height: 100%;overflow: auto;width: 100%;"
     >
-        <div>
-            <div @click="fullScreen">全屏</div>
-        </div>
         <div
             style="position:absolute;top:20px;left:0;height: 100%;overflow: auto;width: 100%;z-index: 1;display: flex;">
             <div style="overflow: auto;">
                 <div
-                    v-for="(item,index) in data"
-                    @click="selectPage=index"
+                    v-for="index in fileData.widget.length"
+                    @click="selectPage=index-1"
                     class="page"
-                    :class="{active:selectPage==index}">
+                    :class="{active:selectPage===index-1}">
                 </div>
-                <div class="page" style="height:30px;" @click="data.push([])">+</div>
+                <div class="page" style="height:30px;" @click="fileData.widget.push([])">+</div>
             </div>
-            <div :class="{'full-screen':isFullScreen}">
+            <div :class="{'full-screen':isFullScreen}" style="position: relative">
                 <div
-                    v-for="(item,pageIndex) in data"
-                    @drop="addData($event,pageIndex)"
+                    v-for="(pageInfo,pageIndex) in fileData.widget"
+                    @drop="addData"
+                    @dragleave="isDragover = false"
                     v-show="selectPage===pageIndex"
-                    @dragover="$event.preventDefault()"
+                    @dragover.prevent.self="dragover"
                     style="width:600px;height:450px;border: solid 1px black;position: relative;">
-                    <div
-                        v-if="drag"
-                        @mouseup="drag=false"
-                        @mouseleave="drag=false"
-                        @mousemove.self="mousemove($event,pageIndex)"
-                        style="position:absolute;top:0;left:0;width: 100%;height:100%;background-color: rgba(255,0,0,0);z-index: 2;"></div>
-                    <template v-for="(item,index) in data[pageIndex]">
+                    <template v-for="(item,index) in pageInfo">
                         <div
                             :ref="'widgetContent'+item.randomId"
                             class="widget-panel"
-                            style="position:absolute;"
-                            :style="{left:item.style.x+'px',top:item.style.y+'px'}"
-                            @mousedown.self="mousedown(index)"
+                            :style="item.style"
                         >
+                            <div class="drag_tip" v-if="isEditing" @mousedown.prevent="moveId = item">&#xe656;</div>
                             <widget
                                 class="widget"
+                                :ref="'page'+pageIndex"
                                 contenteditable="false"
                                 :data="item.data"
                                 :random-id="item.randomId"
-                                :ref="item.randomId"
                             ></widget>
+                            <div class="drag_size" v-if="isEditing" @mousedown="sizeId = item"></div>
                         </div>
                     </template>
+                    <div v-if="moveId || sizeId" class="move_back" @mousemove="mousemove" @mouseup="mouseup"></div>
                 </div>
+                <div :style="seatStyle" v-show="isDragover" class="droging-seat"></div>
             </div>
         </div>
     </div>
 </template>
 <script>
-import widget from '../widget.vue';
+import { prompt } from '../alert/prompt';
+import cloneUtils from '../clone.utils';
+
 export default {
-    props: ['dragDomFunc'],
+    props: {
+        fileData: Object,
+        isEditing: Boolean,
+        dragDomFunc: String,
+        dragDomFuncInfo: Object,
+        isFullScreen: Boolean
+    },
     data() {
         return {
+            // 拖拽占位尺寸
+            seatStyle: {
+                left: 0,
+                top: 0,
+                width: 10,
+                height: 10
+            },
+            isDragover: false, // 正在拖拽函数进入dashboard
+            moveId: null,
+            sizeId: null,
+            // adsf
             drag: false,
-            dragObjIndex: -1,
-            selectPage: 0,
-            data: [[], [], []],
-            isFullScreen: false,
-            setIntervalObj: null
+            selectPage: 0
         };
     },
     mounted() {
-        this.setIntervalObj = setInterval(() => {
-            console.log(1);
-            if(this.isFullscreen() === false) {
-                this.isFullScreen = false;
-            }
-        }, 1000);
+        if(this.fileData.widget === undefined) {
+            this.$set(this.fileData, 'widget', [[]]);
+        }
+        console.log(this.fileData);
     },
     methods: {
-        mousedown(index) {
-            this.dragObjIndex = index;
-            this.drag = true;
-            console.log(1);
-        },
-        mousemove(e, pageIndex) {
-            if(this.drag) {
-                this.data[pageIndex][this.dragObjIndex].style.x = e.offsetX;
-                this.data[pageIndex][this.dragObjIndex].style.y = e.offsetY;
+        // 拖拽widge尺寸或大小
+        mousemove(e) {
+            let widget = this.fileData.widget[this.selectPage].find(item => {
+                return item === (this.moveId || this.sizeId);
+            });
+            this.isDragover = true;
+            if(this.moveId !== null) {
+                this.seatStyle.left = parseInt(Math.max(e.offsetX, 10) / 10) * 10 + 'px';
+                this.seatStyle.width = parseInt(parseInt(widget.style.width) / 10) * 10 + 'px';
+                this.seatStyle.top = parseInt(Math.max(e.offsetY, 10) / 10) * 10 + 'px';
+                this.seatStyle.height = parseInt(parseInt(widget.style.height) / 10) * 10 + 'px';
+            } else if(this.sizeId !== null) {
+                this.seatStyle.left = widget.style.left;
+                this.seatStyle.width = parseInt(e.offsetX / 10) * 10 - parseInt(widget.style.left) + 'px';
+                this.seatStyle.top = widget.style.top;
+                this.seatStyle.height = parseInt(e.offsetY / 10) * 10 - parseInt(widget.style.top) + 'px';
             }
         },
-        addData(e, index) {
-            console.log(e);
-            let randomId = 'r' + parseInt(Math.random() * 1000000);
-            let varName = window.prompt('请输入名称', 'a7');
-            if(varName !== null) {
-                varName = '$' + varName.replace(/^\$/, '');
-                this.data[index].push({
-                    data: varName,
-                    randomId: randomId,
-                    style: {
-                        x: e.offsetX,
-                        y: e.offsetY
-                    }
-                });
-                if(varName !== null) {
-                    this.$nextTick(() => {
-                        this.$emit('createVar', varName);
+        // 拖拽widge尺寸或大小结束
+        mouseup() {
+            let widgetIndex = this.fileData.widget[this.selectPage].findIndex(item => {
+                return item === (this.moveId || this.sizeId);
+            });
+            if(widgetIndex > -1) {
+                console.log(this.selectPage);
+                console.log(widgetIndex);
+                this.$set(this.fileData.widget[this.selectPage][widgetIndex], 'style', Object.assign({}, this.seatStyle));
+                this.$refs['page' + this.selectPage][widgetIndex].resize();
+            }
+            this.isDragover = false;
+            this.moveId = null;
+            this.sizeId = null;
+        },
+        // 拖拽函数过程中
+        dragover(e) {
+            if(this.dragDomFuncInfo) {
+                this.isDragover = true;
+                let defaultWidth = this.dragDomFuncInfo.minSize ? this.dragDomFuncInfo.minSize.width : 100;
+                let defaultHeight = this.dragDomFuncInfo.minSize ? this.dragDomFuncInfo.minSize.height : 100;
+                this.seatStyle.left = parseInt(Math.max(e.offsetX - defaultWidth / 2, 10) / 10) * 10 + 'px';
+                this.seatStyle.width = Math.ceil(defaultWidth / 10) * 10 + 'px';
+                this.seatStyle.top = parseInt(Math.max(e.offsetY - defaultHeight / 2, 10) / 10) * 10 + 'px';
+                this.seatStyle.height = Math.ceil(defaultHeight / 10) * 10 + 'px';
+            }
+        },
+        addData() {
+            this.isDragover = false;
+            let dragDomFunc = this.dragDomFunc;
+            prompt('请输入名称', dragDomFunc + '7').then((varName) => {
+                if(varName !== null && varName !== '') {
+                    varName = '$' + varName.replace(/^\$/, '');
+                    // 创建变量
+                    this.$emit('createVar', varName, dragDomFunc);
+                    this.fileData.widget[this.selectPage].push({
+                        data: varName,
+                        style: cloneUtils.deep(this.seatStyle)
                     });
                 }
-            }
-        },
-        fullScreen() {
-            this.isFullScreen = true;
-            let el = document.documentElement;
-            let rfs = el.requestFullScreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-            if(typeof rfs !== 'undefined' && rfs) {
-                rfs.call(el);
-            }
-        },
-        isFullscreen() {
-            return document.fullscreenElement ||
-                document.msFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.webkitFullscreenElement || false;
+            });
         }
-    },
-    beforeDestroy() {
-        clearInterval(this.setIntervalObj);
-    },
-    components: {
-        widget
     }
 }
 </script>
 <style scoped lang="less">
     .widget-panel {
-        border: solid 1px black;
-        padding: 5px;
+        position:absolute;
+        border: solid 1px #bcbcbc;
+        box-shadow: 0 0 8px -2px #d0d0d0;
+        border-radius: 5px;
+        box-sizing: border-box;
+
+        .drag_tip {
+            position: absolute;
+            font-family: 'iconfont';
+            display: none;
+            z-index: 999999;
+            font-size: 30px;
+            border: solid 1px grey;
+            background-color: #e7e7e7;
+            border-radius: 2px;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            left: -31px;
+            top: 0;
+            cursor: move;
+
+            &:hover {
+                box-shadow: 0 0 8px -1px #a3a3a3;
+            }
+        }
+
+        .drag_size {
+            width: 0;
+            height: 0;
+            border-right: solid 10px black;
+            border-top: solid 10px white;
+            position: absolute;
+            background: black;
+            cursor: nwse-resize;
+            right: 0;
+            bottom: 0;
+            display: none;
+
+            &:hover {
+                background: red;
+            }
+        }
+
+        &:hover {
+            .drag_tip {
+                display: block;
+            }
+
+            .drag_size {
+                display: block;
+            }
+        }
+
+        .widget {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+
+            &.light {
+                border: solid 1px red;
+            }
+        }
     }
 
     .page {
@@ -141,6 +218,7 @@ export default {
         margin: 10px;
         border: solid 1px black;
         cursor: pointer;
+
         &.active {
             box-shadow: #a4a9ff 0 0 1px 3px;
         }
@@ -153,5 +231,27 @@ export default {
         right: 0;
         bottom: 0;
         background-color: white;
+    }
+
+    .move_back {
+        position: absolute;
+        /*background-color: rgba(255, 0, 0, 0.24);*/
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .droging-seat {
+        position: absolute;
+        z-index: 9999999;
+        min-width: 10px;
+        min-height: 10px;
+        background-color: rgba(75, 129, 148, 0.25);
+        pointer-events: none;
+        border: dashed 1px #4a6679;
+        -webkit-box-shadow: 0 5px 5px 3px #bfbfbf;
+        box-shadow: 0 5px 5px 0px #50505069;
+        border-radius: 4px;
     }
 </style>

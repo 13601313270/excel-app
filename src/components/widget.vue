@@ -40,7 +40,7 @@ import allMatch from '../languageParser/allMatch';
 
 let tempVueClass = {
     props: {
-        initProps: [Array, HTMLDivElement],
+        initProps: [Array, HTMLDivElement, HTMLInputElement],
         size: Object
     },
     render(createElement) {

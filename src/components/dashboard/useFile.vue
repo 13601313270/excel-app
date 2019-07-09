@@ -9,7 +9,7 @@
         <div :style="seatStyle" v-show="isDragover" class="droging-seat"></div>
         <div></div>
         <!--<widget saveId="sf"></widget>-->
-        <widget data="$bbb" style="margin-left: 10px;"></widget>
+        <widget data="$bbb" style="margin-left: 10px;width: 200px;"></widget>
         <div class="widget_content" v-for="(item,key) in fileData.widget" :style="item.style">
             <div class="drag_tip" v-if="isEditing" @mousedown.prevent="moveId = item">&#xe656;</div>
             <widget
@@ -172,6 +172,7 @@ export default {
         border: solid 1px #bcbcbc;
         box-shadow: 0 0 8px -2px #d0d0d0;
         border-radius: 5px;
+        box-sizing: border-box;
 
         .drag_tip {
             position: absolute;
